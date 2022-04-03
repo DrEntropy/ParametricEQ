@@ -4,6 +4,7 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="tXb9LF" name="FilterInfo.h" compile="0" resource="0" file="Source/FilterInfo.h"/>
       <FILE id="YwiiMC" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="IGcODe" name="PluginProcessor.h" compile="0" resource="0"
