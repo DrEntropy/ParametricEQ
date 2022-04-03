@@ -12,11 +12,10 @@
 
 
 
-class FilterParametersBase
+struct FilterParametersBase
 {
-public:
-    float frequency;
-    bool bypassed;
-    float quality;
-    double sampleRate;
+    float frequency {1000.f};
+    bool bypassed {false};
+    float quality {1.0f};
+    double sampleRate {20000.0};
 };

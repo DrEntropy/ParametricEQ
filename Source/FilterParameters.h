@@ -13,9 +13,8 @@
 #include "FilterParametersBase.h"
 #include "FilterInfo.h"
 
-class FilterParameters : public FilterParametersBase
+struct FilterParameters :  FilterParametersBase
 {
-public:
-    FilterInfo::FilterType filterType;
-    float gain;
+    FilterInfo::FilterType filterType {FilterInfo::FilterType::LowPass};
+    float gain {0.f};
 };
