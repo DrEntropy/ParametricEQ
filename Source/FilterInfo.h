@@ -13,9 +13,11 @@
 #include <map>
 #include <JuceHeader.h>
 
-namespace FilterInfo {
+namespace FilterInfo
+{
 
-    enum FilterType {
+   enum class FilterType
+   {
         FirstOrderLowPass,
         FirstOrderHighPass,
         FirstOrderAllPass,
@@ -30,18 +32,20 @@ namespace FilterInfo {
     };
 
    const std::map<FilterType,juce::String>  filterToString
-          {   {FirstOrderLowPass, "First Order Low Pass"},
-              {FirstOrderHighPass,"First Order High Pass"},
-              {FirstOrderAllPass,"First Order All Pass"},
-              {LowPass, "Low Pass"},
-              {HighPass,"High Pass"},
-              {BandPass,"Band Pass"},
-              {Notch, "Notch"},
-              {AllPass, "All Pass"},
-              {LowShelf, "Low Shelf"},
-              {HighShelf, "High Shelf"},
-              {PeakFilter, "Peak Filter"}
-          };
+   {
+              {FilterType::FirstOrderLowPass, "First Order Low Pass"},
+              {FilterType::FirstOrderHighPass,"First Order High Pass"},
+              {FilterType::FirstOrderAllPass,"First Order All Pass"},
+              {FilterType::LowPass, "Low Pass"},
+              {FilterType::HighPass,"High Pass"},
+              {FilterType::BandPass,"Band Pass"},
+              {FilterType::Notch, "Notch"},
+              {FilterType::AllPass, "All Pass"},
+              {FilterType::LowShelf, "Low Shelf"},
+              {FilterType::HighShelf, "High Shelf"},
+              {FilterType::PeakFilter, "Peak Filter"}
+       
+   };
 
 
 }
