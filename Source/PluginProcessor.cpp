@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "ParameterHelpers.h"
 
 //==============================================================================
 ParametricEQAudioProcessor::ParametricEQAudioProcessor()
@@ -166,7 +167,8 @@ bool ParametricEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 {
-    return new ParametricEQAudioProcessorEditor (*this);
+   // return new ParametricEQAudioProcessorEditor (*this);
+    return new  juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -188,4 +190,29 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ParametricEQAudioProcessor();
+}
+
+
+
+juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(GainParamString(0),GainParamString(0),
+                                        juce::NormalisableRange<float>(-24.f, 24.f,0.5f,1.0f), 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterBool>(BypassParamString(0),BypassParamString(0),false) );
+    
+    return layout;
+    
+//    juce::String GainParamString(int filterNum);
+//
+//    juce::String QParamString(int filterNum);
+//
+//    juce::String FreqParamString(int filterNum);
+//
+//    juce::String BypassParamString(int filterNum);
+//
+//    juce::String TypeParamString(int filterNum);
+
 }
