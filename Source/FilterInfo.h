@@ -31,7 +31,7 @@ namespace FilterInfo
         PeakFilter
     };
 
-   const std::map<FilterType,juce::String>  filterToString
+   const std::map<FilterType,juce::String>  mapFilterTypeToString
    {
               {FilterType::FirstOrderLowPass, "First Order Low Pass"},
               {FilterType::FirstOrderHighPass,"First Order High Pass"},

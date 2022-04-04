@@ -9,11 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-
-// Including here just to force compile
-#include "FilterInfo.h"
-#include "FilterParameters.h"
-#include "HighCutLowCutParameters.h"
+ 
 
 
 //==============================================================================
@@ -58,8 +54,14 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    // =========================================================================
+    
+    juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 };

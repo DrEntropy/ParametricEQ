@@ -9,6 +9,13 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include "ParameterHelpers.h"
+#include "FilterInfo.h"
+#include "FilterParameters.h"
+#include "HighCutLowCutParameters.h"
+ 
+#include <string>
+
 //==============================================================================
 ParametricEQAudioProcessor::ParametricEQAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -166,7 +173,8 @@ bool ParametricEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 {
-    return new ParametricEQAudioProcessorEditor (*this);
+   // return new ParametricEQAudioProcessorEditor (*this);
+    return new  juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -188,4 +196,39 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ParametricEQAudioProcessor();
+}
+
+
+
+juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(0),createBypassParamString(0),false) );
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(0), createFreqParamString(0),
+                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(0), createQParamString(0),
+                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(0),createGainParamString(0),
+                                       juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+
+    
+    juce::StringArray types;
+    
+    for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
+    {
+      //Verify map is sorted like I believe it is by the standard
+      // DBG( "Key as int:" + std::to_string(static_cast<int>(type)));
+        types.add(stringRep);
+    }
+    
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(0), createTypeParamString(0), types, 0));
+    
+    return layout;
+    
+
 }
