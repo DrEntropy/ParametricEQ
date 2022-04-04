@@ -10,7 +10,7 @@
 
 #include "ParameterHelpers.h"
 
-juce::String ParamString(juce::String label, int filterNum)
+juce::String createParamString(juce::String label, int filterNum)
 {
     return "Filter_" + juce::String(filterNum)+"_"+ label;
 }
@@ -18,25 +18,25 @@ juce::String ParamString(juce::String label, int filterNum)
 
 juce::String createGainParamString(int filterNum)
 {
-    return ParamString("gain",filterNum);
+    return createParamString("gain",filterNum);
 }
 
 juce::String createQParamString(int filterNum)
 {
-    return ParamString("Q",filterNum);
+    return createParamString("Q",filterNum);
 }
 
 juce::String createFreqParamString(int filterNum)
 {
-    return ParamString("freq",filterNum);
+    return createParamString("freq",filterNum);
 }
 
 juce::String createBypassParamString(int filterNum)
 {
-    return ParamString("bypass",filterNum);
+    return createParamString("bypass",filterNum);
 }
 
 juce::String createTypeParamString(int filterNum)
 {
-    return ParamString("type",filterNum);
+    return createParamString("type",filterNum);
 }
