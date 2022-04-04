@@ -15,12 +15,12 @@
 #include "FilterInfo.h"
 
 
-juce::String GainParamString(int filterNum);
+juce::String createGainParamString(int filterNum);
 
-juce::String QParamString(int filterNum);
+juce::String createQParamString(int filterNum);
 
-juce::String FreqParamString(int filterNum);
+juce::String createFreqParamString(int filterNum);
 
-juce::String BypassParamString(int filterNum);
+juce::String createBypassParamString(int filterNum);
 
-juce::String TypeParamString(int filterNum);
+juce::String createTypeParamString(int filterNum);

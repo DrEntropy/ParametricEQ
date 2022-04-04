@@ -204,21 +204,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
-    layout.add(std::make_unique<juce::AudioParameterBool>(BypassParamString(0),BypassParamString(0),false) );
+    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(0),createBypassParamString(0),false) );
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(FreqParamString(0), FreqParamString(0),
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(0), createFreqParamString(0),
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(QParamString(0), QParamString(0),
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(0), createQParamString(0),
                                        juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(GainParamString(0),GainParamString(0),
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(0),createGainParamString(0),
                                        juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
 
     
     juce::StringArray types;
     
-    for (const auto& [type, stringRep] : FilterInfo::filterToString)
+    for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
     {
       //Verify map is sorted like I believe it is by the standard
       // DBG( "Key as int:" + std::to_string(static_cast<int>(type)));
@@ -226,7 +226,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     }
     
     
-    layout.add(std::make_unique<juce::AudioParameterChoice>(TypeParamString(0), TypeParamString(0), types, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(0), createTypeParamString(0), types, 0));
     
     return layout;
     

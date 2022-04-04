@@ -16,27 +16,27 @@ juce::String ParamString(juce::String label, int filterNum)
 }
 
 
-juce::String GainParamString(int filterNum)
+juce::String createGainParamString(int filterNum)
 {
     return ParamString("gain",filterNum);
 }
 
-juce::String QParamString(int filterNum)
+juce::String createQParamString(int filterNum)
 {
     return ParamString("Q",filterNum);
 }
 
-juce::String FreqParamString(int filterNum)
+juce::String createFreqParamString(int filterNum)
 {
     return ParamString("freq",filterNum);
 }
 
-juce::String BypassParamString(int filterNum)
+juce::String createBypassParamString(int filterNum)
 {
     return ParamString("bypass",filterNum);
 }
 
-juce::String TypeParamString(int filterNum)
+juce::String createTypeParamString(int filterNum)
 {
     return ParamString("type",filterNum);
 }
