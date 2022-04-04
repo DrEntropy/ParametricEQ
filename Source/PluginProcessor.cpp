@@ -207,16 +207,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     layout.add(std::make_unique<juce::AudioParameterBool>(BypassParamString(0),BypassParamString(0),false) );
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(FreqParamString(0), FreqParamString(0),
-                                      juce::NormalisableRange<float>(20.0f, 20000.0f,1.0f,0.25f), 20.0f));
+                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(QParamString(0), QParamString(0),
-                                        juce::NormalisableRange<float>(0.1f,10.f,0.05f,1.0f), 1.0f));
+                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(GainParamString(0),GainParamString(0),
-                                        juce::NormalisableRange<float>(-24.f, 24.f,0.5f,1.0f), 0.0f));
+                                       juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
 
     
     juce::StringArray types;
+    
     for (const auto& [type, stringRep] : FilterInfo::filterToString)
     {
       //Verify map is sorted like I believe it is by the standard
@@ -225,8 +226,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     }
     
     
-    layout.add(std::make_unique<juce::AudioParameterChoice>(TypeParamString(0), TypeParamString(0),
-                                           types, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>(TypeParamString(0), TypeParamString(0), types, 0));
     
     return layout;
     
