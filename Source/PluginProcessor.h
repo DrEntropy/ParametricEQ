@@ -9,11 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-
-// Including here just to force compile
-#include "FilterInfo.h"
-#include "FilterParameters.h"
-#include "HighCutLowCutParameters.h"
+ 
 
 
 //==============================================================================
