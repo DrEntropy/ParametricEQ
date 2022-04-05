@@ -22,7 +22,7 @@ struct CoefficientsMaker
    
     
     static auto makeCoefficients (FilterInfo::FilterType filterType,
-                                                                      float freq, float quality, float gain, double sampleRate)
+                                  float freq, float quality, float gain, double sampleRate)
     {
       using namespace FilterInfo;
       using namespace juce::dsp::IIR;
@@ -75,13 +75,13 @@ struct CoefficientsMaker
     {
         if (filterParams.isLowcut)
         {
-        return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(filterParams.frequency,
-                                                                                           filterParams.sampleRate,filterParams.order);
+            return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(filterParams.frequency,
+                                                                                               filterParams.sampleRate,filterParams.order);
         }
         else
         {
-        return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
-                                                                                          filterParams.sampleRate,filterParams.order);
+            return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
+                                                                                              filterParams.sampleRate,filterParams.order);
         }
     }
     
