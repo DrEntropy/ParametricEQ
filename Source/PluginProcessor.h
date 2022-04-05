@@ -70,11 +70,12 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
-    void updateFilters(double);
+    void updateFilters(double sampleRate,bool forceUpdate = false);
     
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     MonoChain leftChain, rightChain;
     
     HighCutLowCutParameters oldCutParams;
     FilterParameters oldParametricParams;
+    FilterInfo::FilterType oldFilterType;
 };
