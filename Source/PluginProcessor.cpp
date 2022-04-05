@@ -314,7 +314,7 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpda
         parametricParams.sampleRate = sampleRate;
         parametricParams.quality = quality;
         parametricParams.bypassed = bypassed;
-        parametricParams.gain = apvts.getRawParameterValue(createGainParamString(filterNum))-> load();
+        parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
         
         // set up filter chains.
 
