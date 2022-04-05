@@ -21,3 +21,9 @@ struct HighCutLowCutParameters : FilterParametersBase
     int order {1};
     bool isLowcut {true};
 };
+
+
+inline bool operator==(const HighCutLowCutParameters& lhs, const HighCutLowCutParameters& rhs)
+{
+    return (lhs.order == rhs.order && lhs.isLowcut == rhs.isLowcut && static_cast<FilterParametersBase>(lhs) == static_cast<FilterParametersBase>(rhs) );
+}
