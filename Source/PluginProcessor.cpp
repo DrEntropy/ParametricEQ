@@ -255,7 +255,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 }
 
 
-void ParametricEQAudioProcessor::updateFilters(double sampleRate,bool forceUpdate)
+void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
 {
     
     
@@ -274,20 +274,25 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate,bool forceUpdat
     
     FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
     
-    if (filterType == FilterType::LowPass || filterType == FilterType::HighPass)
+    if (filterType == FilterType::LowPass || filterType == FilterType::HighPass || filterType == FilterType::FirstOrderHighPass || filterType == FilterType::FirstOrderLowPass)
     {
         HighCutLowCutParameters cutParams;
         
-        cutParams.isLowcut = (filterType == FilterType::HighPass);
+        cutParams.isLowcut = (filterType == FilterType::HighPass) || (filterType == FilterType::FirstOrderHighPass);
         cutParams.frequency = frequency;
         cutParams.bypassed = bypassed;
-        cutParams.order = 1;  // todo get this from apvts.
+        cutParams.order = 1;
+        
+        if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
+            cutParams.order = 2;
+            
+        
         cutParams.sampleRate = sampleRate;
         cutParams.quality  = quality;
         
         // set up filter chains.
        
-        if (forceUpdate || filterType != oldFilterType || !(cutParams == oldCutParams))
+        if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
             leftChain.setBypassed<0>(bypassed);
@@ -313,7 +318,7 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate,bool forceUpdat
         
         // set up filter chains.
 
-        if (forceUpdate || filterType != oldFilterType || !(parametricParams == oldParametricParams))
+        if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
             leftChain.setBypassed<0>(bypassed);
