@@ -9,7 +9,14 @@
 #pragma once
 
 #include <JuceHeader.h>
- 
+#include "HighCutLowCutParameters.h"
+#include "FilterParameters.h"
+
+
+using Filter = juce::dsp::IIR::Filter<float>;
+// up to eight filters for each band may be needed, lets start with one for now
+using MonoChain = juce::dsp::ProcessorChain<Filter>;
+
 
 
 //==============================================================================
@@ -63,5 +70,11 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
+    void updateFilters(double);
+    
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    MonoChain leftChain, rightChain;
+    
+    HighCutLowCutParameters oldCutParams;
+    FilterParameters oldParametricParams;
 };

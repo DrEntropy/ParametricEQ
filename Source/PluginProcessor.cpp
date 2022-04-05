@@ -143,7 +143,9 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-
+    
+    
+    
     // test filter functions
     FilterParameters filterParams;  //use default values;
     auto coefficients = CoefficientsMaker::makeCoefficients(filterParams);
@@ -241,4 +243,58 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     return layout;
     
 
+}
+
+
+void ParametricEQAudioProcessor::updateFilters(double sampleRate)
+{
+    
+    
+    using namespace FilterInfo;
+    
+    // anticipating a loop through the bands
+    int filterNum = 0;
+    
+    
+    float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+    
+    
+    /// HOW TO DRY THIS???  Downcast a base pointer?
+    
+    FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
+    if (filterType == FilterType::LowPass || filterType == FilterType::HighPass)
+    {
+        HighCutLowCutParameters cutParams;
+        
+        cutParams.isLowcut = (filterType == FilterType::HighPass);
+        cutParams.frequency = frequency;
+        cutParams.bypassed = bypassed;
+        cutParams.order = 1;  // todo get this from apvts.
+        cutParams.sampleRate = sampleRate;
+        cutParams.quality  = quality;
+        
+        // set up filter chain
+        
+        oldCutParams = cutParams;
+    }
+    else
+    {
+        FilterParameters parametricParams;
+        
+        parametricParams.frequency = frequency;
+        parametricParams.filterType = filterType;
+        parametricParams.sampleRate = sampleRate;
+        parametricParams.quality = quality;
+        parametricParams.bypassed = bypassed;
+        parametricParams.gain = apvts.getRawParameterValue(createGainParamString(filterNum))-> load();
+        
+        // set up filter chain
+        
+        oldParametricParams = parametricParams;
+        
+    }
+    
+    //TODO Check for change
 }
