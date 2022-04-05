@@ -13,6 +13,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
+#include "CoefficientsMaker.h"
  
 #include <string>
 
@@ -141,6 +142,15 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+
+    // test filter functions
+    FilterParameters filterParams;  //use default values;
+    auto coefficients = CoefficientsMaker::makeCoefficients(filterParams);
+    
+    HighCutLowCutParameters lowCutParams;
+    auto coefficientsArray = CoefficientsMaker::makeCoefficients(lowCutParams);
+    // 
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
