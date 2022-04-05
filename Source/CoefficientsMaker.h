@@ -78,11 +78,10 @@ struct CoefficientsMaker
             return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(filterParams.frequency,
                                                                                                filterParams.sampleRate,filterParams.order);
         }
-        else
-        {
-            return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
+        
+        return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
                                                                                               filterParams.sampleRate,filterParams.order);
-        }
+    
     }
     
 };
