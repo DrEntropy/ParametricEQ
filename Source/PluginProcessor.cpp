@@ -298,7 +298,6 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate,bool forceUpdat
             *(rightChain.get<0>().coefficients) = *(chainCoefficients[0]);
         }
     
-        
         oldCutParams = cutParams;
     }
     else
@@ -322,9 +321,8 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate,bool forceUpdat
             *(leftChain.get<0>().coefficients) = *chainCoefficients;
             *(rightChain.get<0>().coefficients) = *chainCoefficients;
         }
-        oldParametricParams = parametricParams;
         
+        oldParametricParams = parametricParams;
     }
-    
     
 }
