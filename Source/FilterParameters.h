@@ -22,5 +22,12 @@ struct FilterParameters :  FilterParametersBase
 
 inline bool operator==(const FilterParameters& lhs, const FilterParameters& rhs)
 {
-    return (lhs.filterType == rhs.filterType && lhs.gain == rhs.gain && static_cast<FilterParametersBase>(lhs) == static_cast<FilterParametersBase>(rhs) );
+    return (lhs.filterType == rhs.filterType && lhs.gain == rhs.gain &&
+            static_cast<const FilterParametersBase&>(lhs) == static_cast<const FilterParametersBase&>(rhs) );
+}
+
+
+inline bool operator!=(const FilterParameters& lhs, const FilterParameters& rhs)
+{
+    return !(lhs == rhs);
 }
