@@ -154,14 +154,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     
     
-    
-    // test filter functions
-//    FilterParameters filterParams;  //use default values;
-//    auto coefficients = CoefficientsMaker::makeCoefficients(filterParams);
-//
-//    HighCutLowCutParameters lowCutParams;
-//    auto coefficientsArray = CoefficientsMaker::makeCoefficients(lowCutParams);
-    // 
+
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -241,8 +234,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     
     for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
     {
-      //Verify map is sorted like I believe it is by the standard
-      // DBG( "Key as int:" + std::to_string(static_cast<int>(type)));
         types.add(stringRep);
     }
     
@@ -270,7 +261,6 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpda
     bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
     
     
-    /// HOW TO DRY THIS???  Downcast a base pointer? This would have been better if I used 'contains a ' instead of ' is a' relationship maybe?
     
     FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
     
