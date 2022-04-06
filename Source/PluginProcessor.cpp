@@ -9,6 +9,14 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include "ParameterHelpers.h"
+#include "FilterInfo.h"
+#include "FilterParameters.h"
+#include "HighCutLowCutParameters.h"
+#include "CoefficientsMaker.h"
+ 
+#include <string>
+
 //==============================================================================
 ParametricEQAudioProcessor::ParametricEQAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -95,6 +103,15 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+    
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
+    
+    updateFilters(sampleRate,true);
 }
 
 void ParametricEQAudioProcessor::releaseResources()
@@ -134,6 +151,10 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    
+    
+
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -144,18 +165,18 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    
+     updateFilters(getSampleRate());
+     
+     juce::dsp::AudioBlock<float> block(buffer);
+     auto leftBlock = block.getSingleChannelBlock(0);
+     auto rightBlock = block.getSingleChannelBlock(1);
+     
+    
+     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+     leftChain.process(leftContext);
+     rightChain.process(rightContext);
 }
 
 //==============================================================================
@@ -166,7 +187,8 @@ bool ParametricEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 {
-    return new ParametricEQAudioProcessorEditor (*this);
+   // return new ParametricEQAudioProcessorEditor (*this);
+    return new  juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -188,4 +210,114 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ParametricEQAudioProcessor();
+}
+
+
+
+juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(0),createBypassParamString(0),false) );
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(0), createFreqParamString(0),
+                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(0), createQParamString(0),
+                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(0),createGainParamString(0),
+                                       juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+
+    
+    juce::StringArray types;
+    
+    for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
+    {
+        types.add(stringRep);
+    }
+    
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(0), createTypeParamString(0), types, 0));
+    
+    return layout;
+    
+
+}
+
+
+void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+{
+    
+    
+    using namespace FilterInfo;
+    
+    // anticipating a loop through the bands, probably going to require template metaprogramming....
+    int filterNum = 0;
+    
+    
+    float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+    
+    
+    
+    FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
+    
+    if (filterType == FilterType::LowPass || filterType == FilterType::HighPass || filterType == FilterType::FirstOrderHighPass || filterType == FilterType::FirstOrderLowPass)
+    {
+        HighCutLowCutParameters cutParams;
+        
+        cutParams.isLowcut = (filterType == FilterType::HighPass) || (filterType == FilterType::FirstOrderHighPass);
+        cutParams.frequency = frequency;
+        cutParams.bypassed = bypassed;
+        cutParams.order = 1;
+        
+        if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
+            cutParams.order = 2;
+            
+        
+        cutParams.sampleRate = sampleRate;
+        cutParams.quality  = quality;
+        
+        // set up filter chains.
+       
+        if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            leftChain.setBypassed<0>(bypassed);
+            rightChain.setBypassed<0>(bypassed);
+            
+            // Later this will be multiple filters for each of the bands i think.
+            *(leftChain.get<0>().coefficients) = *(chainCoefficients[0]);
+            *(rightChain.get<0>().coefficients) = *(chainCoefficients[0]);
+        }
+    
+        oldCutParams = cutParams;
+    }
+    else
+    {
+        FilterParameters parametricParams;
+        
+        parametricParams.frequency = frequency;
+        parametricParams.filterType = filterType;
+        parametricParams.sampleRate = sampleRate;
+        parametricParams.quality = quality;
+        parametricParams.bypassed = bypassed;
+        parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
+        
+        // set up filter chains.
+
+        if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
+            leftChain.setBypassed<0>(bypassed);
+            rightChain.setBypassed<0>(bypassed);
+            *(leftChain.get<0>().coefficients) = *chainCoefficients;
+            *(rightChain.get<0>().coefficients) = *chainCoefficients;
+        }
+        
+        oldParametricParams = parametricParams;
+    }
+    
 }
