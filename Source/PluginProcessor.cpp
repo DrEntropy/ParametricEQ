@@ -103,6 +103,15 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+    
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
+    
+    updateFilters(sampleRate,true);
 }
 
 void ParametricEQAudioProcessor::releaseResources()
@@ -143,13 +152,15 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-
-    // test filter functions
-    FilterParameters filterParams;  //use default values;
-    auto coefficients = CoefficientsMaker::makeCoefficients(filterParams);
     
-    HighCutLowCutParameters lowCutParams;
-    auto coefficientsArray = CoefficientsMaker::makeCoefficients(lowCutParams);
+    
+    
+    // test filter functions
+//    FilterParameters filterParams;  //use default values;
+//    auto coefficients = CoefficientsMaker::makeCoefficients(filterParams);
+//
+//    HighCutLowCutParameters lowCutParams;
+//    auto coefficientsArray = CoefficientsMaker::makeCoefficients(lowCutParams);
     // 
 
     // In case we have more outputs than inputs, this code clears any output
@@ -161,18 +172,18 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    
+     updateFilters(getSampleRate());
+     
+     juce::dsp::AudioBlock<float> block(buffer);
+     auto leftBlock = block.getSingleChannelBlock(0);
+     auto rightBlock = block.getSingleChannelBlock(1);
+     
+    
+     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+     leftChain.process(leftContext);
+     rightChain.process(rightContext);
 }
 
 //==============================================================================
@@ -241,4 +252,82 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     return layout;
     
 
+}
+
+
+void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+{
+    
+    
+    using namespace FilterInfo;
+    
+    // anticipating a loop through the bands, probably going to require template metaprogramming....
+    int filterNum = 0;
+    
+    
+    float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+    
+    
+    /// HOW TO DRY THIS???  Downcast a base pointer? This would have been better if I used 'contains a ' instead of ' is a' relationship maybe?
+    
+    FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
+    
+    if (filterType == FilterType::LowPass || filterType == FilterType::HighPass || filterType == FilterType::FirstOrderHighPass || filterType == FilterType::FirstOrderLowPass)
+    {
+        HighCutLowCutParameters cutParams;
+        
+        cutParams.isLowcut = (filterType == FilterType::HighPass) || (filterType == FilterType::FirstOrderHighPass);
+        cutParams.frequency = frequency;
+        cutParams.bypassed = bypassed;
+        cutParams.order = 1;
+        
+        if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
+            cutParams.order = 2;
+            
+        
+        cutParams.sampleRate = sampleRate;
+        cutParams.quality  = quality;
+        
+        // set up filter chains.
+       
+        if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            leftChain.setBypassed<0>(bypassed);
+            rightChain.setBypassed<0>(bypassed);
+            
+            // Later this will be multiple filters for each of the bands i think.
+            *(leftChain.get<0>().coefficients) = *(chainCoefficients[0]);
+            *(rightChain.get<0>().coefficients) = *(chainCoefficients[0]);
+        }
+    
+        oldCutParams = cutParams;
+    }
+    else
+    {
+        FilterParameters parametricParams;
+        
+        parametricParams.frequency = frequency;
+        parametricParams.filterType = filterType;
+        parametricParams.sampleRate = sampleRate;
+        parametricParams.quality = quality;
+        parametricParams.bypassed = bypassed;
+        parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
+        
+        // set up filter chains.
+
+        if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
+            leftChain.setBypassed<0>(bypassed);
+            rightChain.setBypassed<0>(bypassed);
+            *(leftChain.get<0>().coefficients) = *chainCoefficients;
+            *(rightChain.get<0>().coefficients) = *chainCoefficients;
+        }
+        
+        oldParametricParams = parametricParams;
+    }
+    
 }
