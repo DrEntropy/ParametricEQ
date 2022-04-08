@@ -14,6 +14,7 @@
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
 #include "CoefficientsMaker.h"
+#include "Decibel.h"
  
 #include <string>
 
@@ -112,6 +113,20 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     rightChain.prepare(spec);
     
     updateFilters(sampleRate,true);
+    
+    // testing decibals , delete when testing complete
+    DBG("Testing decibel class\n");
+    Decibel<float> db{6.0f};
+    Decibel<float> test;
+    
+    test += db;
+    DBG("result " + std::to_string(test.getGain()));
+    test = db + Decibel<float>(6.0);
+    DBG("result2 " + std::to_string(test.getGain()));
+    
+    bool lessThen = test == (db + Decibel<float>(6.0));
+    DBG("result3 " + std::to_string(lessThen));
+    // End testing section
 }
 
 void ParametricEQAudioProcessor::releaseResources()
