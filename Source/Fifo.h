@@ -23,7 +23,8 @@ struct Fifo
     //used when T is AudioBuffer<float>
     void prepare(int numSamples, int numChannels)
     {
-        static_assert(std::is_same<juce::AudioBuffer<float>, T>::value,"Fifo::prepare(2 params) requires T to be AudioBuffer<float>!");
+        static_assert(std::is_same<juce::AudioBuffer<float>, T>::value,
+                      "Fifo::prepare(2 params) requires T to be AudioBuffer<float>!");
         for (auto& audioBuffer:buffer)
         {
             // don't bother clearing extra space, we are going to clear right after this call.
@@ -35,7 +36,8 @@ struct Fifo
     //used when T is std::vector<float>
     void prepare(size_t numElements)
     {
-        static_assert(std::is_same<std::vector<float>, T>::value,"Fifo::prepare(1 param) requires T to be vector<float>!");
+        static_assert(std::is_same<std::vector<float>, T>::value,
+                      "Fifo::prepare(1 param) requires T to be vector<float>!");
         for (auto& elemVector:buffer)
         {
             elemVector.clear();
@@ -49,17 +51,20 @@ struct Fifo
     {
         auto writeHandle = fifo.write(1);
         
-        if (writeHandle.blocksize1 < 1)
+        if (writeHandle.blockSize1 < 1)
             return false;
         
         if constexpr (isReferenceCountedObjectPtr<T>::value)
         {
-            // save a copy of the ptr currently in buffer, increasing reference count.
+            // save a copy of the ptr currently in buffer if any, increasing reference count.
             auto tempT {buffer[writeHandle.startIndex1]};
             buffer[writeHandle.startIndex1] = t;
             
-            // verify we are not about to delete the object that was at this index.
-            jassert(tempT.get()->getReferenceCount() > 1);
+            // verify we are not about to delete the object that was at this index, if any!
+            if(tempT)
+            {
+                jassert(tempT.get()->getReferenceCount() > 1);
+            }
             
             return true;
         }
@@ -70,7 +75,7 @@ struct Fifo
     bool pull(T& t)
     {
         auto readHandle = fifo.read(1);
-        if (readHandle.blocksize > 1)
+        if (readHandle.blockSize1 > 0)
         {
             t = buffer[readHandle.startIndex1];
             return true;
@@ -87,6 +92,7 @@ struct Fifo
     {
         return fifo.getFreeSpace();
     }
+    
 private:
     juce::AbstractFifo fifo { Size };
     std::array<T, Size> buffer;
