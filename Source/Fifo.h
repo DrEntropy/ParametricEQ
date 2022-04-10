@@ -43,11 +43,7 @@ struct Fifo
         }
     }
     
-    template <typename U>
-    struct isReferenceCountedObjectPtr : std::false_type { };
 
-    template <typename W>
-    struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W> > : std::true_type { };
 
     bool push(const T &t)
     {
@@ -94,4 +90,11 @@ struct Fifo
 private:
     juce::AbstractFifo fifo { Size };
     std::array<T, Size> buffer;
+    
+    
+    template <typename U>
+    struct isReferenceCountedObjectPtr : std::false_type { };
+
+    template <typename W>
+    struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W> > : std::true_type { };
 };
