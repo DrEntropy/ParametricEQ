@@ -35,16 +35,16 @@ void Fifo<T, Size>::prepare(size_t numElements)
 
 
 
-template <typename T, typename W>
+template <typename T>
 struct isReferenceCountedObjectPtr : std::false_type { };
 
 template <typename W>
-struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W>, W> : std::true_type { };
+struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W> > : std::true_type { };
 
 template <typename T, size_t Size>
 void Fifo<T, Size>::push(<#const T &t#>)
 {
-    if constexpr (isReferenceCountedObjectPtr<T, W>::value)
+    if constexpr (isReferenceCountedObjectPtr<T>::value)
     {
         //  deal with reference counting
     }
