@@ -42,14 +42,37 @@ template <typename W>
 struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W> > : std::true_type { };
 
 template <typename T, size_t Size>
-void Fifo<T, Size>::push(<#const T &t#>)
+bool Fifo<T, Size>::push(const T &t)
 {
+    auto writeHandle = fifo.write(1);
+    
+    if (writeHandle.blocksize1 < 1)
+        return false;
+    
     if constexpr (isReferenceCountedObjectPtr<T>::value)
     {
-        //  deal with reference counting
+        // save a copy of the ptr currently in buffer, increasing reference count.
+        auto tempT {buffer[writeHandle.startIndex1]};
+        buffer[writeHandle.startIndex1] = t;
+        
+        // verify we are not about to delete the object that was at this index.
+        jassert(tempT.get()->getReferenceCount() > 1);
+        
+        return true;
     }
-    else
-    {
-        //normal push
-    }
+    buffer[writeHandle.startIndex1] = t;
+    return true;
 }
+
+template <typename T, size_t Size>
+bool Fifo<T, Size>::pull(T &t)
+{
+    auto readHandle = fifo.read(1);
+    if (readHandle.blocksize > 1)
+    {
+        t = buffer[readHandle.startIndex1];
+        return true;
+    }
+    return false;
+}
+ 

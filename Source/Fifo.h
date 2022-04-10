@@ -29,8 +29,14 @@ struct Fifo
     bool push(const T& t);
     bool pull(T& t);
     
-    int getNumAvailableForReading() const;
-    int getAvailableSpace() const;
+    int getNumAvailableForReading() const
+    {
+        return fifo.getNumReady();
+    }
+    int getAvailableSpace() const
+    {
+        return fifo.getFreeSpace();
+    }
 private:
     juce::AbstractFifo fifo { Size };
     std::array<T, Size> buffer;
