@@ -4,6 +4,7 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="MawBAi" name="Fifo.h" compile="0" resource="0" file="Source/Fifo.h"/>
       <FILE id="OgseIV" name="Decibel.h" compile="0" resource="0" file="Source/Decibel.h"/>
       <FILE id="tifnVR" name="CoefficientsMaker.h" compile="0" resource="0"
             file="Source/CoefficientsMaker.h"/>
