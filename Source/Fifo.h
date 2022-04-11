@@ -25,7 +25,7 @@ struct Fifo
     {
         static_assert (std::is_same<juce::AudioBuffer<float>, T>::value,
                       "Fifo::prepare(2 params) requires T to be AudioBuffer<float>!");
-        for (auto& audioBuffer:buffer)
+        for (auto& audioBuffer : buffer)
         {
             // don't bother clearing extra space, we are going to clear right after this call.
             audioBuffer.setSize (numChannels, numSamples, false, false, true);
@@ -65,8 +65,10 @@ struct Fifo
             {
                 jassert (tempT.get()->getReferenceCount() > 1);
             }
-            
-            return true;
+        }
+        else
+        {
+            buffer[writeHandle.startIndex1] = t;
         }
         
         buffer[writeHandle.startIndex1] = t;
