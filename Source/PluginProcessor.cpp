@@ -219,11 +219,13 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
     layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(filterNum), createFreqParamString(filterNum),
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
-                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+
     
     if(!isCut)
     {
+        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+        
         layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(filterNum),createGainParamString(filterNum),
                                            juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
         juce::StringArray types;
@@ -344,7 +346,6 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
     using namespace FilterInfo;
     
     float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
-    float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
     bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
     
     Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(filterNum))->load());
@@ -356,7 +357,7 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
     cutParams.bypassed = bypassed;
     cutParams.order = static_cast<int>(slope) + 1;
     cutParams.sampleRate = sampleRate;
-    cutParams.quality  = quality;
+    cutParams.quality  = 1.0f; //not used for cut filters
     if (true)  // TODO check for filter change first
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);

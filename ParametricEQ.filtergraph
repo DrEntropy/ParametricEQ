@@ -61,11 +61,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="7" x="0.43875" y="0.6038461538461538" uiLastX_Normal="159"
-          uiLastY_Normal="377" uiopen_Normal="0">
+  <FILTER uid="7" x="0.43875" y="0.6038461538461538" uiLastX_Normal="871"
+          uiLastY_Normal="384" uiopen_Normal="1">
     <PLUGIN name="ParametricEQ" format="VST3" category="Fx" manufacturer="Rational Pursuit"
             version="1.0.0" file="/Users/ronaldlegere/Library/Audio/Plug-Ins/VST3/ParametricEQ.vst3"
-            uniqueId="f5a0e424" isInstrument="0" fileTime="17feba23faa" infoUpdateTime="17febaeada3"
+            uniqueId="f5a0e424" isInstrument="0" fileTime="17feba23faa" infoUpdateTime="1801a4ea28d"
             numInputs="2" numOutputs="2" isShell="0" uid="acf67f52"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
     <LAYOUT>
@@ -78,12 +78,12 @@
     </LAYOUT>
   </FILTER>
   <FILTER uid="11" x="0.4475" y="0.3634615384615384" uiLastX_Normal="132"
-          uiLastY_Normal="409" uiopen_Normal="0">
+          uiLastY_Normal="409" uiopen_Normal="1">
     <PLUGIN name="AUAudioFilePlayer" format="AudioUnit" category="Generator"
             manufacturer="Apple" version="1.6.0" file="AudioUnit:Generators/augn,afpl,appl"
-            uniqueId="6163676e" isInstrument="0" fileTime="0" infoUpdateTime="17febaeada3"
+            uniqueId="6163676e" isInstrument="0" fileTime="0" infoUpdateTime="1801a4ea28d"
             numInputs="0" numOutputs="2" isShell="0" uid="6163676e"/>
-    <STATE>137.hAGaoMGcv.i0AHv.DTfAGfPBJr.CT4VXsUFWsEla0YVXiQWcxUlbTQVXzEFUzkGbkc0b0IFc4AWYWYWYxMWZu4FVU4FcoQGakQlDgAGbrAjDgU2YtIQXlAGaP..BUnwIrDSNAozSPUkV........AD..........M....................vE</STATE>
+    <STATE>594.hAGaoMGcv.C1AHv.DTfAGfPBJr.Gc3wGgvUag4VclE1XzUmbkIGUjEFcg8EDarVPUAkbkMWYzAUYxMWZyQWYtQ2TzEFcksTY4c0b0IFc4AWYWYWYxMWZu4FUzkGbk8EDOXVZrUVKxUlYkIWYtMVYyQkag0VYRDFbvwFPgxvzM3vCPDQFXYTZrUlSg0VYWIUYmk1atMmWIM2TkwVYiQWYjYTZrU1WPP1KUMWYxM2Kx8lagwFYrU1YkIWYuzTcyk1XujFU04VYy8RZTUmakMGHMUFYoE1KMU2boM1KDUWXfvTZvE1KFUGc0IWYf3zayQWXrcVZg8BLx.BQu41IzAxTzElbzAhSucmKsQSXgJA0SPQEVbAFYngWRU1Yo8laD8VYywzauAmVRU1Yo8laDEFcg8EDPjzbSUFakMFckQlTkcVZu4lVRU1Yo8laNEVakgvSP.G..........f+.1z68+A...POgVS7e......v+......dEFI..fA...4iRB..X....zSn0D+G..D.....w+A.........................................................X6A......InkSkcGHRU1Yo8laIHQXlAGaP.fDgU2YtEMHPXkQowVYfDCVU4FcoQGakQF.H.PF.XB.q.PR.DE.YAfW..G.0Afd.rG.8A.g.zH.UB.oArP.MDfEATR.vDvPA3T.OEfvALb.NGvyAPc.VGv1A3c.kC.......HP..........HB..................Df6</STATE>
     <LAYOUT>
       <INPUTS/>
       <OUTPUTS>
