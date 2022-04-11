@@ -21,22 +21,22 @@ struct Fifo
     }
     
     //used when T is AudioBuffer<float>
-    void prepare(int numSamples, int numChannels)
+    void prepare (int numSamples, int numChannels)
     {
-        static_assert(std::is_same<juce::AudioBuffer<float>, T>::value,
+        static_assert (std::is_same<juce::AudioBuffer<float>, T>::value,
                       "Fifo::prepare(2 params) requires T to be AudioBuffer<float>!");
         for (auto& audioBuffer:buffer)
         {
             // don't bother clearing extra space, we are going to clear right after this call.
-            audioBuffer.setSize(numChannels, numSamples, false, false, true);
+            audioBuffer.setSize (numChannels, numSamples, false, false, true);
             audioBuffer.clear();
         }
     }
     
     //used when T is std::vector<float>
-    void prepare(size_t numElements)
+    void prepare (size_t numElements)
     {
-        static_assert(std::is_same<std::vector<float>, T>::value,
+        static_assert (std::is_same<std::vector<float>, T>::value,
                       "Fifo::prepare(1 param) requires T to be vector<float>!");
         for (auto& elemVector:buffer)
         {
@@ -47,7 +47,7 @@ struct Fifo
     
 
 
-    bool push(const T &t)
+    bool push (const T &t)
     {
         auto writeHandle = fifo.write(1);
         
@@ -63,16 +63,17 @@ struct Fifo
             // verify we are not about to delete the object that was at this index, if any!
             if(tempT)
             {
-                jassert(tempT.get()->getReferenceCount() > 1);
+                jassert (tempT.get()->getReferenceCount() > 1);
             }
             
             return true;
         }
+        
         buffer[writeHandle.startIndex1] = t;
         return true;
     }
     
-    bool pull(T& t)
+    bool pull (T& t)
     {
         auto readHandle = fifo.read(1);
         if (readHandle.blockSize1 > 0)
@@ -80,6 +81,7 @@ struct Fifo
             t = buffer[readHandle.startIndex1];
             return true;
         }
+        
         return false;
     }
     
@@ -102,5 +104,5 @@ private:
     struct isReferenceCountedObjectPtr : std::false_type { };
 
     template <typename W>
-    struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W> > : std::true_type { };
+    struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W>> : std::true_type { };
 };
