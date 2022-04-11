@@ -13,10 +13,14 @@
 #include "FilterParameters.h"
 
 
-using Filter = juce::dsp::IIR::Filter<float>;
-// up to eight filters for each band may be needed, lets start with one for now
-using MonoChain = juce::dsp::ProcessorChain<Filter>;
 
+
+using Filter = juce::dsp::IIR::Filter<float>;
+using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
+using MonoChain = juce::dsp::ProcessorChain<CutFilter,Filter,CutFilter>;
+
+
+ 
 
 
 //==============================================================================
@@ -70,9 +74,51 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
+    template <const int filterNum>
+    void updateParametricFilter(double sampleRate, bool forceUpdate);
+    
+    template <const int filterNum>
+    void updateCutFilter(double sampleRate, bool forceUpdate, bool isLowCut);
+    
+    template <const int filterNum, const int subFilterNum, typename CoefficientType>
+    void updateSingleCut(CoefficientType& chainCoefficients)
+    {
+        auto& leftSubChain = leftChain.template get<filterNum>();
+        auto& rightSubChain = rightChain.template get<filterNum>();
+        
+        
+        
+        *(leftSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
+        *(rightSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
+        
+        leftSubChain.template setBypassed<subFilterNum>(false);
+        rightSubChain.template setBypassed<subFilterNum>(false);
+        
+    }
+    
+    template <const int filterNum>
+    void bypassSubChain()
+    {
+        auto& leftSubChain = leftChain.template get<filterNum>();
+        auto& rightSubChain = rightChain.template get<filterNum>();
+        leftSubChain.template setBypassed<0>(true);
+        leftSubChain.template setBypassed<1>(true);
+        leftSubChain.template setBypassed<2>(true);
+        leftSubChain.template setBypassed<3>(true);
+        rightSubChain.template setBypassed<0>(true);
+        rightSubChain.template setBypassed<1>(true);
+        rightSubChain.template setBypassed<2>(true);
+        rightSubChain.template setBypassed<3>(true);
+    }
+  
     void updateFilters(double sampleRate, bool forceUpdate = false);
     
-    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
+    
+    void addFilterParamToLayout(ParamLayout&, int,bool);
+ 
+    
+    ParamLayout createParameterLayout();
     MonoChain leftChain, rightChain;
     
     HighCutLowCutParameters oldCutParams;

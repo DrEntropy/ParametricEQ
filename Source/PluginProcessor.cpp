@@ -212,49 +212,65 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new ParametricEQAudioProcessor();
 }
 
+void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, int filterNum, bool isCut)
+{
+    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(filterNum),createBypassParamString(filterNum),false) );
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(filterNum), createFreqParamString(filterNum),
+                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+    
+    if(!isCut)
+    {
+        layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(filterNum),createGainParamString(filterNum),
+                                           juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+        juce::StringArray types;
+        
+        for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
+        {
+            types.add(stringRep);
+        }
+
+        layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(filterNum), createTypeParamString(filterNum), types, 0));
+    }
+    else
+    {
+        juce::StringArray slopes;
+        
+        for (const auto& [order, stringRep] : FilterInfo::mapSlopeToString)
+        {
+            slopes.add(stringRep);
+        }
+
+        layout.add(std::make_unique<juce::AudioParameterChoice>(createSlopeParamString(filterNum),
+                                                                createSlopeParamString(filterNum), slopes, 0));
+    }
+}
+
 
 
 juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
-    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(0),createBypassParamString(0),false) );
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(0), createFreqParamString(0),
-                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
-    
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(0), createQParamString(0),
-                                       juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
-    
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(0),createGainParamString(0),
-                                       juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
-
-    
-    juce::StringArray types;
-    
-    for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
-    {
-        types.add(stringRep);
-    }
-    
-    
-    layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(0), createTypeParamString(0), types, 0));
+    addFilterParamToLayout(layout, 0, true);
+    addFilterParamToLayout(layout, 1, false);
+    addFilterParamToLayout(layout, 2, true);
     
     return layout;
     
 
 }
 
-
-void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+template <const int filterNum>
+void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool forceUpdate)
 {
-    
-    
     using namespace FilterInfo;
     
-    // anticipating a loop through the bands, probably going to require template metaprogramming....
-    int filterNum = 0;
-    
+
     
     float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
     float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
@@ -285,12 +301,12 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpda
         if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
-            leftChain.setBypassed<0>(bypassed);
-            rightChain.setBypassed<0>(bypassed);
+            leftChain.setBypassed<filterNum>(bypassed);
+            rightChain.setBypassed<filterNum>(bypassed);
             
             // Later this will be multiple filters for each of the bands i think.
-            *(leftChain.get<0>().coefficients) = *(chainCoefficients[0]);
-            *(rightChain.get<0>().coefficients) = *(chainCoefficients[0]);
+            *(leftChain.get<filterNum>().coefficients) = *(chainCoefficients[0]);
+            *(rightChain.get<filterNum>().coefficients) = *(chainCoefficients[0]);
         }
     
         oldCutParams = cutParams;
@@ -311,13 +327,76 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpda
         if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
-            leftChain.setBypassed<0>(bypassed);
-            rightChain.setBypassed<0>(bypassed);
-            *(leftChain.get<0>().coefficients) = *chainCoefficients;
-            *(rightChain.get<0>().coefficients) = *chainCoefficients;
+            leftChain.setBypassed<filterNum>(bypassed);
+            rightChain.setBypassed<filterNum>(bypassed);
+            *(leftChain.get<filterNum>().coefficients) = *chainCoefficients;
+            *(rightChain.get<filterNum>().coefficients) = *chainCoefficients;
         }
         
         oldParametricParams = parametricParams;
     }
+}
+
+// to do - DRY
+template<const int filterNum>
+void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUpdate, bool isLowCut)
+{
+    using namespace FilterInfo;
+    
+    float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+    
+    Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(filterNum))->load());
+    
+    HighCutLowCutParameters cutParams;
+        
+    cutParams.isLowcut = isLowCut;
+    cutParams.frequency = frequency;
+    cutParams.bypassed = bypassed;
+    cutParams.order = static_cast<int>(slope) + 1;
+    cutParams.sampleRate = sampleRate;
+    cutParams.quality  = quality;
+    if (true)  // TODO check for filter change first
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            leftChain.setBypassed<filterNum>(bypassed);
+            rightChain.setBypassed<filterNum>(bypassed);
+            bypassSubChain<filterNum>();
+            //set up the four filters
+            if(!bypassed)
+            {
+                
+                switch(slope)
+                {
+                    case Slope::Slope_48:
+                    case Slope::Slope_42:
+                        updateSingleCut<filterNum,3> (chainCoefficients);
+                        
+                    case Slope::Slope_36:
+                    case Slope::Slope_30:
+                        updateSingleCut<filterNum,2> (chainCoefficients);
+                        
+                    case Slope::Slope_24:
+                    case Slope::Slope_18:
+                        updateSingleCut<filterNum,1> (chainCoefficients);
+               
+                    case Slope::Slope_12:
+                    case Slope::Slope_6:
+                        updateSingleCut<filterNum,0> (chainCoefficients);
+
+                   }
+            }
+        }
+    
+        //oldCutParams = cutParams;
+}
+
+
+void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+{
+    updateCutFilter<0>(sampleRate,true,forceUpdate);
+    updateParametricFilter<1>(sampleRate,forceUpdate);
+    updateCutFilter<2>(sampleRate,false,forceUpdate);
     
 }
