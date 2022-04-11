@@ -61,10 +61,8 @@ struct Fifo
             buffer[writeHandle.startIndex1] = t;
             
             // verify we are not about to delete the object that was at this index, if any!
-            if(tempT)
-            {
-                jassert (tempT.get()->getReferenceCount() > 1);
-            }
+            jassert (tempT.get() == nullptr || tempT.get()->getReferenceCount() > 1);
+            
         }
         else
         {
