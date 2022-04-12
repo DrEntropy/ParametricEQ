@@ -117,7 +117,6 @@ private:
     
     void addFilterParamToLayout(ParamLayout&, int,bool);
  
-    
     ParamLayout createParameterLayout();
     MonoChain leftChain, rightChain;
     
@@ -131,12 +130,9 @@ private:
     using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
     using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
 
-    
     Fifo <ParametricCoeffPtr,10>  parametricCoeffFifo;
     Fifo <CutCoeffArray,10>  cutCoeffFifo;
     
-    // for future use.
     Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
     Fifo <CutCoeffArray,10>  highCutCoeffFifo;
-    
 };

@@ -152,10 +152,6 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    
-    
-
-
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -257,14 +253,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
-    
     addFilterParamToLayout(layout, 0, true);
     addFilterParamToLayout(layout, 1, false);
     addFilterParamToLayout(layout, 2, true);
     
     return layout;
-    
-
 }
 
 template <const int filterNum>
@@ -423,5 +416,4 @@ void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpda
     updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
     updateParametricFilter<1>(sampleRate, forceUpdate);
     updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
-    
 }
