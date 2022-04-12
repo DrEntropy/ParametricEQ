@@ -272,13 +272,9 @@ void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool 
 {
     using namespace FilterInfo;
     
-
-    
     float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
     float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
     bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
-    
-    
     
     FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
     
@@ -303,12 +299,17 @@ void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool 
         if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            
+            cutCoeffFifo.push(chainCoefficients);
+            decltype(chainCoefficients) newChainCoefficients;
+            cutCoeffFifo.pull(newChainCoefficients);
+            
             leftChain.setBypassed<filterNum>(bypassed);
             rightChain.setBypassed<filterNum>(bypassed);
             
             // Later this will be multiple filters for each of the bands i think.
-            *(leftChain.get<filterNum>().coefficients) = *(chainCoefficients[0]);
-            *(rightChain.get<filterNum>().coefficients) = *(chainCoefficients[0]);
+            *(leftChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
+            *(rightChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
         }
     
         oldCutParams = cutParams;
@@ -329,10 +330,16 @@ void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool 
         if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
+            
+            // push and pull Fifo for testing.
+            parametricCoeffFifo.push(chainCoefficients);
+            decltype(chainCoefficients) newChainCoefficients;
+            parametricCoeffFifo.pull(newChainCoefficients);
+            
             leftChain.setBypassed<filterNum>(bypassed);
             rightChain.setBypassed<filterNum>(bypassed);
-            *(leftChain.get<filterNum>().coefficients) = *chainCoefficients;
-            *(rightChain.get<filterNum>().coefficients) = *chainCoefficients;
+            *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
+            *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
         }
         
         oldParametricParams = parametricParams;
@@ -341,7 +348,8 @@ void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool 
 
 // to do - DRY
 template<const int filterNum>
-void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUpdate, HighCutLowCutParameters& oldParams, bool isLowCut)
+void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUpdate,
+                                                 HighCutLowCutParameters& oldParams, bool isLowCut)
 {
     using namespace FilterInfo;
     
@@ -364,6 +372,19 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
     if (forceUpdate || oldParams != cutParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            decltype(chainCoefficients) newChainCoefficients;
+            
+            if(isLowCut)
+            {
+                lowCutCoeffFifo.push(chainCoefficients);
+                lowCutCoeffFifo.pull(newChainCoefficients);
+            }
+            else
+            {
+                highCutCoeffFifo.push(chainCoefficients);
+                highCutCoeffFifo.pull(newChainCoefficients);
+            }
+        
             leftChain.setBypassed<filterNum>(bypassed);
             rightChain.setBypassed<filterNum>(bypassed);
             bypassSubChain<filterNum>();
@@ -375,19 +396,19 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
                 {
                     case Slope::Slope_48:
                     case Slope::Slope_42:
-                        updateSingleCut<filterNum,3> (chainCoefficients);
+                        updateSingleCut<filterNum,3> (newChainCoefficients);
                         
                     case Slope::Slope_36:
                     case Slope::Slope_30:
-                        updateSingleCut<filterNum,2> (chainCoefficients);
+                        updateSingleCut<filterNum,2> (newChainCoefficients);
                         
                     case Slope::Slope_24:
                     case Slope::Slope_18:
-                        updateSingleCut<filterNum,1> (chainCoefficients);
+                        updateSingleCut<filterNum,1> (newChainCoefficients);
                
                     case Slope::Slope_12:
                     case Slope::Slope_6:
-                        updateSingleCut<filterNum,0> (chainCoefficients);
+                        updateSingleCut<filterNum,0> (newChainCoefficients);
 
                    }
             }
@@ -400,7 +421,7 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
 void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
 {
     updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
-    updateParametricFilter<1>(sampleRate,forceUpdate);
+    updateParametricFilter<1>(sampleRate, forceUpdate);
     updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
     
 }

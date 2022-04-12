@@ -132,8 +132,11 @@ private:
     using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
 
     
-    Fifo <ParametricCoeffPtr,10>  ParametricCoeffFifo;
-    Fifo <CutCoeffArray,10>  LowCutCoeffFifo;
-    Fifo <CutCoeffArray,10>  HighCutCoeffFifo;
+    Fifo <ParametricCoeffPtr,10>  parametricCoeffFifo;
+    Fifo <CutCoeffArray,10>  cutCoeffFifo;
+    
+    // for future use.
+    Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
+    Fifo <CutCoeffArray,10>  highCutCoeffFifo;
     
 };
