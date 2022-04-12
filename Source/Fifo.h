@@ -79,6 +79,7 @@ struct Fifo
         if (readHandle.blockSize1 > 0)
         {
             t = buffer[readHandle.startIndex1];
+            buffer[readHandle.startIndex1] = T{};
             return true;
         }
         
