@@ -78,8 +78,7 @@ struct Fifo
         auto readHandle = fifo.read(1);
         if (readHandle.blockSize1 > 0)
         {
-            t = buffer[readHandle.startIndex1];
-            buffer[readHandle.startIndex1] = T{};
+            t = std::move(buffer[readHandle.startIndex1]);
             return true;
         }
         
