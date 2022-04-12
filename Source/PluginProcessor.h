@@ -11,8 +11,8 @@
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
 #include "FilterParameters.h"
-
-
+#include "Fifo.h"
+#include "CoefficientsMaker.h"
 
 
 using Filter = juce::dsp::IIR::Filter<float>;
@@ -78,7 +78,7 @@ private:
     void updateParametricFilter(double sampleRate, bool forceUpdate);
     
     template <const int filterNum>
-    void updateCutFilter(double sampleRate, bool forceUpdate, bool isLowCut);
+    void updateCutFilter(double sampleRate, bool forceUpdate, HighCutLowCutParameters& oldParams, bool isLowCut);
     
     template <const int filterNum, const int subFilterNum, typename CoefficientType>
     void updateSingleCut(CoefficientType& chainCoefficients)
@@ -124,4 +124,16 @@ private:
     HighCutLowCutParameters oldCutParams;
     FilterParameters oldParametricParams;
     FilterInfo::FilterType oldFilterType;
+    
+    HighCutLowCutParameters oldHighCutParams;
+    HighCutLowCutParameters oldLowCutParams;
+    
+    using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
+    using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
+
+    
+    Fifo <ParametricCoeffPtr,10>  ParametricCoeffFifo;
+    Fifo <CutCoeffArray,10>  LowCutCoeffFifo;
+    Fifo <CutCoeffArray,10>  HighCutCoeffFifo;
+    
 };

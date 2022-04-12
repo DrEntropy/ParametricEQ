@@ -13,7 +13,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
-#include "CoefficientsMaker.h"
+
  
 #include <string>
 
@@ -341,7 +341,7 @@ void ParametricEQAudioProcessor::updateParametricFilter(double sampleRate, bool 
 
 // to do - DRY
 template<const int filterNum>
-void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUpdate, bool isLowCut)
+void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUpdate, HighCutLowCutParameters& oldParams, bool isLowCut)
 {
     using namespace FilterInfo;
     
@@ -358,7 +358,10 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
     cutParams.order = static_cast<int>(slope) + 1;
     cutParams.sampleRate = sampleRate;
     cutParams.quality  = 1.0f; //not used for cut filters
-    if (true)  // TODO check for filter change first
+    
+   
+    
+    if (forceUpdate || oldParams != cutParams)
         {
             auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
             leftChain.setBypassed<filterNum>(bypassed);
@@ -389,15 +392,15 @@ void ParametricEQAudioProcessor::updateCutFilter(double sampleRate, bool forceUp
                    }
             }
         }
-    
-        //oldCutParams = cutParams;
+        // side effect update. Code smell?
+        oldParams = cutParams;
 }
 
 
 void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
 {
-    updateCutFilter<0>(sampleRate, forceUpdate, true);
+    updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
     updateParametricFilter<1>(sampleRate,forceUpdate);
-    updateCutFilter<2>(sampleRate, forceUpdate, false);
+    updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
     
 }
