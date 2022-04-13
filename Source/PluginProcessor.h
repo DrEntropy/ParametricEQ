@@ -13,6 +13,7 @@
 #include "FilterParameters.h"
 #include "Fifo.h"
 #include "CoefficientsMaker.h"
+#include "ParameterHelpers.h"
 
 
 using Filter = juce::dsp::IIR::Filter<float>;
@@ -75,10 +76,161 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
     template <const int filterNum>
-    void updateParametricFilter(double sampleRate, bool forceUpdate);
+    void updateParametricFilter(double sampleRate, bool forceUpdate)
+    {
+        using namespace FilterInfo;
+
+
+        
+        float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+        float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
+        bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+        
+        FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
+        
+        if (filterType == FilterType::LowPass || filterType == FilterType::HighPass || filterType == FilterType::FirstOrderHighPass || filterType == FilterType::FirstOrderLowPass)
+        {
+            HighCutLowCutParameters cutParams;
+            
+            cutParams.isLowcut = (filterType == FilterType::HighPass) || (filterType == FilterType::FirstOrderHighPass);
+            cutParams.frequency = frequency;
+            cutParams.bypassed = bypassed;
+            cutParams.order = 1;
+            
+            if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
+                cutParams.order = 2;
+                
+            
+            cutParams.sampleRate = sampleRate;
+            cutParams.quality  = quality;
+            
+            // set up filter chains.
+           
+            if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
+            {
+                auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+                
+                cutCoeffFifo.push(chainCoefficients);
+                decltype(chainCoefficients) newChainCoefficients;
+                cutCoeffFifo.pull(newChainCoefficients);
+                
+                leftChain.setBypassed<filterNum>(bypassed);
+                rightChain.setBypassed<filterNum>(bypassed);
+                
+                // Later this will be multiple filters for each of the bands i think.
+                *(leftChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
+                *(rightChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
+            }
+        
+            oldCutParams = cutParams;
+        }
+        else
+        {
+            FilterParameters parametricParams;
+            
+            parametricParams.frequency = frequency;
+            parametricParams.filterType = filterType;
+            parametricParams.sampleRate = sampleRate;
+            parametricParams.quality = quality;
+            parametricParams.bypassed = bypassed;
+            parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
+            
+            // set up filter chains.
+
+            if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
+            {
+                auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
+                // push and pull Fifo for testing.
+                parametricCoeffFifo.push(chainCoefficients);
+                
+                // pull a copy
+                ParametricCoeffPtr newChainCoefficients;
+                bool temp = parametricCoeffFifo.pull(newChainCoefficients);
+                jassert(temp);
+                
+                leftChain.setBypassed<filterNum>(bypassed);
+                rightChain.setBypassed<filterNum>(bypassed);
+                *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
+                *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
+                
+                // ok this step will actually now get rid of last reference to old chain coefficients and save an extra reference to the new ones
+                parametricChainCoeffPtr = chainCoefficients;
+
+            }
+            
+            oldParametricParams = parametricParams;
+            oldFilterType = filterType;
+        }
+    }
     
     template <const int filterNum>
-    void updateCutFilter(double sampleRate, bool forceUpdate, HighCutLowCutParameters& oldParams, bool isLowCut);
+    void updateCutFilter(double sampleRate, bool forceUpdate, HighCutLowCutParameters& oldParams, bool isLowCut)
+    {
+        using namespace FilterInfo;
+        
+        float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+        bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
+        
+        Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(filterNum))->load());
+        
+        HighCutLowCutParameters cutParams;
+            
+        cutParams.isLowcut = isLowCut;
+        cutParams.frequency = frequency;
+        cutParams.bypassed = bypassed;
+        cutParams.order = static_cast<int>(slope) + 1;
+        cutParams.sampleRate = sampleRate;
+        cutParams.quality  = 1.0f; //not used for cut filters
+        
+       
+        
+        if (forceUpdate || oldParams != cutParams)
+        {
+            auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
+            decltype(chainCoefficients) newChainCoefficients;
+            
+            if(isLowCut)
+            {
+                lowCutCoeffFifo.push(chainCoefficients);
+                lowCutCoeffFifo.pull(newChainCoefficients);
+            }
+            else
+            {
+                highCutCoeffFifo.push(chainCoefficients);
+                highCutCoeffFifo.pull(newChainCoefficients);
+            }
+        
+            leftChain.setBypassed<filterNum>(bypassed);
+            rightChain.setBypassed<filterNum>(bypassed);
+            bypassSubChain<filterNum>();
+            //set up the four filters
+            if(!bypassed)
+            {
+                
+                switch(slope)
+                {
+                    case Slope::Slope_48:
+                    case Slope::Slope_42:
+                        updateSingleCut<filterNum,3> (newChainCoefficients);
+                        
+                    case Slope::Slope_36:
+                    case Slope::Slope_30:
+                        updateSingleCut<filterNum,2> (newChainCoefficients);
+                        
+                    case Slope::Slope_24:
+                    case Slope::Slope_18:
+                        updateSingleCut<filterNum,1> (newChainCoefficients);
+               
+                    case Slope::Slope_12:
+                    case Slope::Slope_6:
+                        updateSingleCut<filterNum,0> (newChainCoefficients);
+
+                   }
+            }
+        }
+        // side effect update. Code smell?
+        oldParams = cutParams;
+    }
     
     template <const int filterNum, const int subFilterNum, typename CoefficientType>
     void updateSingleCut(CoefficientType& chainCoefficients)
@@ -135,4 +287,8 @@ private:
     
     Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
     Fifo <CutCoeffArray,10>  highCutCoeffFifo;
+    
+    
+    // placeholder , in future these parameters will be updated in a different object and thread.
+    ParametricCoeffPtr parametricChainCoeffPtr;
 };
