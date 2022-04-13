@@ -53,7 +53,7 @@ struct Fifo
         
         if (writeHandle.blockSize1 < 1)
             return false;
-        
+    
         if constexpr (isReferenceCountedObjectPtr<T>::value)
         {
             // save a copy of the ptr currently in buffer if any, increasing reference count.

@@ -140,22 +140,26 @@ private:
             if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
             {
                 auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
+                
                 // push and pull Fifo for testing.
-                parametricCoeffFifo.push(chainCoefficients);
+                bool temp0 = parametricCoeffFifo.push(chainCoefficients);
+                jassert(temp0);
                 
                 // pull a copy
                 ParametricCoeffPtr newChainCoefficients;
                 bool temp = parametricCoeffFifo.pull(newChainCoefficients);
                 jassert(temp);
                 
+
+                
                 leftChain.setBypassed<filterNum>(bypassed);
                 rightChain.setBypassed<filterNum>(bypassed);
                 *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 
-                // ok this step will actually now get rid of last reference to old chain coefficients and save an extra reference to the new ones
-                parametricChainCoeffPtr = chainCoefficients;
-
+                // manually decrement reference count to deal with 'stranded' reference in fifo.
+                chainCoefficients.get()->decReferenceCount();
+      
             }
             
             oldParametricParams = parametricParams;
@@ -287,8 +291,4 @@ private:
     
     Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
     Fifo <CutCoeffArray,10>  highCutCoeffFifo;
-    
-    
-    // placeholder , in future these parameters will be updated in a different object and thread.
-    ParametricCoeffPtr parametricChainCoeffPtr;
 };
