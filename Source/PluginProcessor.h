@@ -157,6 +157,8 @@ private:
                 *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 
+                // TEMPORARY To avoid releasing resources in audio thread, i increment the
+                // reference count. But that means these will never get released for now. 
                 newChainCoefficients.get()->incReferenceCount();
       
             }
