@@ -157,8 +157,7 @@ private:
                 *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 
-                // manually decrement reference count to deal with 'stranded' reference in fifo.
-                chainCoefficients.get()->decReferenceCount();
+                newChainCoefficients.get()->incReferenceCount();
       
             }
             

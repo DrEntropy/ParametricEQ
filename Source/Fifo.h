@@ -59,11 +59,10 @@ struct Fifo
             // save a copy of the ptr currently in buffer if any, increasing reference count.
             auto tempT {buffer[writeHandle.startIndex1]};
             buffer[writeHandle.startIndex1] = t;
-            
+
             // verify we are not about to delete the object that was at this index, if any!
             jassert (tempT.get() == nullptr || tempT.get()->getReferenceCount() != 1);
-       
-            
+    
         }
         else
         {
