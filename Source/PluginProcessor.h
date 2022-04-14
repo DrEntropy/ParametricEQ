@@ -14,6 +14,7 @@
 #include "Fifo.h"
 #include "CoefficientsMaker.h"
 #include "ParameterHelpers.h"
+#include "FilterCoefficientGenerator.h"
 
 
 using Filter = juce::dsp::IIR::Filter<float>;
@@ -284,12 +285,14 @@ private:
     HighCutLowCutParameters oldHighCutParams;
     HighCutLowCutParameters oldLowCutParams;
     
-    using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
-    using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
+    //using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
+    //using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
 
     Fifo <ParametricCoeffPtr,10>  parametricCoeffFifo;
     Fifo <CutCoeffArray,10>  cutCoeffFifo;
     
     Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
     Fifo <CutCoeffArray,10>  highCutCoeffFifo;
+    
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 10> cutCoeffGen {cutCoeffFifo};
 };

@@ -15,7 +15,7 @@
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
 
- 
+
 
 
 struct CoefficientsMaker
@@ -86,3 +86,10 @@ struct CoefficientsMaker
     }
     
 };
+
+
+
+// convenience types
+
+using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (FilterParameters()));
+using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (HighCutLowCutParameters()));
