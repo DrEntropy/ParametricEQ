@@ -101,24 +101,24 @@ private:
             if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
                 cutParams.order = 2;
                 
-            
             cutParams.sampleRate = sampleRate;
             cutParams.quality  = quality;
             
-            // set up filter chains.
-           
+            
             if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
             {
-                auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
-                
-                cutCoeffFifo.push(chainCoefficients);
-                decltype(chainCoefficients) newChainCoefficients;
-                cutCoeffFifo.pull(newChainCoefficients);
-                
+                cutCoeffGen.changeParameters(cutParams);
+            }
+            
+            CutCoeffArray newChainCoefficients;
+            bool newChainAvailable = cutCoeffFifo.pull(newChainCoefficients);
+            
+            
+            if (newChainAvailable)
+            {
                 leftChain.setBypassed<filterNum>(bypassed);
                 rightChain.setBypassed<filterNum>(bypassed);
                 
-                // Later this will be multiple filters for each of the bands i think.
                 *(leftChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
                 *(rightChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
             }
@@ -137,31 +137,23 @@ private:
             parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
             
             // set up filter chains.
-
             if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
             {
-                auto chainCoefficients = CoefficientsMaker::makeCoefficients(parametricParams);
-                
-                // push and pull Fifo for testing.
-                bool temp0 = parametricCoeffFifo.push(chainCoefficients);
-                jassert(temp0);
-                
-                // pull a copy
-                ParametricCoeffPtr newChainCoefficients;
-                bool temp = parametricCoeffFifo.pull(newChainCoefficients);
-                jassert(temp);
-                
+                parametricCoeffGen.changeParameters(parametricParams);
+            }
+            
+            ParametricCoeffPtr newChainCoefficients;
+            bool newChainAvailable = parametricCoeffFifo.pull(newChainCoefficients);
 
-                
+            if (newChainAvailable)
+            {
                 leftChain.setBypassed<filterNum>(bypassed);
                 rightChain.setBypassed<filterNum>(bypassed);
                 *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 
-                // TEMPORARY To avoid releasing resources in audio thread, i increment the
-                // reference count. But that means these will never get released for now. 
+                // placeholder until release pool will take care of this Remember to get rid of this
                 newChainCoefficients.get()->incReferenceCount();
-      
             }
             
             oldParametricParams = parametricParams;
@@ -189,51 +181,57 @@ private:
         cutParams.quality  = 1.0f; //not used for cut filters
         
        
-        
+        //  send parameters if they changed
         if (forceUpdate || oldParams != cutParams)
         {
-            auto chainCoefficients = CoefficientsMaker::makeCoefficients(cutParams);
-            decltype(chainCoefficients) newChainCoefficients;
-            
             if(isLowCut)
             {
-                lowCutCoeffFifo.push(chainCoefficients);
-                lowCutCoeffFifo.pull(newChainCoefficients);
+                lowCutCoeffGen.changeParameters(cutParams);
+    
             }
             else
             {
-                highCutCoeffFifo.push(chainCoefficients);
-                highCutCoeffFifo.pull(newChainCoefficients);
+                highCutCoeffGen.changeParameters(cutParams);
             }
+            
+        }
         
+           
+        CutCoeffArray newChainCoefficients;
+        bool newChainAvailable;
+        
+        if(isLowCut)
+        {
+            newChainAvailable = lowCutCoeffFifo.pull(newChainCoefficients);
+        }
+        else
+        {
+            newChainAvailable = highCutCoeffFifo.pull(newChainCoefficients);
+        }
+        
+        if (newChainAvailable)
+        {
             leftChain.setBypassed<filterNum>(bypassed);
             rightChain.setBypassed<filterNum>(bypassed);
             bypassSubChain<filterNum>();
             //set up the four filters
             if(!bypassed)
             {
-                
-                switch(slope)
+                int order {newChainCoefficients.size()};
+                switch(order)
                 {
-                    case Slope::Slope_48:
-                    case Slope::Slope_42:
+                    case 4:
                         updateSingleCut<filterNum,3> (newChainCoefficients);
-                        
-                    case Slope::Slope_36:
-                    case Slope::Slope_30:
+                    case 3:
                         updateSingleCut<filterNum,2> (newChainCoefficients);
-                        
-                    case Slope::Slope_24:
-                    case Slope::Slope_18:
+                    case 2:
                         updateSingleCut<filterNum,1> (newChainCoefficients);
-               
-                    case Slope::Slope_12:
-                    case Slope::Slope_6:
+                    case 1:
                         updateSingleCut<filterNum,0> (newChainCoefficients);
-
                    }
             }
         }
+        
         // side effect update. Code smell?
         oldParams = cutParams;
     }
@@ -288,11 +286,18 @@ private:
     //using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
     //using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
 
-    Fifo <ParametricCoeffPtr,10>  parametricCoeffFifo;
-    Fifo <CutCoeffArray,10>  cutCoeffFifo;
+    Fifo <ParametricCoeffPtr,100>  parametricCoeffFifo;
+    Fifo <CutCoeffArray,100>  cutCoeffFifo;
     
-    Fifo <CutCoeffArray,10>  lowCutCoeffFifo;
-    Fifo <CutCoeffArray,10>  highCutCoeffFifo;
+    Fifo <CutCoeffArray,100>  lowCutCoeffFifo;
+    Fifo <CutCoeffArray,100>  highCutCoeffFifo;
     
-    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 10> cutCoeffGen {cutCoeffFifo};
+    // FOUR filter coefficient generators, due to the special case of the central cut filter.
+    // Will probably delete this central cut filter, because when we have 8 of these it will be a nightmare
+    // and also have no value since we get teh same filter for order 1 and 2 from the makeLowPass, etc
+    
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> highCutCoeffGen {highCutCoeffFifo};
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> lowCutCoeffGen {lowCutCoeffFifo};
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> cutCoeffGen {cutCoeffFifo};
+    FilterCoefficientGenerator<ParametricCoeffPtr, FilterParameters, CoefficientsMaker, 100> parametricCoeffGen {parametricCoeffFifo};
 };
