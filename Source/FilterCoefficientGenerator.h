@@ -14,9 +14,6 @@
 #include "Fifo.h"
 #include "CoefficientsMaker.h"
 
-
-
-
 template <typename CoefficientType, typename ParamType, typename MakeFunction, size_t Size>
 struct FilterCoefficientGenerator : juce::Thread
 {
@@ -45,12 +42,12 @@ struct FilterCoefficientGenerator : juce::Thread
             if (paramChanged.compareAndSetBool (false, true))
             {
                 while (paramFifo.getNumAvailableForReading() >0)
-                    {
-                        ParamType params;
-                        paramFifo.pull(params);
-                        auto coeffs = MakeFunction::makeCoefficients(params);
-                        coeffFifo.push(coeffs);
-                    }
+                {
+                    ParamType params;
+                    paramFifo.pull(params);
+                    auto coeffs = MakeFunction::makeCoefficients(params);
+                    coeffFifo.push(coeffs);
+                }
             }
             
         }
