@@ -40,3 +40,9 @@ juce::String createTypeParamString(int filterNum)
 {
     return createParamString("type",filterNum);
 }
+
+
+juce::String createSlopeParamString(int filterNum)
+{
+    return createParamString("slope",filterNum);
+}

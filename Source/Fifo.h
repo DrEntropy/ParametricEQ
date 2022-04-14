@@ -53,25 +53,21 @@ struct Fifo
         
         if (writeHandle.blockSize1 < 1)
             return false;
-        
+    
         if constexpr (isReferenceCountedObjectPtr<T>::value)
         {
             // save a copy of the ptr currently in buffer if any, increasing reference count.
             auto tempT {buffer[writeHandle.startIndex1]};
             buffer[writeHandle.startIndex1] = t;
-            
+
             // verify we are not about to delete the object that was at this index, if any!
-            if(tempT)
-            {
-                jassert (tempT.get()->getReferenceCount() > 1);
-            }
+            jassert (tempT.get() == nullptr || tempT.get()->getReferenceCount() != 1);
+    
         }
         else
         {
             buffer[writeHandle.startIndex1] = t;
         }
-        
-        buffer[writeHandle.startIndex1] = t;
         return true;
     }
     
@@ -80,6 +76,7 @@ struct Fifo
         auto readHandle = fifo.read(1);
         if (readHandle.blockSize1 > 0)
         {
+            // note, a copy is returned, make sure somewhere this is dealt with!
             t = buffer[readHandle.startIndex1];
             return true;
         }

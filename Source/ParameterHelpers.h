@@ -24,3 +24,5 @@ juce::String createFreqParamString(int filterNum);
 juce::String createBypassParamString(int filterNum);
 
 juce::String createTypeParamString(int filterNum);
+
+juce::String createSlopeParamString(int filterNum);
