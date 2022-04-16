@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <algorithm>
 #include <JuceHeader.h>
 #include "Fifo.h"
 
@@ -53,7 +54,8 @@ struct ReleasePool : juce::Timer {
            while (holdPool.getNumAvailableForReading() >0)
            {
                paramFifo.exchange(object);
-               addIfNotAlreadyThere(object);
+               if(object.get())
+                   addIfNotAlreadyThere(object);
                object = nullptr; // ready for next one!
            }
        }
@@ -66,7 +68,10 @@ private:
     
     void addIfNotAlreadyThere(Ptr ptr)
     {
-      //TODO use std::find to check if ptr is in the pool. if it is not, then pushback
+        if(std::find(deletionPool.begin(),deletionPool.end(), ptr))
+           return;
+        
+        deletionPool.push_back(ptr);
     }
     
     bool readyToDelete(const Ptr& ptr)

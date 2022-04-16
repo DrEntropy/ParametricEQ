@@ -84,6 +84,25 @@ struct Fifo
         return false;
     }
     
+    bool exchange(T&& t)
+    {
+
+            auto readHandle = fifo.read(1);
+            if (readHandle.blockSize1 > 0)
+            {
+                if constexpr (isReferenceCountedObjectPtr<T>::value)
+                {
+                    std::swap(t,buffer[readHandle.startIndex1]);
+                    jassert(! buffer[readHandle.startIndex].get());
+                    return true;
+                }
+                return false;
+            }
+            return false;
+
+        
+    }
+    
     int getNumAvailableForReading() const
     {
         return fifo.getNumReady();
