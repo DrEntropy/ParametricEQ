@@ -15,8 +15,9 @@
 
 template <typename ObjectType, size_t PoolSize>
 struct ReleasePool : juce::Timer {
-    using Ptr = ReferenceCountedObjectPtr<ObjType>
-    using Array = RefferenceCountedArray<ObjType>
+    
+    using Ptr = juce::ReferenceCountedObjectPtr<ObjectType>;
+    using Array = juce::ReferenceCountedArray<ObjectType>;
     
     ReleasePool(size_t delPoolSize) : Timer{}
     {
@@ -27,7 +28,7 @@ struct ReleasePool : juce::Timer {
     void add(Ptr ptr)
     {
         auto messManager = juce::MessageManager::getInstanceWithoutCreating();
-        if (messManager && messManger.isThisMessageThread())
+        if (messManager && messManager->isThisTheMessageThread())
         {
             // message thread, add to pool directly
             addIfNotAlreadyThere(ptr);
@@ -35,7 +36,7 @@ struct ReleasePool : juce::Timer {
         else
         {
             // on audio thread, push to fifo to deal with later.
-            newAddition = holdPool.push(ptr);
+            newAddition = holdFifo.push(ptr);
             jassert(newAddition);
         }
     }
@@ -51,36 +52,37 @@ struct ReleasePool : juce::Timer {
        if (newAddition.compareAndSetBool (false, true))
        {
            Ptr object;
-           while (holdPool.getNumAvailableForReading() >0)
+           while (holdFifo.getNumAvailableForReading() >0)
            {
-               paramFifo.exchange(object);
+               bool exchangeSucceeded = holdFifo.exchange(object);
+               jassert(exchangeSucceeded); // should not fail.
                if(object.get())
                    addIfNotAlreadyThere(object);
+               
                object = nullptr; // ready for next one!
            }
        }
        // Ok time to clean the pool.
         deletionPool.erase(std::remove_if(deletionPool.begin(), deletionPool.end(), readyToDelete), deletionPool.end());
-        
     }
     
 private:
     
     void addIfNotAlreadyThere(Ptr ptr)
     {
-        if(std::find(deletionPool.begin(),deletionPool.end(), ptr))
+        if(std::find(deletionPool.begin(), deletionPool.end(), ptr))
            return;
         
         deletionPool.push_back(ptr);
     }
     
-    bool readyToDelete(const Ptr& ptr)
+    static bool readyToDelete(const Ptr& ptr)
     {
         return ptr.get()->getReferenceCount() <= 1;
     }
     
     std::vector<Ptr> deletionPool;
-    Fifo<Ptr, PoolSize> holdPool;
-    Atomic<bool> newAddition {false};
+    Fifo<Ptr, PoolSize> holdFifo;
+    juce::Atomic<bool> newAddition {false};
     
 };
