@@ -91,48 +91,36 @@ struct Fifo
             auto readHandle = fifo.read(1);
             if (readHandle.blockSize1 > 0)
             {
-                T temp;
-                
                 if constexpr (isReferenceCountedObjectPtr<T>::value)
                 {
-                    temp = std::move(buffer[readHandle.startIndex1]);
-                    jassert(! buffer[readHandle.startIndex1].get());
-                    buffer[readHandle.startIndex1]= t;
-                    t = temp;
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassert(! buffer[readHandle.startIndex1].get()); // only call this when t points to null
                     return true;
                 }
                 
                 if constexpr(isReferenceCountedArray<T>::value)
                 {
-                    temp = std::move(buffer[readHandle.startIndex1]);
-                    jassert(buffer[readHandle.startIndex1].isEmpty());
-                    buffer[readHandle.startIndex1]= t;
-                    t = temp;
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassert(buffer[readHandle.startIndex1].isEmpty());  //ony call when t is empty
                     return true;
                 }
                 
                 if constexpr(isVector<T>::value)
                 {
-                    if(t.size() == buffer[readHandle.startIndex1].size())
+                    if(t.size() >= buffer[readHandle.startIndex1].size()) //not sure this is needed
                     {
-                        temp = std::move(buffer[readHandle.startIndex1]);
-                        jassert(buffer[readHandle.startIndex1].empty());
-                        buffer[readHandle.startIndex1]= t;
-                        t = temp;
+                        std::swap(t, buffer[readHandle.startIndex1]);
                         return true;
                     }
-                    
+                   
                     return false;
                 }
                 
                 if constexpr(isAudioBuffer<T>::value)
                 {
-                    if(t.getNumSamples() == buffer[readHandle.startIndex1].getNumSamples())
+                    if(t.getNumSamples() >= buffer[readHandle.startIndex1].getNumSamples()) //not sure if this guard is needed
                     {
-                        temp = std::move(buffer[readHandle.startIndex1]);
-                        jassert(buffer[readHandle.startIndex1].getNumSamples()==0);
-                        buffer[readHandle.startIndex1]= t;
-                        t = temp;
+                        std::swap(t, buffer[readHandle.startIndex1]);
                         return true;
                     }
                     
@@ -140,10 +128,8 @@ struct Fifo
                 }
                
                 // blind swap
-                temp = std::move(buffer[readHandle.startIndex1]);
-                jassert(true); // detect reaching this case to see if we need to do something special
-                buffer[readHandle.startIndex1]= t;
-                t = temp;
+                std::swap(t, buffer[readHandle.startIndex1]);
+                jassertfalse;  // temporary, check on this case if it occurs
                 return true;
                 
              
