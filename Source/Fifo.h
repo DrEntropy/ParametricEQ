@@ -112,7 +112,7 @@ struct Fifo
                         std::swap(t, buffer[readHandle.startIndex1]);
                         return true;
                     }
-                   
+                    // couldn't exchange, so fail.
                     return false;
                 }
                 
@@ -123,20 +123,16 @@ struct Fifo
                         std::swap(t, buffer[readHandle.startIndex1]);
                         return true;
                     }
-                    
+                    // couldn't exchange, so fail.
                     return false;
-                }
-               
+                }               
                 // blind swap
                 std::swap(t, buffer[readHandle.startIndex1]);
                 jassertfalse;  // temporary, check on this case if it occurs
                 return true;
-                
-             
             }
-            return false;
-
         
+            return false;
     }
     
     int getNumAvailableForReading() const
