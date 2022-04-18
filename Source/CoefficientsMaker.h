@@ -91,5 +91,5 @@ struct CoefficientsMaker
 
 // convenience types
 
-using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (FilterParameters()));
+using FilterCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (FilterParameters()));
 using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (HighCutLowCutParameters()));

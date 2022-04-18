@@ -94,7 +94,7 @@ struct Fifo
                 if constexpr (isReferenceCountedObjectPtr<T>::value)
                 {
                     std::swap(t, buffer[readHandle.startIndex1]);
-                    jassert( buffer[readHandle.startIndex1].get() != nullptr); // only call this when t points to null
+                    jassert( buffer[readHandle.startIndex1].get() == nullptr); // only call this when t points to null
                 }
                 else if constexpr(isReferenceCountedArray<T>::value)
                 {

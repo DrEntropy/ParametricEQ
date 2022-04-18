@@ -13,7 +13,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
-#include "ReleasePool.h"
+
 
  
 #include <string>

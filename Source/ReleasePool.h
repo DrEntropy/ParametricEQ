@@ -17,12 +17,11 @@ template <typename ObjectType, size_t PoolSize>
 struct ReleasePool : juce::Timer {
     
     using Ptr = juce::ReferenceCountedObjectPtr<ObjectType>;
-    using Array = juce::ReferenceCountedArray<ObjectType>;
-    
-    ReleasePool(size_t delPoolSize) : Timer{}
+ 
+    ReleasePool(size_t delPoolSize, int interval) : Timer{}
     {
         deletionPool.reserve(delPoolSize);
-        startTimer(2000); // two seconds
+        startTimer(interval); // two seconds
     }
     
     void add(Ptr ptr)
@@ -37,15 +36,11 @@ struct ReleasePool : juce::Timer {
         {
             // on audio thread, push to fifo to deal with later.
             newAddition = holdFifo.push(ptr);
-            jassert(newAddition);
+            jassert(newAddition.value);
         }
     }
     
-    void add (Array array)
-    {
-        //TODO loop through array andd add each element
-        
-    }
+ 
     
     void timerCallback() override
     {
@@ -54,7 +49,7 @@ struct ReleasePool : juce::Timer {
            Ptr object;
            while (holdFifo.getNumAvailableForReading() >0)
            {
-               bool exchangeSucceeded = holdFifo.exchange(object);
+               bool exchangeSucceeded = holdFifo.exchange(std::move(object));
                jassert(exchangeSucceeded); // should not fail.
                if(object.get())
                    addIfNotAlreadyThere(object);
@@ -64,6 +59,13 @@ struct ReleasePool : juce::Timer {
        }
        // Ok time to clean the pool.
         deletionPool.erase(std::remove_if(deletionPool.begin(), deletionPool.end(), readyToDelete), deletionPool.end());
+        
+        
+        // after 10 intervals stop and check what is going on
+        // if(count == 10)
+        //     jassertfalse;
+        //
+        // count++;
     }
     
 private:
@@ -82,5 +84,8 @@ private:
     std::vector<Ptr> deletionPool;
     Fifo<Ptr, PoolSize> holdFifo;
     juce::Atomic<bool> newAddition {false};
+
+    // for debugging
+    //int count{0};
     
 };
