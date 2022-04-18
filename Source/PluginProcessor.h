@@ -121,6 +121,8 @@ private:
                 
                 *(leftChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
                 *(rightChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
+                
+                parametricCoeffPool.add(newChainCoefficients[0]);
             }
         
             oldCutParams = cutParams;
@@ -220,15 +222,14 @@ private:
                 switch(order)
                 {
                     case 4:
-                        updateSingleCut<filterNum,3> (newChainCoefficients);
-                        
+                        updateSingleCut<filterNum,3> (newChainCoefficients, isLowCut);
                     case 3:
-                        updateSingleCut<filterNum,2> (newChainCoefficients);
+                        updateSingleCut<filterNum,2> (newChainCoefficients, isLowCut);
                     case 2:
-                        updateSingleCut<filterNum,1> (newChainCoefficients);
+                        updateSingleCut<filterNum,1> (newChainCoefficients, isLowCut);
                     case 1:
-                        updateSingleCut<filterNum,0> (newChainCoefficients);
-                   }
+                        updateSingleCut<filterNum,0> (newChainCoefficients, isLowCut);
+                }
             }
         }
         
@@ -237,7 +238,7 @@ private:
     }
     
     template <const int filterNum, const int subFilterNum, typename CoefficientType>
-    void updateSingleCut(CoefficientType& chainCoefficients)
+    void updateSingleCut(CoefficientType& chainCoefficients, bool isLowCut)
     {
         auto& leftSubChain = leftChain.template get<filterNum>();
         auto& rightSubChain = rightChain.template get<filterNum>();
@@ -247,6 +248,15 @@ private:
         *(leftSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
         *(rightSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
         
+        // add to correct release pool
+        if(isLowCut)
+        {
+            lowCutCoeffPool.add(chainCoefficients[subFilterNum]);
+        }
+        else
+        {
+            highCutCoeffPool.add(chainCoefficients[subFilterNum]);
+        }
         
         leftSubChain.template setBypassed<subFilterNum>(false);
         rightSubChain.template setBypassed<subFilterNum>(false);
