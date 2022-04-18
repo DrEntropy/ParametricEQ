@@ -84,6 +84,59 @@ struct Fifo
         return false;
     }
     
+    
+    bool exchange(T&& t)
+    {
+
+            auto readHandle = fifo.read(1);
+            if (readHandle.blockSize1 > 0)
+            {
+                if constexpr (isReferenceCountedObjectPtr<T>::value)
+                {
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassert( buffer[readHandle.startIndex1].get() != nullptr); // only call this when t points to null
+                }
+                else if constexpr(isReferenceCountedArray<T>::value)
+                {
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassert(buffer[readHandle.startIndex1].isEmpty());  //ony call when t is empty
+                }
+                else if constexpr(isVector<T>::value)
+                {
+                    if(t.size() >= buffer[readHandle.startIndex1].size())
+                    {
+                        std::swap(t, buffer[readHandle.startIndex1]);
+                    }
+                    else
+                    {
+                        t = buffer[readHandle.startIndex1]; //can't swap.  must copy
+                    }
+                }
+                else if constexpr(isAudioBuffer<T>::value)
+                {
+                    if(t.getNumSamples() >= buffer[readHandle.startIndex1].getNumSamples())
+                    {
+                        std::swap(t, buffer[readHandle.startIndex1]);
+                    }
+                    else
+                    {
+                        t = buffer[readHandle.startIndex1]; //can't swap.  must copy
+                    }
+                    
+                }
+                else
+                {
+                    // blind swap
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassertfalse;  // temporary, check on this case if it occurs
+                }
+
+                return true;
+            }
+        
+            return false;
+    }
+    
     int getNumAvailableForReading() const
     {
         return fifo.getNumReady();
@@ -98,10 +151,28 @@ private:
     juce::AbstractFifo fifo { Size };
     std::array<T, Size> buffer;
     
-    
+    // helpers for type checking
     template <typename U>
     struct isReferenceCountedObjectPtr : std::false_type { };
 
     template <typename W>
     struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W>> : std::true_type { };
+    
+    template <typename U>
+    struct isReferenceCountedArray : std::false_type { };
+
+    template <typename W>
+    struct isReferenceCountedArray<juce::ReferenceCountedArray<W>> : std::true_type { };
+    
+    template <typename U>
+    struct isVector : std::false_type { };
+
+    template <typename W>
+    struct isVector<std::vector<W>> : std::true_type { };
+    
+    template <typename U>
+    struct isAudioBuffer : std::false_type { };
+
+    template <typename W>
+    struct isAudioBuffer<juce::AudioBuffer<W>> : std::true_type { };
 };
