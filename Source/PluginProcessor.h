@@ -15,7 +15,7 @@
 #include "CoefficientsMaker.h"
 #include "ParameterHelpers.h"
 #include "FilterCoefficientGenerator.h"
-
+#include "ReleasePool.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
@@ -142,7 +142,7 @@ private:
                 parametricCoeffGen.changeParameters(parametricParams);
             }
             
-            ParametricCoeffPtr newChainCoefficients;
+            FilterCoeffPtr newChainCoefficients;
             bool newChainAvailable = parametricCoeffFifo.pull(newChainCoefficients);
 
             if (newChainAvailable)
@@ -152,8 +152,8 @@ private:
                 *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
                 
-                // placeholder until release pool will take care of this Remember to get rid of this
-                newChainCoefficients.get()->incReferenceCount();
+                // prevent in thread deletion
+                parametricCoeffPool.add(newChainCoefficients);
             }
             
             oldParametricParams = parametricParams;
@@ -282,22 +282,28 @@ private:
     
     HighCutLowCutParameters oldHighCutParams;
     HighCutLowCutParameters oldLowCutParams;
-    
-    //using ParametricCoeffPtr = decltype(CoefficientsMaker::makeCoefficients (oldParametricParams));
-    //using CutCoeffArray = decltype(CoefficientsMaker::makeCoefficients (oldLowCutParams));
 
-    Fifo <ParametricCoeffPtr,100>  parametricCoeffFifo;
-    Fifo <CutCoeffArray,100>  cutCoeffFifo;
+    static const int fifoSize = 10;
     
-    Fifo <CutCoeffArray,100>  lowCutCoeffFifo;
-    Fifo <CutCoeffArray,100>  highCutCoeffFifo;
+    Fifo <FilterCoeffPtr, fifoSize>  parametricCoeffFifo;
+    Fifo <CutCoeffArray, fifoSize>  cutCoeffFifo;
+    
+    Fifo <CutCoeffArray, fifoSize>  lowCutCoeffFifo;
+    Fifo <CutCoeffArray, fifoSize>  highCutCoeffFifo;
     
     // FOUR filter coefficient generators, due to the special case of the central cut filter.
     // Will probably delete this central cut filter, because when we have 8 of these it will be a nightmare
     // and also have no value since we get teh same filter for order 1 and 2 from the makeLowPass, etc
     
-    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> highCutCoeffGen {highCutCoeffFifo};
-    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> lowCutCoeffGen {lowCutCoeffFifo};
-    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, 100> cutCoeffGen {cutCoeffFifo};
-    FilterCoefficientGenerator<ParametricCoeffPtr, FilterParameters, CoefficientsMaker, 100> parametricCoeffGen {parametricCoeffFifo};
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> highCutCoeffGen {highCutCoeffFifo};
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> lowCutCoeffGen {lowCutCoeffFifo};
+    FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> cutCoeffGen {cutCoeffFifo};
+    FilterCoefficientGenerator<FilterCoeffPtr, FilterParameters, CoefficientsMaker, fifoSize> parametricCoeffGen {parametricCoeffFifo};
+    
+    // Release pools
+    //
+    using Coefficients = juce::dsp::IIR::Coefficients<float>;
+    //ReleasePool<Coefficients, 1000> lowCutCoeffPool {1000, 2000};
+    ReleasePool<Coefficients, 100> parametricCoeffPool {100, 2000};
+    //ReleasePool<Coefficients, 1000> highCutCoeffPool {1000, 2000};
 };
