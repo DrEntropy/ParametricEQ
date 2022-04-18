@@ -94,7 +94,7 @@ struct Fifo
                 if constexpr (isReferenceCountedObjectPtr<T>::value)
                 {
                     std::swap(t, buffer[readHandle.startIndex1]);
-                    jassert(! buffer[readHandle.startIndex1].get()); // only call this when t points to null
+                    jassert( buffer[readHandle.startIndex1].get() != nullptr); // only call this when t points to null
                     return true;
                 }
                 
@@ -107,24 +107,30 @@ struct Fifo
                 
                 if constexpr(isVector<T>::value)
                 {
-                    if(t.size() >= buffer[readHandle.startIndex1].size()) //not sure this is needed
+                    if(t.size() >= buffer[readHandle.startIndex1].size())
                     {
                         std::swap(t, buffer[readHandle.startIndex1]);
                         return true;
                     }
-                    // couldn't exchange, so fail.
-                    return false;
+                    else
+                    {
+                        t = buffer[readHandle.startIndex1]; //can't swap.  must copy
+                    }
+                    return true;
                 }
                 
                 if constexpr(isAudioBuffer<T>::value)
                 {
-                    if(t.getNumSamples() >= buffer[readHandle.startIndex1].getNumSamples()) //not sure if this guard is needed
+                    if(t.getNumSamples() >= buffer[readHandle.startIndex1].getNumSamples())
                     {
                         std::swap(t, buffer[readHandle.startIndex1]);
-                        return true;
                     }
-                    // couldn't exchange, so fail.
-                    return false;
+                    else
+                    {
+                        t = buffer[readHandle.startIndex1]; //can't swap.  must copy
+                    }
+                    
+                    return true;
                 }               
                 // blind swap
                 std::swap(t, buffer[readHandle.startIndex1]);
