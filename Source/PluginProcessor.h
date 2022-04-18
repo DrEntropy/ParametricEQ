@@ -187,7 +187,6 @@ private:
             if(isLowCut)
             {
                 lowCutCoeffGen.changeParameters(cutParams);
-    
             }
             else
             {
@@ -222,6 +221,7 @@ private:
                 {
                     case 4:
                         updateSingleCut<filterNum,3> (newChainCoefficients);
+                        
                     case 3:
                         updateSingleCut<filterNum,2> (newChainCoefficients);
                     case 2:
@@ -246,6 +246,7 @@ private:
         
         *(leftSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
         *(rightSubChain.template get<subFilterNum>().coefficients) = *(chainCoefficients[subFilterNum]);
+        
         
         leftSubChain.template setBypassed<subFilterNum>(false);
         rightSubChain.template setBypassed<subFilterNum>(false);
@@ -283,7 +284,10 @@ private:
     HighCutLowCutParameters oldHighCutParams;
     HighCutLowCutParameters oldLowCutParams;
 
-    static const int fifoSize = 10;
+    static const int fifoSize = 100;
+    // in testing i could fill the pool with enough fiddling with pool size =100, not so with 1000
+    static const int poolSize = 1000;
+    static const int cleanupInterval = 2000; // ms
     
     Fifo <FilterCoeffPtr, fifoSize>  parametricCoeffFifo;
     Fifo <CutCoeffArray, fifoSize>  cutCoeffFifo;
@@ -303,7 +307,7 @@ private:
     // Release pools
     //
     using Coefficients = juce::dsp::IIR::Coefficients<float>;
-    //ReleasePool<Coefficients, 1000> lowCutCoeffPool {1000, 2000};
-    ReleasePool<Coefficients, 100> parametricCoeffPool {100, 2000};
-    //ReleasePool<Coefficients, 1000> highCutCoeffPool {1000, 2000};
+    ReleasePool<Coefficients, poolSize> lowCutCoeffPool {poolSize, cleanupInterval};
+    ReleasePool<Coefficients, poolSize> parametricCoeffPool {poolSize, cleanupInterval};
+    ReleasePool<Coefficients, poolSize> highCutCoeffPool {poolSize, cleanupInterval};
 };

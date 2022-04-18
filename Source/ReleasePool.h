@@ -62,10 +62,10 @@ struct ReleasePool : juce::Timer {
         
         
         // after 10 intervals stop and check what is going on
-        if(count == 10)
-            jassertfalse;
-        
-        count++;
+        // if(count == 10)
+        //     jassertfalse;
+        //
+        // count++;
     }
     
 private:
@@ -84,9 +84,8 @@ private:
     std::vector<Ptr> deletionPool;
     Fifo<Ptr, PoolSize> holdFifo;
     juce::Atomic<bool> newAddition {false};
-    
-    
+
     // for debugging
-    int count{0};
+    //int count{0};
     
 };
