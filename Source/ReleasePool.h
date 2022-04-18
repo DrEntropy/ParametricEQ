@@ -70,10 +70,8 @@ private:
     
     void addIfNotAlreadyThere(Ptr ptr)
     {
-        if(std::find(deletionPool.begin(), deletionPool.end(), ptr))
-           return;
-        
-        deletionPool.push_back(ptr);
+        if(std::find(deletionPool.begin(), deletionPool.end(), ptr) == deletionPool.end())
+            deletionPool.push_back(ptr);
     }
     
     static bool readyToDelete(const Ptr& ptr)
