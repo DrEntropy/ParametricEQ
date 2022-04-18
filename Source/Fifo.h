@@ -95,31 +95,24 @@ struct Fifo
                 {
                     std::swap(t, buffer[readHandle.startIndex1]);
                     jassert( buffer[readHandle.startIndex1].get() != nullptr); // only call this when t points to null
-                    return true;
                 }
-                
-                if constexpr(isReferenceCountedArray<T>::value)
+                else if constexpr(isReferenceCountedArray<T>::value)
                 {
                     std::swap(t, buffer[readHandle.startIndex1]);
                     jassert(buffer[readHandle.startIndex1].isEmpty());  //ony call when t is empty
-                    return true;
                 }
-                
-                if constexpr(isVector<T>::value)
+                else if constexpr(isVector<T>::value)
                 {
                     if(t.size() >= buffer[readHandle.startIndex1].size())
                     {
                         std::swap(t, buffer[readHandle.startIndex1]);
-                        return true;
                     }
                     else
                     {
                         t = buffer[readHandle.startIndex1]; //can't swap.  must copy
                     }
-                    return true;
                 }
-                
-                if constexpr(isAudioBuffer<T>::value)
+                else if constexpr(isAudioBuffer<T>::value)
                 {
                     if(t.getNumSamples() >= buffer[readHandle.startIndex1].getNumSamples())
                     {
@@ -130,11 +123,14 @@ struct Fifo
                         t = buffer[readHandle.startIndex1]; //can't swap.  must copy
                     }
                     
-                    return true;
-                }               
-                // blind swap
-                std::swap(t, buffer[readHandle.startIndex1]);
-                jassertfalse;  // temporary, check on this case if it occurs
+                }
+                else
+                {
+                    // blind swap
+                    std::swap(t, buffer[readHandle.startIndex1]);
+                    jassertfalse;  // temporary, check on this case if it occurs
+                }
+
                 return true;
             }
         
