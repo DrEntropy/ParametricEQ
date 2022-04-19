@@ -10,8 +10,16 @@
 
 #pragma once
 
+#include "FilterCoefficientGenerator.h"
+#include "ReleasePool.h"
+#include "Fifo.h"
 
-template<typename FilterType, FifoDataType, ParamType, FunctionType>
+// FifoDataType is for example ReferenceCountedObjectPtr
+// ParamType is one of the FilterParameters types.
+// Function type is going to be CoefficientsMaker for now.
+// FilterType is juce::dsp::IIR::Filter<float> or a chain of them.
+
+template <typename FilterType, FifoDataType, ParamType, FunctionType>
 struct FilterLink
 {
     void prepare(const dsp::ProcessSpec&);
@@ -43,4 +51,24 @@ private:
     //stuff for setting the coefficients of the FilterType instance.
     updateFilterState(Ptr& oldState, Ptr newState);
     void configureCutFilterChain(const FifoDataType& coefficients);
+    
+    // magic numebrs
+    static const int fifoSize = 100;
+    static const int poolSize = 1000;
+    static const int cleanupInterval = 2000; // ms
+
+    using Coefficients = juce::dsp::IIR::Coefficients<float>;
+    
+    float sampleRate;
+    
+    ParamType currentParams;
+    
+    bool shouldComputeNewCoefficients;
+ 
+    ReleasePool<Coefficients, poolSize> releasePool {poolSize, cleanupInterval};
+    Fifo <FifoDataType, fifoSize>  coeffFifo;
+    FilterCoefficientGenerator<FifoDataType, ParamType, CoefficientsMaker, fifoSize> coeffGen {coeffFifo};
+    FilterType myFilter;
+    
+    
 };
