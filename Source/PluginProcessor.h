@@ -16,6 +16,7 @@
 #include "ParameterHelpers.h"
 #include "FilterCoefficientGenerator.h"
 #include "ReleasePool.h"
+#include "FilterLink.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
@@ -320,4 +321,8 @@ private:
     ReleasePool<Coefficients, poolSize> lowCutCoeffPool {poolSize, cleanupInterval};
     ReleasePool<Coefficients, poolSize> parametricCoeffPool {poolSize, cleanupInterval};
     ReleasePool<Coefficients, poolSize> highCutCoeffPool {poolSize, cleanupInterval};
+    
+    
+    //
+    FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker> paraFilterLink;
 };
