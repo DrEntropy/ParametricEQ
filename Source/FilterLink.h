@@ -33,7 +33,7 @@ struct FilterLink
         filter.prepare(spec);
         
         // update sampleRate
-        sampleRate = spec.sampleRate;
+        initialize(ParamType{}, 0.0, true, spec.sampleRate);
         
     }
     
@@ -58,12 +58,13 @@ struct FilterLink
 //    void advanceSmoothers(int numSamples);
     
     //stuff for updating the params
-    void updateParams(const ParamType& params, bool forceUpdate = false)
+    void updateParams(const ParamType& params)
     {
-       if(forceUpdate || params != currentParams)
+       if(params != currentParams)
        {
            //coeffGen.changeParameters(params);
            shouldComputeNewCoefficients = true;
+           currentParams = params;
        }
     }
 
@@ -114,9 +115,22 @@ struct FilterLink
     }
     
     //stuff for configuring the filter before processing
-    void performPreloopUpdate(const ParamType& params);
+    void performPreloopUpdate(const ParamType& params)
+    {
+        updateParams(params);
+        
+    }
     void performInnerLoopFilterUpdate(bool onRealTimeThread, int numSamplesToSkip);
-    void initialize(const ParamType& params, float rampTime, bool onRealTimeThread, double sr);
+    
+    void initialize(const ParamType& params, float rampTime, bool onRealTimeThread, double sr)
+    {
+        currentParams = params;
+        sampleRate = sr;
+        shouldComputeNewCoefficients = true;
+        genearteNewCoefficientsIfNeeded();
+        loadCoefficients(onRealTimeThread);
+        
+    }
 private:
     //stuff for setting the coefficients of the FilterType instance.
 
