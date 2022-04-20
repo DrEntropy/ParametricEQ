@@ -273,10 +273,15 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
     // initialize filters first.
     FilterParameters paramatricParams = getParametericFilterParams<1>(sampleRate);
     leftChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
+    rightChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
     
-    //TODO replace these with initialize stuff.
-    updateCutFilter<0>(sampleRate, true, oldHighCutParams, true);
-    updateCutFilter<2>(sampleRate, true, oldLowCutParams, false);
+    //low cut filter, and then high cut
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(sampleRate, true);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<2>(sampleRate, true);
+    leftChain.get<0>().initialize(lowCutParams, 0.0, false, sampleRate);
+    rightChain.get<0>().initialize(lowCutParams, 0.0, false, sampleRate);
+    leftChain.get<2>().initialize(highCutParams, 0.0, false, sampleRate);
+    rightChain.get<2>().initialize(highCutParams, 0.0, false, sampleRate);
 }
  
 
@@ -284,7 +289,7 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
 
 void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
 {
-    updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
+    updateCutFilter<0>(sampleRate, true);
     updateParametricFilter<1>(sampleRate);
-    updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
+    updateCutFilter<2>(sampleRate, false);
 }
