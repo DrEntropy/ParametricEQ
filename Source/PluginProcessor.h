@@ -245,7 +245,7 @@ private:
         rightSubChain.template setBypassed<2>(true);
         rightSubChain.template setBypassed<3>(true);
     }
-  
+    void initializeFilters(double sampleRate);
     void updateFilters(double sampleRate, bool forceUpdate = false);
     
     using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;

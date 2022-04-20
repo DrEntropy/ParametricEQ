@@ -112,13 +112,9 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     leftChain.prepare(spec);
     rightChain.prepare(spec);
     
-    // initialize filters first.
-    FilterParameters paramatricParams = getParametericFilterParams<1>(sampleRate);
-    leftChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
     
-    //TODO replace these with initialize stuff.
-    updateCutFilter<0>(sampleRate, true, oldHighCutParams, true);
-    updateCutFilter<2>(sampleRate, true, oldLowCutParams, false);
+    initializeFilters(sampleRate);
+
 }
 
 void ParametricEQAudioProcessor::releaseResources()
@@ -197,15 +193,19 @@ juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 //==============================================================================
 void ParametricEQAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void ParametricEQAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+     if (xmlState.get() != nullptr)
+                if (xmlState->hasTagName (apvts.state.getType()))
+                    apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
+    initializeFilters(getSampleRate());
 }
 
 //==============================================================================
@@ -268,7 +268,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 }
 
 
-
+void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
+{
+    // initialize filters first.
+    FilterParameters paramatricParams = getParametericFilterParams<1>(sampleRate);
+    leftChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
+    
+    //TODO replace these with initialize stuff.
+    updateCutFilter<0>(sampleRate, true, oldHighCutParams, true);
+    updateCutFilter<2>(sampleRate, true, oldLowCutParams, false);
+}
  
 
 
