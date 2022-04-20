@@ -156,7 +156,7 @@ private:
     
   
     void initializeFilters(double sampleRate);
-    void updateFilters(double sampleRate, bool forceUpdate = false);
+    void updateFilters(double sampleRate);
     
     using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
     

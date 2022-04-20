@@ -291,7 +291,7 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
 
 
 
-void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+void ParametricEQAudioProcessor::updateFilters(double sampleRate)
 {
     updateCutFilter<0>(sampleRate, true);
     updateParametricFilter<1>(sampleRate);
