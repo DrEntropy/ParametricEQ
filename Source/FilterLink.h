@@ -140,7 +140,7 @@ struct FilterLink
 private:
     //stuff for setting the coefficients of the FilterType instance.
 
-    void updateFilterState(FifoDataType& oldState, FifoDataType newState)
+    void updateFilterState(FilterCoeffPtr& oldState, FilterCoeffPtr newState)
     {
         *oldState = *newState;
         releasePool.add(newState);
