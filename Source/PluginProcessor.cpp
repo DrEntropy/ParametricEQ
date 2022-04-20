@@ -270,6 +270,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
 {
     updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
-    updateParametricFilter<1>(sampleRate, forceUpdate);
+    updateParametricFilter<1>(sampleRate);
     updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
 }

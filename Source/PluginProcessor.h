@@ -20,11 +20,9 @@
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
-using MonoChain = juce::dsp::ProcessorChain<CutFilter,Filter,CutFilter>;
-
-
+using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
  
-
+using MonoChain = juce::dsp::ProcessorChain<CutFilter,ParametricFilter,CutFilter>;
 
 //==============================================================================
 /**
@@ -78,7 +76,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
     template <const int filterNum>
-    void updateParametricFilter(double sampleRate, bool forceUpdate)
+    void updateParametricFilter(double sampleRate)
     {
         using namespace FilterInfo;
 
@@ -90,78 +88,40 @@ private:
         
         FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(filterNum))->load());
         
-        if (filterType == FilterType::LowPass || filterType == FilterType::HighPass || filterType == FilterType::FirstOrderHighPass || filterType == FilterType::FirstOrderLowPass)
-        {
-            HighCutLowCutParameters cutParams;
-            
-            cutParams.isLowcut = (filterType == FilterType::HighPass) || (filterType == FilterType::FirstOrderHighPass);
-            cutParams.frequency = frequency;
-            cutParams.bypassed = bypassed;
-            cutParams.order = 1;
-            
-            if (filterType == FilterType::HighPass || filterType == FilterType::LowPass)
-                cutParams.order = 2;
-                
-            cutParams.sampleRate = sampleRate;
-            cutParams.quality  = quality;
-            
-            
-            if (forceUpdate || filterType != oldFilterType || cutParams != oldCutParams)
-            {
-                cutCoeffGen.changeParameters(cutParams);
-            }
-            
-            CutCoeffArray newChainCoefficients;
-            bool newChainAvailable = cutCoeffFifo.pull(newChainCoefficients);
-            
-            
-            if (newChainAvailable)
-            {
-                leftChain.setBypassed<filterNum>(bypassed);
-                rightChain.setBypassed<filterNum>(bypassed);
-                
-                *(leftChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
-                *(rightChain.get<filterNum>().coefficients) = *(newChainCoefficients[0]);
-                
-                parametricCoeffPool.add(newChainCoefficients[0]);
-            }
         
-            oldCutParams = cutParams;
-        }
-        else
-        {
-            FilterParameters parametricParams;
-            
-            parametricParams.frequency = frequency;
-            parametricParams.filterType = filterType;
-            parametricParams.sampleRate = sampleRate;
-            parametricParams.quality = quality;
-            parametricParams.bypassed = bypassed;
-            parametricParams.gain = juce::Decibels::decibelsToGain(apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
-            
-            // set up filter chains.
-            if (forceUpdate || filterType != oldFilterType || parametricParams != oldParametricParams)
-            {
-                parametricCoeffGen.changeParameters(parametricParams);
-            }
-            
-            FilterCoeffPtr newChainCoefficients;
-            bool newChainAvailable = parametricCoeffFifo.pull(newChainCoefficients);
-
-            if (newChainAvailable)
-            {
-                leftChain.setBypassed<filterNum>(bypassed);
-                rightChain.setBypassed<filterNum>(bypassed);
-                *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
-                *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
-                
-                // prevent in thread deletion
-                parametricCoeffPool.add(newChainCoefficients);
-            }
-            
-            oldParametricParams = parametricParams;
-            oldFilterType = filterType;
-        }
+        FilterParameters parametricParams;
+        
+        parametricParams.frequency = frequency;
+        parametricParams.filterType = filterType;
+        parametricParams.sampleRate = sampleRate;
+        parametricParams.quality = quality;
+        parametricParams.bypassed = bypassed;
+        parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
+    
+        
+        leftChain.get<filterNum>().performPreLoopUpdate(parametricParams);
+        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
+        rightChain.get<filterNum>().performPreLoopUpdate(parametricParams);
+        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
+        
+        
+//        FilterCoeffPtr newChainCoefficients;
+//        bool newChainAvailable = parametricCoeffFifo.pull(newChainCoefficients);
+//
+//        if (newChainAvailable)
+//        {
+//            leftChain.setBypassed<filterNum>(bypassed);
+//            rightChain.setBypassed<filterNum>(bypassed);
+//            *(leftChain.get<filterNum>().coefficients) = *newChainCoefficients;
+//            *(rightChain.get<filterNum>().coefficients) = *newChainCoefficients;
+//
+//            // prevent in thread deletion
+//            parametricCoeffPool.add(newChainCoefficients);
+//        }
+//
+//        oldParametricParams = parametricParams;
+//        oldFilterType = filterType;
+        
     }
     
     template <const int filterNum>
@@ -300,7 +260,7 @@ private:
     static const int poolSize = 1000;
     static const int cleanupInterval = 2000; // ms
     
-    Fifo <FilterCoeffPtr, fifoSize>  parametricCoeffFifo;
+    //Fifo <FilterCoeffPtr, fifoSize>  parametricCoeffFifo;
     Fifo <CutCoeffArray, fifoSize>  cutCoeffFifo;
     
     Fifo <CutCoeffArray, fifoSize>  lowCutCoeffFifo;
@@ -313,16 +273,16 @@ private:
     FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> highCutCoeffGen {highCutCoeffFifo};
     FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> lowCutCoeffGen {lowCutCoeffFifo};
     FilterCoefficientGenerator<CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker, fifoSize> cutCoeffGen {cutCoeffFifo};
-    FilterCoefficientGenerator<FilterCoeffPtr, FilterParameters, CoefficientsMaker, fifoSize> parametricCoeffGen {parametricCoeffFifo};
+    //FilterCoefficientGenerator<FilterCoeffPtr, FilterParameters, CoefficientsMaker, fifoSize> parametricCoeffGen {parametricCoeffFifo};
     
     // Release pools
     //
     using Coefficients = juce::dsp::IIR::Coefficients<float>;
     ReleasePool<Coefficients, poolSize> lowCutCoeffPool {poolSize, cleanupInterval};
-    ReleasePool<Coefficients, poolSize> parametricCoeffPool {poolSize, cleanupInterval};
+    //ReleasePool<Coefficients, poolSize> parametricCoeffPool {poolSize, cleanupInterval};
     ReleasePool<Coefficients, poolSize> highCutCoeffPool {poolSize, cleanupInterval};
     
     
     //
-    FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker> paraFilterLink;
+    
 };
