@@ -270,18 +270,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 
 void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
 {
+    // check if on realtime thread
+    auto messMan = juce::MessageManager::getInstanceWithoutCreating();
+    bool onRealTimeThread=  ! ((messMan != nullptr) && messMan->isThisTheMessageThread());
+    
     // initialize filters first.
     FilterParameters paramatricParams = getParametericFilterParams<1>(sampleRate);
-    leftChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
-    rightChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
+    leftChain.get<1>().initialize(paramatricParams, 0.0, onRealTimeThread, sampleRate);
+    rightChain.get<1>().initialize(paramatricParams, 0.0, onRealTimeThread, sampleRate);
     
     //low cut filter, and then high cut
     HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(sampleRate, true);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<2>(sampleRate, true);
-    leftChain.get<0>().initialize(lowCutParams, 0.0, false, sampleRate);
-    rightChain.get<0>().initialize(lowCutParams, 0.0, false, sampleRate);
-    leftChain.get<2>().initialize(highCutParams, 0.0, false, sampleRate);
-    rightChain.get<2>().initialize(highCutParams, 0.0, false, sampleRate);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<2>(sampleRate, false);
+    leftChain.get<0>().initialize(lowCutParams, 0.0, onRealTimeThread, sampleRate);
+    rightChain.get<0>().initialize(lowCutParams, 0.0, onRealTimeThread, sampleRate);
+    leftChain.get<2>().initialize(highCutParams, 0.0, onRealTimeThread, sampleRate);
+    rightChain.get<2>().initialize(highCutParams, 0.0, onRealTimeThread, sampleRate);
 }
  
 
