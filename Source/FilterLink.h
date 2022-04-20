@@ -31,10 +31,6 @@ struct FilterLink
     void prepare(const juce::dsp::ProcessSpec& spec)
     {
         filter.prepare(spec);
-        
-        // this probably IS the realtime thread, but for testing i am forcing it.
-        initialize(ParamType{}, 0.0, false, spec.sampleRate);
-        
     }
     
     void reset()

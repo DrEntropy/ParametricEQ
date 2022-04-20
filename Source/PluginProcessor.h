@@ -76,11 +76,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
     
     template <const int filterNum>
-    void updateParametricFilter(double sampleRate)
+    FilterParameters getParametericFilterParams(double sampleRate)
     {
         using namespace FilterInfo;
-
-
         
         float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
         float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
@@ -97,7 +95,16 @@ private:
         parametricParams.quality = quality;
         parametricParams.bypassed = bypassed;
         parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
+        
+        return parametricParams;
+        
+    }
     
+    template <const int filterNum>
+    void updateParametricFilter(double sampleRate)
+    {
+ 
+        FilterParameters parametricParams = getParametericFilterParams<filterNum>(sampleRate);
         
         leftChain.get<filterNum>().performPreloopUpdate(parametricParams);
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);

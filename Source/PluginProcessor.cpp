@@ -112,7 +112,13 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     leftChain.prepare(spec);
     rightChain.prepare(spec);
     
-    updateFilters(sampleRate,true);
+    // initialize filters first.
+    FilterParameters paramatricParams = getParametericFilterParams<1>(sampleRate);
+    leftChain.get<1>().initialize(paramatricParams, 0.0, false, sampleRate);
+    
+    //TODO replace these with initialize stuff.
+    updateCutFilter<0>(sampleRate, true, oldHighCutParams, true);
+    updateCutFilter<2>(sampleRate, true, oldLowCutParams, false);
 }
 
 void ParametricEQAudioProcessor::releaseResources()
