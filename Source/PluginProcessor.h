@@ -99,9 +99,9 @@ private:
         parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(filterNum))-> load());
     
         
-        leftChain.get<filterNum>().performPreLoopUpdate(parametricParams);
+        leftChain.get<filterNum>().performPreloopUpdate(parametricParams);
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
-        rightChain.get<filterNum>().performPreLoopUpdate(parametricParams);
+        rightChain.get<filterNum>().performPreloopUpdate(parametricParams);
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
         
         

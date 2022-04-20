@@ -32,8 +32,8 @@ struct FilterLink
     {
         filter.prepare(spec);
         
-        // update sampleRate
-        initialize(ParamType{}, 0.0, true, spec.sampleRate);
+        // this probably IS the realtime thread, but for testing i am forcing it.
+        initialize(ParamType{}, 0.0, false, spec.sampleRate);
         
     }
     
@@ -109,7 +109,7 @@ struct FilterLink
             ParamType newParams {currentParams};
             // TODO update newParams using smoothed values for freq/gain/quality..
             // this will probably require some more type checking to see if it has a gain parameter or not.
-            coeffGen.add(newParams);
+            coeffGen.changeParameters(newParams);
             
         }
     }
@@ -118,16 +118,26 @@ struct FilterLink
     void performPreloopUpdate(const ParamType& params)
     {
         updateParams(params);
+        // update smoother targets here.
         
     }
-    void performInnerLoopFilterUpdate(bool onRealTimeThread, int numSamplesToSkip);
+    void performInnerLoopFilterUpdate(bool onRealTimeThread, int numSamplesToSkip)
+    {
+        if(currentParams.bypassed)
+            return;
+        
+        generateNewCoefficientsIfNeeded();
+        loadCoefficients(onRealTimeThread);
+        // check smoothing, skip samples
+        
+    }
     
     void initialize(const ParamType& params, float rampTime, bool onRealTimeThread, double sr)
     {
         currentParams = params;
         sampleRate = sr;
         shouldComputeNewCoefficients = true;
-        genearteNewCoefficientsIfNeeded();
+        generateNewCoefficientsIfNeeded();
         loadCoefficients(onRealTimeThread);
         
     }
