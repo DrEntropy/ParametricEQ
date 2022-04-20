@@ -19,11 +19,11 @@
 #include "FilterLink.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
-using CutFilter = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
-using CutFilterLink = FilterLink<CutFilter, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
+using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
+using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
  
-using MonoChain = juce::dsp::ProcessorChain<CutFilterLink,ParametricFilter,CutFilterLink>;
+using MonoChain = juce::dsp::ProcessorChain<CutFilter,ParametricFilter,CutFilter>;
 
 //==============================================================================
 /**
