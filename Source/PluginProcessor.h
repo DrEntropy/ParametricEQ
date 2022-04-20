@@ -23,7 +23,14 @@ using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
  
-using MonoChain = juce::dsp::ProcessorChain<CutFilter,ParametricFilter,CutFilter>;
+using MonoChain = juce::dsp::ProcessorChain<CutFilter,
+                                            ParametricFilter,
+                                            ParametricFilter,
+                                            ParametricFilter,
+                                            ParametricFilter,
+                                            ParametricFilter,
+                                            ParametricFilter,
+                                            CutFilter>;
 
 //==============================================================================
 /**
@@ -152,7 +159,12 @@ private:
         
     }
     
-     
+    template <const int filterNum, typename ParamType>
+    void initializeChain(ParamType params, bool onRealTimeThread, double sampleRate)
+    {
+        leftChain.get<filterNum>().initialize(params, 0.0, onRealTimeThread, sampleRate);
+        rightChain.get<filterNum>().initialize(params, 0.0, onRealTimeThread, sampleRate);
+    }
     
   
     void initializeFilters(double sampleRate);
