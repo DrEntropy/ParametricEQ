@@ -24,7 +24,6 @@ public:
     {
     }
     
-    
     FloatType getDb() const
     {
         return decibels;
