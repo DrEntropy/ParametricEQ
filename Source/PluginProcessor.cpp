@@ -162,22 +162,30 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+         buffer.clear (i, 0, buffer.getNumSamples());
+
+    performPreLoopUpdate(getSampleRate());
+    
+    juce::dsp::AudioBlock<float> block(buffer);
 
     
-     performPreLoopUpdate(getSampleRate());
+    int numSamples = buffer.getNumSamples();
+    int offset = 0;
     
-     performInnerLoopUpdate(getSampleRate(), buffer.getNumSamples());
-     
-     juce::dsp::AudioBlock<float> block(buffer);
-     auto leftBlock = block.getSingleChannelBlock(0);
-     auto rightBlock = block.getSingleChannelBlock(1);
-     
-    
-     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
-     leftChain.process(leftContext);
-     rightChain.process(rightContext);
+    while(offset < numSamples)
+    {
+        int blockSize = std::min(numSamples - offset, innerLoopSize);
+        auto subBlock =  block.getSubBlock(offset, blockSize);
+        auto leftBlock = subBlock.getSingleChannelBlock(0);
+        auto rightBlock = subBlock.getSingleChannelBlock(1);
+        
+        performInnerLoopUpdate(getSampleRate(), blockSize);
+        juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+        juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+        leftChain.process(leftContext);
+        rightChain.process(rightContext);
+        offset += innerLoopSize;
+    }
 }
 
 //==============================================================================

@@ -24,6 +24,7 @@ using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, C
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
 
 const float rampTime = 0.05f;  //50 mseconds
+const int innerLoopSize = 32;
  
 using MonoChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
