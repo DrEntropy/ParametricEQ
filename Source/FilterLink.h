@@ -139,8 +139,8 @@ struct FilterLink
     }
 private:
     //stuff for setting the coefficients of the FilterType instance.
-
-    void updateFilterState(FilterCoeffPtr& oldState, FilterCoeffPtr newState)
+    template <typename Obj>
+    void updateFilterState(juce::ReferenceCountedObjectPtr<Obj>& oldState ,juce::ReferenceCountedObjectPtr<Obj> newState)
     {
         *oldState = *newState;
         releasePool.add(newState);
