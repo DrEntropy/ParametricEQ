@@ -227,7 +227,7 @@ private:
     
     // magic numebrs
     static const int fifoSize = 100;
-    static const int poolSize = 5000;
+    static const int poolSize = 50000;
     static const int cleanupInterval = 2000; // ms
 
     using Coefficients = juce::dsp::IIR::Coefficients<float>;
