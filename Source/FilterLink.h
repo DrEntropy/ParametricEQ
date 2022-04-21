@@ -20,7 +20,7 @@
 
 
 
-// FifoDataType is for example ReferenceCountedObjectPtr
+// FifoDataType is for example ReferenceCountedObjectPtr or ReferenceCountedArray
 // ParamType is one of the FilterParameters types.
 // Function type is going to be CoefficientsMaker for now.
 // FilterType is juce::dsp::IIR::Filter<float> or a chain of them.
@@ -46,12 +46,63 @@ struct FilterLink
     }
     
     //stuff for the juce::SmoothedValue instances.
-    // commented out for now, will come back to when i get the rest working.
-//    void updateSmootherTargets();
-//    void resetSmoothers(float rampTime);
-//    bool isSmoothing() const;
-//    void checkIfStillSmoothing();
-//    void advanceSmoothers(int numSamples);
+ 
+    void updateSmootherTargets()
+    {
+        if(freqSmoother.getTargetValue()  != currentParams.frequency)
+            freqSmoother.setTargetValue(currentParams.frequency);
+        
+        if(qualitySmoother.getTargetValue()  != currentParams.quality)
+            qualitySmoother.setTargetValue(currentParams.quality);
+        
+        if constexpr (std::is_same<FilterParameters, ParamType>::value)
+        {
+            if(gainSmoother.getTargetValue()  != currentParams.gain)
+                gainSmoother.setTargetValue(currentParams.gain);
+        }
+    }
+    void resetSmoothers(float rampTime)
+    {
+        freqSmoother.reset(sampleRate, rampTime);
+        freqSmoother.setCurrentAndTargetValue(currentParams.frequency);
+        
+        qualitySmoother.reset(sampleRate, rampTime);
+        qualitySmoother.setCurrentAndTargetValue(currentParams.quality);
+        
+        
+        if constexpr (std::is_same<FilterParameters, ParamType>::value)
+        {
+            gainSmoother.reset(sampleRate, rampTime);
+            gainSmoother.setCurrentAndTargetValue(currentParams.gain);
+        }
+    }
+    bool isSmoothing() const
+    {
+        bool result = freqSmoother.isSmoothing() || qualitySmoother.isSmoothing();
+        
+        if constexpr (std::is_same<FilterParameters, ParamType>::value)
+        {
+            result = result || gainSmoother.isSmoothing();
+        }
+        
+        return result;
+    }
+    void checkIfStillSmoothing()
+    {
+        
+        shouldComputeNewCoefficients = isSmoothing();
+    }
+    
+    void advanceSmoothers(int numSamples)
+    {
+        freqSmoother.skip(numSamples);
+        qualitySmoother.skip(numSamples);
+        
+        if constexpr (std::is_same<FilterParameters, ParamType>::value)
+        {
+            gainSmoother.skip(numSamples);
+        }
+    }
     
     //stuff for updating the params
     void updateParams(const ParamType& params)
@@ -103,8 +154,13 @@ struct FilterLink
         if(shouldComputeNewCoefficients.compareAndSetBool(false,true))
         {
             ParamType newParams {currentParams};
-            // TODO update newParams using smoothed values for freq/gain/quality..
-            // this will probably require some more type checking to see if it has a gain parameter or not.
+            if(isSmoothing())
+            {
+                currentParams.frequency = freqSmoother.getCurrentValue();
+                currentParams.quality = qualitySmoother.getCurrentValue();
+                if constexpr(std::is_same<FilterParameters, ParamType>::value)
+                    currentParams.gain = gainSmoother.getCurrentValue();
+            }
             coeffGen.changeParameters(newParams);
             
         }
@@ -114,7 +170,7 @@ struct FilterLink
     void performPreloopUpdate(const ParamType& params)
     {
         updateParams(params);
-        // update smoother targets here.
+        updateSmootherTargets();
         
     }
     void performInnerLoopFilterUpdate(bool onRealTimeThread, int numSamplesToSkip)
@@ -124,7 +180,10 @@ struct FilterLink
         
         generateNewCoefficientsIfNeeded();
         loadCoefficients(onRealTimeThread);
-        // check smoothing, skip samples
+        
+        advanceSmoothers(numSamplesToSkip);
+        checkIfStillSmoothing();
+            
         
     }
     
@@ -135,6 +194,8 @@ struct FilterLink
         shouldComputeNewCoefficients = true;
         generateNewCoefficientsIfNeeded();
         loadCoefficients(onRealTimeThread);
+        
+        resetSmoothers(rampTime);
         
     }
 private:
@@ -191,8 +252,8 @@ private:
     FilterType filter;
     
     // Smoothers
-//    juce::SmoothedValue<float> freqSmoother;
-//    juce::SmoothedValue<float> qualitySmoother;
-//    juce::SmoothedValue<Decibel<float>> gainSmoother;
+    juce::SmoothedValue<float> freqSmoother;
+    juce::SmoothedValue<float> qualitySmoother;
+    juce::SmoothedValue<Decibel<float>> gainSmoother;
     
 };
