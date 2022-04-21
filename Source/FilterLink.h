@@ -16,10 +16,6 @@
 #include "Decibel.h"
 #include "CoeffTypeHelpers.h"
 
-
-
-
-
 // FifoDataType is for example ReferenceCountedObjectPtr or ReferenceCountedArray
 // ParamType is one of the FilterParameters types.
 // Function type is going to be CoefficientsMaker for now.
@@ -45,8 +41,6 @@ struct FilterLink
            filter.process(context);
     }
     
-    //stuff for the juce::SmoothedValue instances.
- 
     void updateSmootherTargets()
     {
         if(freqSmoother.getTargetValue()  != currentParams.frequency)
@@ -61,6 +55,7 @@ struct FilterLink
                 gainSmoother.setTargetValue(currentParams.gain);
         }
     }
+    
     void resetSmoothers(float rampTime)
     {
         freqSmoother.reset(sampleRate, rampTime);
@@ -69,13 +64,13 @@ struct FilterLink
         qualitySmoother.reset(sampleRate, rampTime);
         qualitySmoother.setCurrentAndTargetValue(currentParams.quality);
         
-        
         if constexpr (std::is_same<FilterParameters, ParamType>::value)
         {
             gainSmoother.reset(sampleRate, rampTime);
             gainSmoother.setCurrentAndTargetValue(currentParams.gain);
         }
     }
+    
     bool isSmoothing() const
     {
         bool result = freqSmoother.isSmoothing() || qualitySmoother.isSmoothing();
@@ -87,9 +82,9 @@ struct FilterLink
         
         return result;
     }
+    
     void checkIfStillSmoothing()
     {
-        
         shouldComputeNewCoefficients = isSmoothing();
     }
     
@@ -114,7 +109,6 @@ struct FilterLink
        }
     }
 
-    
     //stuff for updating the coefficients from processBlock, prepareToPlay, or setStateInformation
     void updateCoefficients(const FifoDataType& coefficents)
     {
@@ -131,8 +125,7 @@ struct FilterLink
             jassertfalse;  // this should not happen
         }
     }
-    
-    
+        
     void loadCoefficients(bool fromFifo)
     {
         if(fromFifo)

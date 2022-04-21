@@ -291,12 +291,12 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
     
     // initialize filters
    
-    initializeChain<1>(getParametericFilterParams<1>(sampleRate),onRealTimeThread,sampleRate);
-    initializeChain<2>(getParametericFilterParams<2>(sampleRate),onRealTimeThread,sampleRate);
-    initializeChain<3>(getParametericFilterParams<3>(sampleRate),onRealTimeThread,sampleRate);
-    initializeChain<4>(getParametericFilterParams<4>(sampleRate),onRealTimeThread,sampleRate);
-    initializeChain<5>(getParametericFilterParams<5>(sampleRate),onRealTimeThread,sampleRate);
-    initializeChain<6>(getParametericFilterParams<6>(sampleRate),onRealTimeThread,sampleRate);
+    initializeChain<1>(getParametericFilterParams<1>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<2>(getParametericFilterParams<2>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<3>(getParametericFilterParams<3>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<4>(getParametericFilterParams<4>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<5>(getParametericFilterParams<5>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<6>(getParametericFilterParams<6>(sampleRate), onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
@@ -306,9 +306,6 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
     initializeChain<7>(highCutParams,onRealTimeThread,sampleRate);
  
 }
-
-
-
 
 
 void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
