@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "CoeffTypeHelpers.h"
 
 template<typename T, size_t Size>
 struct Fifo
@@ -151,28 +152,5 @@ private:
     juce::AbstractFifo fifo { Size };
     std::array<T, Size> buffer;
     
-    // helpers for type checking
-    template <typename U>
-    struct isReferenceCountedObjectPtr : std::false_type { };
 
-    template <typename W>
-    struct isReferenceCountedObjectPtr<juce::ReferenceCountedObjectPtr<W>> : std::true_type { };
-    
-    template <typename U>
-    struct isReferenceCountedArray : std::false_type { };
-
-    template <typename W>
-    struct isReferenceCountedArray<juce::ReferenceCountedArray<W>> : std::true_type { };
-    
-    template <typename U>
-    struct isVector : std::false_type { };
-
-    template <typename W>
-    struct isVector<std::vector<W>> : std::true_type { };
-    
-    template <typename U>
-    struct isAudioBuffer : std::false_type { };
-
-    template <typename W>
-    struct isAudioBuffer<juce::AudioBuffer<W>> : std::true_type { };
 };

@@ -12,11 +12,12 @@
 
 #include "FilterParametersBase.h"
 #include "FilterInfo.h"
+#include "Decibel.h"
 
 struct FilterParameters :  FilterParametersBase
 {
     FilterInfo::FilterType filterType {FilterInfo::FilterType::LowPass};
-    float gain {0.f};
+    Decibel<float> gain {0.f};
 };
 
 

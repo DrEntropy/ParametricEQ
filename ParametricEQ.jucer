@@ -4,6 +4,9 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="WCCJln" name="CoeffTypeHelpers.h" compile="0" resource="0"
+            file="Source/CoeffTypeHelpers.h"/>
+      <FILE id="dttkDI" name="FilterLink.h" compile="0" resource="0" file="Source/FilterLink.h"/>
       <FILE id="xB6BvK" name="ReleasePool.h" compile="0" resource="0" file="Source/ReleasePool.h"/>
       <FILE id="zR55yf" name="FilterCoefficientGenerator.h" compile="0" resource="0"
             file="Source/FilterCoefficientGenerator.h"/>

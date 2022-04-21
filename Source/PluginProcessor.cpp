@@ -112,7 +112,9 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     leftChain.prepare(spec);
     rightChain.prepare(spec);
     
-    updateFilters(sampleRate,true);
+    
+    initializeFilters(sampleRate);
+
 }
 
 void ParametricEQAudioProcessor::releaseResources()
@@ -160,20 +162,30 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+         buffer.clear (i, 0, buffer.getNumSamples());
+
+    performPreLoopUpdate(getSampleRate());
+    
+    juce::dsp::AudioBlock<float> block(buffer);
 
     
-     updateFilters(getSampleRate());
-     
-     juce::dsp::AudioBlock<float> block(buffer);
-     auto leftBlock = block.getSingleChannelBlock(0);
-     auto rightBlock = block.getSingleChannelBlock(1);
-     
+    int numSamples = buffer.getNumSamples();
+    int offset = 0;
     
-     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
-     leftChain.process(leftContext);
-     rightChain.process(rightContext);
+    while(offset < numSamples)
+    {
+        int blockSize = std::min(numSamples - offset, innerLoopSize);
+        auto subBlock =  block.getSubBlock(offset, blockSize);
+        auto leftBlock = subBlock.getSingleChannelBlock(0);
+        auto rightBlock = subBlock.getSingleChannelBlock(1);
+        
+        performInnerLoopUpdate(getSampleRate(), blockSize);
+        juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+        juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+        leftChain.process(leftContext);
+        rightChain.process(rightContext);
+        offset += innerLoopSize;
+    }
 }
 
 //==============================================================================
@@ -191,15 +203,19 @@ juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 //==============================================================================
 void ParametricEQAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void ParametricEQAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+     if (xmlState.get() != nullptr)
+                if (xmlState->hasTagName (apvts.state.getType()))
+                    apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
+    initializeFilters(getSampleRate());
 }
 
 //==============================================================================
@@ -256,20 +272,62 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     
     addFilterParamToLayout(layout, 0, true);
     addFilterParamToLayout(layout, 1, false);
-    addFilterParamToLayout(layout, 2, true);
+    addFilterParamToLayout(layout, 2, false);
+    addFilterParamToLayout(layout, 3, false);
+    addFilterParamToLayout(layout, 4, false);
+    addFilterParamToLayout(layout, 5, false);
+    addFilterParamToLayout(layout, 6, false);
+    addFilterParamToLayout(layout, 7, true);
     
     return layout;
 }
 
 
-
- 
-
-
-
-void ParametricEQAudioProcessor::updateFilters(double sampleRate, bool forceUpdate)
+void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
 {
-    updateCutFilter<0>(sampleRate, forceUpdate, oldHighCutParams, true);
-    updateParametricFilter<1>(sampleRate, forceUpdate);
-    updateCutFilter<2>(sampleRate, forceUpdate, oldLowCutParams, false);
+    // check if on realtime thread
+    auto messMan = juce::MessageManager::getInstanceWithoutCreating();
+    bool onRealTimeThread=  ! ((messMan != nullptr) && messMan->isThisTheMessageThread());
+    
+    // initialize filters
+   
+    initializeChain<1>(getParametericFilterParams<1>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<2>(getParametericFilterParams<2>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<3>(getParametericFilterParams<3>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<4>(getParametericFilterParams<4>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<5>(getParametericFilterParams<5>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<6>(getParametericFilterParams<6>(sampleRate), onRealTimeThread, sampleRate);
+    
+    
+    //low cut filter, and then high cut
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(sampleRate, true);
+    initializeChain<0>(lowCutParams,onRealTimeThread,sampleRate);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(sampleRate, false);
+    initializeChain<7>(highCutParams,onRealTimeThread,sampleRate);
+ 
+}
+
+
+void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
+{
+    preUpdateCutFilter<0>(sampleRate, true);
+    preUpdateParametricFilter<1>(sampleRate);
+    preUpdateParametricFilter<2>(sampleRate);
+    preUpdateParametricFilter<3>(sampleRate);
+    preUpdateParametricFilter<4>(sampleRate);
+    preUpdateParametricFilter<5>(sampleRate);
+    preUpdateParametricFilter<6>(sampleRate);
+    preUpdateCutFilter<7>(sampleRate, false);
+}
+
+void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int numSamplesToSkip)
+{
+    loopUpdateCutFilter<0>(sampleRate, true, numSamplesToSkip);
+    loopUpdateParametricFilter<1>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<2>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<3>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<4>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<5>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<6>(sampleRate, numSamplesToSkip);
+    loopUpdateCutFilter<7>(sampleRate, false, numSamplesToSkip);
 }
