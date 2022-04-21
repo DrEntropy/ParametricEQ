@@ -165,7 +165,9 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
     
-     updateFilters(getSampleRate());
+     performPreLoopUpdate(getSampleRate());
+    
+     performInnerLoopUpdate(getSampleRate(), buffer.getNumSamples());
      
      juce::dsp::AudioBlock<float> block(buffer);
      auto leftBlock = block.getSingleChannelBlock(0);
@@ -301,14 +303,26 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
 
 
 
-void ParametricEQAudioProcessor::updateFilters(double sampleRate)
+void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
 {
-    updateCutFilter<0>(sampleRate, true);
-    updateParametricFilter<1>(sampleRate);
-    updateParametricFilter<2>(sampleRate);
-    updateParametricFilter<3>(sampleRate);
-    updateParametricFilter<4>(sampleRate);
-    updateParametricFilter<5>(sampleRate);
-    updateParametricFilter<6>(sampleRate);
-    updateCutFilter<7>(sampleRate, false);
+    preUpdateCutFilter<0>(sampleRate, true);
+    preUpdateParametricFilter<1>(sampleRate);
+    preUpdateParametricFilter<2>(sampleRate);
+    preUpdateParametricFilter<3>(sampleRate);
+    preUpdateParametricFilter<4>(sampleRate);
+    preUpdateParametricFilter<5>(sampleRate);
+    preUpdateParametricFilter<6>(sampleRate);
+    preUpdateCutFilter<7>(sampleRate, false);
+}
+
+void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int numSamplesToSkip)
+{
+    loopUpdateCutFilter<0>(sampleRate, true, numSamplesToSkip);
+    loopUpdateParametricFilter<1>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<2>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<3>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<4>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<5>(sampleRate, numSamplesToSkip);
+    loopUpdateParametricFilter<6>(sampleRate, numSamplesToSkip);
+    loopUpdateCutFilter<7>(sampleRate, false, numSamplesToSkip);
 }

@@ -109,7 +109,6 @@ struct FilterLink
     {
        if(params != currentParams)
        {
-           //coeffGen.changeParameters(params);
            shouldComputeNewCoefficients = true;
            currentParams = params;
        }
@@ -156,10 +155,10 @@ struct FilterLink
             ParamType newParams {currentParams};
             if(isSmoothing())
             {
-                currentParams.frequency = freqSmoother.getCurrentValue();
-                currentParams.quality = qualitySmoother.getCurrentValue();
+                newParams.frequency = freqSmoother.getCurrentValue();
+                newParams.quality = qualitySmoother.getCurrentValue();
                 if constexpr(std::is_same<FilterParameters, ParamType>::value)
-                    currentParams.gain = gainSmoother.getCurrentValue();
+                    newParams.gain = gainSmoother.getCurrentValue();
             }
             coeffGen.changeParameters(newParams);
             

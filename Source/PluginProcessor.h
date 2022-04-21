@@ -22,6 +22,8 @@ using Filter = juce::dsp::IIR::Filter<float>;
 using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
+
+const float rampTime = 0.05f;  //50 mseconds
  
 using MonoChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
@@ -128,47 +130,56 @@ private:
         cutParams.quality  = 1.0f; //not used for cut filters
         
         return cutParams;
-        
     }
     
     template <const int filterNum>
-    void updateParametricFilter(double sampleRate)
+    void preUpdateParametricFilter(double sampleRate)
     {
- 
         FilterParameters parametricParams = getParametericFilterParams<filterNum>(sampleRate);
         
         leftChain.get<filterNum>().performPreloopUpdate(parametricParams);
-        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
         rightChain.get<filterNum>().performPreloopUpdate(parametricParams);
-        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
-        
-        
     }
     
+    
     template <const int filterNum>
-    void updateCutFilter(double sampleRate, bool isLowCut)
+    void loopUpdateParametricFilter(double sampleRate, int samplesToSkip)
     {
- 
-        
+        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+    }
+    
+    
+    
+    template <const int filterNum>
+    void preUpdateCutFilter(double sampleRate, bool isLowCut)
+    {
         HighCutLowCutParameters cutParams = getCutFilterParams<filterNum>(sampleRate, isLowCut);
             
         leftChain.get<filterNum>().performPreloopUpdate(cutParams);
-        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
         rightChain.get<filterNum>().performPreloopUpdate(cutParams);
-        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true,0);
-        
+   
     }
+    
+    template <const int filterNum>
+    void loopUpdateCutFilter(double sampleRate, bool isLowCut, int samplesToSkip)
+    {
+        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+    }
+    
     
     template <const int filterNum, typename ParamType>
     void initializeChain(ParamType params, bool onRealTimeThread, double sampleRate)
     {
-        leftChain.get<filterNum>().initialize(params, 0.0, onRealTimeThread, sampleRate);
-        rightChain.get<filterNum>().initialize(params, 0.0, onRealTimeThread, sampleRate);
+        leftChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
+        rightChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
     }
     
   
     void initializeFilters(double sampleRate);
-    void updateFilters(double sampleRate);
+    void performInnerLoopUpdate(double sampleRate, int samplesToSkip);
+    void performPreLoopUpdate(double sampleRate);
     
     using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
     
