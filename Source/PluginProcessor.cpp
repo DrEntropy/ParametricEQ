@@ -272,9 +272,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
     layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
-                                                           juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+                                                           juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
-                                                           juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+                                                           juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
 
     addFilterParamToLayout(layout, 0, true);
     addFilterParamToLayout(layout, 1, false);
