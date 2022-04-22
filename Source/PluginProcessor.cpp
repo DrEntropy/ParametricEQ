@@ -111,6 +111,10 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+    // reuse spec
+    spec.numChannels = 2;
+    inputTrim.prepare(spec);
+    outputTrim.prepare(spec);
     
     
     initializeFilters(sampleRate);
@@ -177,14 +181,23 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     {
         int blockSize = std::min(numSamples - offset, innerLoopSize);
         auto subBlock =  block.getSubBlock(offset, blockSize);
+        
+        // Context for processing all channels
+        juce::dsp::ProcessContextReplacing<float> stereoContext(subBlock);
+        inputTrim.process(stereoContext);
+        
         auto leftBlock = subBlock.getSingleChannelBlock(0);
         auto rightBlock = subBlock.getSingleChannelBlock(1);
         
         performInnerLoopUpdate(getSampleRate(), blockSize);
+        
         juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
         juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
         leftChain.process(leftContext);
         rightChain.process(rightContext);
+        
+        outputTrim.process(stereoContext);
+        
         offset += innerLoopSize;
     }
 }
@@ -341,10 +354,9 @@ void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int n
 void ParametricEQAudioProcessor::updateTrims()
 {
     
-    float inputTrim = apvts.getRawParameterValue("input_trim")->load();
-    float outputTrim = apvts.getRawParameterValue("output_trim")->load();
-    leftChain.get<InputTrim>().setGainDecibels(inputTrim);
-    rightChain.get<InputTrim>().setGainDecibels(inputTrim);
-    leftChain.get<OutputTrim>().setGainDecibels(outputTrim);
-    rightChain.get<OutputTrim>().setGainDecibels(outputTrim);
+    float inputGain= apvts.getRawParameterValue("input_trim")->load();
+    float outputGain = apvts.getRawParameterValue("output_trim")->load();
+    inputTrim.setGainDecibels(inputGain);
+    outputTrim.setGainDecibels(outputGain);
+ 
 }

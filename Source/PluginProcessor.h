@@ -24,7 +24,6 @@ using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
 
-enum ChainPos {InputTrim, FilterChain, OutputTrim };
 
 const float rampTime = 0.05f;  //50 mseconds
 const int innerLoopSize = 32;
@@ -38,9 +37,7 @@ using MonoFilterChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
                                             CutFilter>;
 
-using MonoChain = juce::dsp::ProcessorChain<Trim,
-                                            MonoFilterChain,
-                                            Trim>;
+
 
 //==============================================================================
 /**
@@ -145,16 +142,16 @@ private:
     {
         FilterParameters parametricParams = getParametericFilterParams<filterNum>(sampleRate);
         
-        leftChain.get<FilterChain>().get<filterNum>().performPreloopUpdate(parametricParams);
-        rightChain.get<FilterChain>().get<filterNum>().performPreloopUpdate(parametricParams);
+        leftChain.get<filterNum>().performPreloopUpdate(parametricParams);
+        rightChain.get<filterNum>().performPreloopUpdate(parametricParams);
     }
     
     
     template <const int filterNum>
     void loopUpdateParametricFilter(double sampleRate, int samplesToSkip)
     {
-        leftChain.get<FilterChain>().get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
-        rightChain.get<FilterChain>().get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
     }
     
     
@@ -164,24 +161,24 @@ private:
     {
         HighCutLowCutParameters cutParams = getCutFilterParams<filterNum>(sampleRate, isLowCut);
             
-        leftChain.get<FilterChain>().get<filterNum>().performPreloopUpdate(cutParams);
-        rightChain.get<FilterChain>().get<filterNum>().performPreloopUpdate(cutParams);
+        leftChain.get<filterNum>().performPreloopUpdate(cutParams);
+        rightChain.get<filterNum>().performPreloopUpdate(cutParams);
    
     }
     
     template <const int filterNum>
     void loopUpdateCutFilter(double sampleRate, bool isLowCut, int samplesToSkip)
     {
-        leftChain.get<FilterChain>().get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
-        rightChain.get<FilterChain>().get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
+        rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
     }
     
     
     template <const int filterNum, typename ParamType>
     void initializeChain(ParamType params, bool onRealTimeThread, double sampleRate)
     {
-        leftChain.get<FilterChain>().get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
-        rightChain.get<FilterChain>().get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
+        leftChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
+        rightChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
     }
     
   
@@ -195,7 +192,8 @@ private:
     void addFilterParamToLayout(ParamLayout&, int,bool);
  
     ParamLayout createParameterLayout();
-    MonoChain leftChain, rightChain;
+    MonoFilterChain leftChain, rightChain;
+    Trim inputTrim, outputTrim;
     
 
     
