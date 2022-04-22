@@ -19,14 +19,16 @@
 #include "FilterLink.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
+using Trim = juce::dsp::Gain<float>;
 using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
 
+
 const float rampTime = 0.05f;  //50 mseconds
 const int innerLoopSize = 32;
  
-using MonoChain = juce::dsp::ProcessorChain<CutFilter,
+using MonoFilterChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
                                             ParametricFilter,
                                             ParametricFilter,
@@ -34,6 +36,8 @@ using MonoChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
                                             ParametricFilter,
                                             CutFilter>;
+
+
 
 //==============================================================================
 /**
@@ -181,13 +185,15 @@ private:
     void initializeFilters(double sampleRate);
     void performInnerLoopUpdate(double sampleRate, int samplesToSkip);
     void performPreLoopUpdate(double sampleRate);
+    void updateTrims();
     
     using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
     
     void addFilterParamToLayout(ParamLayout&, int,bool);
  
     ParamLayout createParameterLayout();
-    MonoChain leftChain, rightChain;
+    MonoFilterChain leftChain, rightChain;
+    Trim inputTrim, outputTrim;
     
 
     

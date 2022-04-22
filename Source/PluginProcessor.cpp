@@ -111,6 +111,10 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+    // reuse spec
+    spec.numChannels = 2;
+    inputTrim.prepare(spec);
+    outputTrim.prepare(spec);
     
     
     initializeFilters(sampleRate);
@@ -163,7 +167,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
          buffer.clear (i, 0, buffer.getNumSamples());
-
+    
+    updateTrims();
     performPreLoopUpdate(getSampleRate());
     
     juce::dsp::AudioBlock<float> block(buffer);
@@ -172,20 +177,28 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int numSamples = buffer.getNumSamples();
     int offset = 0;
     
+    juce::dsp::ProcessContextReplacing<float> stereoContext(block);
+    inputTrim.process(stereoContext);
+    
     while(offset < numSamples)
     {
         int blockSize = std::min(numSamples - offset, innerLoopSize);
         auto subBlock =  block.getSubBlock(offset, blockSize);
+        
         auto leftBlock = subBlock.getSingleChannelBlock(0);
         auto rightBlock = subBlock.getSingleChannelBlock(1);
         
         performInnerLoopUpdate(getSampleRate(), blockSize);
+        
         juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
         juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
         leftChain.process(leftContext);
         rightChain.process(rightContext);
+                
         offset += innerLoopSize;
     }
+    
+    outputTrim.process(stereoContext);
 }
 
 //==============================================================================
@@ -270,6 +283,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
+    layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
+                                                           juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
+                                                           juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
+
     addFilterParamToLayout(layout, 0, true);
     addFilterParamToLayout(layout, 1, false);
     addFilterParamToLayout(layout, 2, false);
@@ -330,4 +348,14 @@ void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int n
     loopUpdateParametricFilter<5>(sampleRate, numSamplesToSkip);
     loopUpdateParametricFilter<6>(sampleRate, numSamplesToSkip);
     loopUpdateCutFilter<7>(sampleRate, false, numSamplesToSkip);
+}
+
+void ParametricEQAudioProcessor::updateTrims()
+{
+    
+    float inputGain= apvts.getRawParameterValue("input_trim")->load();
+    float outputGain = apvts.getRawParameterValue("output_trim")->load();
+    inputTrim.setGainDecibels(inputGain);
+    outputTrim.setGainDecibels(outputGain);
+ 
 }
