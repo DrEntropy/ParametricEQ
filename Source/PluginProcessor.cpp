@@ -177,14 +177,13 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int numSamples = buffer.getNumSamples();
     int offset = 0;
     
+    juce::dsp::ProcessContextReplacing<float> stereoContext(block);
+    inputTrim.process(stereoContext);
+    
     while(offset < numSamples)
     {
         int blockSize = std::min(numSamples - offset, innerLoopSize);
         auto subBlock =  block.getSubBlock(offset, blockSize);
-        
-        // Context for processing all channels
-        juce::dsp::ProcessContextReplacing<float> stereoContext(subBlock);
-        inputTrim.process(stereoContext);
         
         auto leftBlock = subBlock.getSingleChannelBlock(0);
         auto rightBlock = subBlock.getSingleChannelBlock(1);
@@ -195,11 +194,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
         leftChain.process(leftContext);
         rightChain.process(rightContext);
-        
-        outputTrim.process(stereoContext);
-        
+                
         offset += innerLoopSize;
     }
+    
+    outputTrim.process(stereoContext);
 }
 
 //==============================================================================
