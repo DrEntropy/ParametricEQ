@@ -341,8 +341,8 @@ void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int n
 void ParametricEQAudioProcessor::updateTrims()
 {
     
-    float inputTrim = apvts.getRawParameterValue("input_trim")-> load();
-    float outputTrim = apvts.getRawParameterValue("output_trim")-> load();
+    float inputTrim = apvts.getRawParameterValue("input_trim")->load();
+    float outputTrim = apvts.getRawParameterValue("output_trim")->load();
     leftChain.get<InputTrim>().setGainDecibels(inputTrim);
     rightChain.get<InputTrim>().setGainDecibels(inputTrim);
     leftChain.get<OutputTrim>().setGainDecibels(outputTrim);
