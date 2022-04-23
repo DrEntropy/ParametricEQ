@@ -22,8 +22,11 @@ namespace HelperFunctions {
         jassert (sampleRate > 0);
         jassert (frequency > 0 && frequency <= sampleRate * 0.5);
         jassert (order > 0);
+        jassert (quality > 0);
 
         ReferenceCountedArray<IIR::Coefficients<FloatType>> arrayFilters;
+             
+        float a = pow(quality*sqrt(2.0f),1.0/order);
 
         if (order % 2 == 1)
         {
@@ -31,7 +34,7 @@ namespace HelperFunctions {
 
             for (int i = 0; i < order / 2; ++i)
             {
-                auto Q = 1.0 / (2.0 * std::cos ((i + 1.0) * MathConstants<double>::pi / order));
+                auto Q = a / (2.0 * std::cos ((i + 1.0) * MathConstants<double>::pi / order));
                 arrayFilters.add (*IIR::Coefficients<FloatType>::makeLowPass (sampleRate, frequency,
                                                                               static_cast<FloatType> (Q)));
             }
@@ -40,7 +43,7 @@ namespace HelperFunctions {
         {
             for (int i = 0; i < order / 2; ++i)
             {
-                auto Q = 1.0 / (2.0 * std::cos ((2.0 * i + 1.0) * MathConstants<double>::pi / (order * 2.0)));
+                auto Q = a / (2.0 * std::cos ((2.0 * i + 1.0) * MathConstants<double>::pi / (order * 2.0)));
                 arrayFilters.add (*IIR::Coefficients<FloatType>::makeLowPass (sampleRate, frequency,
                                                                               static_cast<FloatType> (Q)));
             }
@@ -56,8 +59,11 @@ namespace HelperFunctions {
         jassert (sampleRate > 0);
         jassert (frequency > 0 && frequency <= sampleRate * 0.5);
         jassert (order > 0);
-
+        jassert (quality > 0);
+            
         ReferenceCountedArray<IIR::Coefficients<FloatType>> arrayFilters;
+            
+        float a = pow(quality*sqrt(2.0f),1.0/order);
 
         if (order % 2 == 1)
         {
@@ -65,7 +71,7 @@ namespace HelperFunctions {
 
             for (int i = 0; i < order / 2; ++i)
             {
-                auto Q = 1.0 / (2.0 * std::cos ((i + 1.0) * MathConstants<double>::pi / order));
+                auto Q = a / (2.0 * std::cos ((i + 1.0) * MathConstants<double>::pi / order));
                 arrayFilters.add (*IIR::Coefficients<FloatType>::makeHighPass (sampleRate, frequency,
                                                                                static_cast<FloatType> (Q)));
             }
@@ -74,7 +80,7 @@ namespace HelperFunctions {
         {
             for (int i = 0; i < order / 2; ++i)
             {
-                auto Q = 1.0 / (2.0 * std::cos ((2.0 * i + 1.0) * MathConstants<double>::pi / (order * 2.0)));
+                auto Q = a / (2.0 * std::cos ((2.0 * i + 1.0) * MathConstants<double>::pi / (order * 2.0)));
                 arrayFilters.add (*IIR::Coefficients<FloatType>::makeHighPass (sampleRate, frequency,
                                                                                static_cast<FloatType> (Q)));
             }
