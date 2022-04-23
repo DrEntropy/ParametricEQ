@@ -121,6 +121,7 @@ private:
         using namespace FilterInfo;
         
         float frequency = apvts.getRawParameterValue(createFreqParamString(filterNum))->load();
+        float quality  = apvts.getRawParameterValue(createQParamString(filterNum))->load();
         bool bypassed = apvts.getRawParameterValue(createBypassParamString(filterNum))->load() > 0.5f;
         
         Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(filterNum))->load());
@@ -132,7 +133,7 @@ private:
         cutParams.bypassed = bypassed;
         cutParams.order = static_cast<int>(slope) + 1;
         cutParams.sampleRate = sampleRate;
-        cutParams.quality  = 1.0f; //not used for cut filters
+        cutParams.quality  = quality;
         
         return cutParams;
     }
