@@ -27,7 +27,7 @@ namespace HelperFunctions {
         ReferenceCountedArray<IIR::Coefficients<FloatType>> arrayFilters;
          
         int n = order / 2;
-        float a = pow(quality*sqrt(2.0f), 1.0f / static_cast<float> (n));
+        float a = pow(quality * sqrt(2.0f), 1.0f / static_cast<float> (n));
 
         if (order % 2 == 1)
         {
@@ -65,7 +65,7 @@ namespace HelperFunctions {
         ReferenceCountedArray<IIR::Coefficients<FloatType>> arrayFilters;
             
         int n = order / 2;
-        float a = pow(quality*sqrt(2.0f), 1.0f / static_cast<float> (n));
+        float a = pow(quality * sqrt(2.0f), 1.0f / static_cast<float> (n));
  
 
         if (order % 2 == 1)
