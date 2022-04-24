@@ -14,7 +14,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
-
+#include "HelperFunctions.h"
 
 
 
@@ -76,12 +76,14 @@ struct CoefficientsMaker
     {
         if (filterParams.isLowcut)
         {
-            return juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(filterParams.frequency,
-                                                                                               filterParams.sampleRate,filterParams.order);
+            return HelperFunctions::designIIRHighpassHighOrderButterworthMethod(filterParams.frequency,
+                                                                                               filterParams.sampleRate,
+                                                                                               filterParams.order, filterParams.quality);
         }
         
-        return juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
-                                                                                          filterParams.sampleRate,filterParams.order);
+        return HelperFunctions::designIIRLowpassHighOrderButterworthMethod(filterParams.frequency,
+                                                                                          filterParams.sampleRate,
+                                                                                          filterParams.order, filterParams.quality);
     
     }
     

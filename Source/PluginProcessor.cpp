@@ -245,10 +245,10 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
     layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(filterNum), createFreqParamString(filterNum),
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
-
     
     if(!isCut)
     {
+        
         layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
                                            juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
         
@@ -265,6 +265,8 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
     }
     else
     {
+        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.01f, 1.0f), 0.71f));
         juce::StringArray slopes;
         
         for (const auto& [order, stringRep] : FilterInfo::mapSlopeToString)
