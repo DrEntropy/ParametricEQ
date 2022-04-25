@@ -24,6 +24,7 @@ using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
 
+using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
 
 const float rampTime = 0.05f;  //50 mseconds
 const int innerLoopSize = 32;
@@ -150,7 +151,7 @@ private:
     
     
     template <const int filterNum>
-    void loopUpdateParametricFilter(double sampleRate, int samplesToSkip)
+    void loopUpdateParametricFilter(int samplesToSkip)
     {
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
@@ -170,7 +171,7 @@ private:
     }
     
     template <const int filterNum>
-    void loopUpdateCutFilter(double sampleRate, bool isLowCut, int samplesToSkip)
+    void loopUpdateCutFilter(int samplesToSkip)
     {
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
@@ -186,11 +187,11 @@ private:
     
   
     void initializeFilters(Channel channel, double sampleRate);
-    void performInnerLoopUpdate(double sampleRate, int samplesToSkip);
+    void performInnerLoopUpdate(int samplesToSkip);
     void performPreLoopUpdate(double sampleRate);
     void updateTrims();
     
-    using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
+
     
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);

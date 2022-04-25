@@ -189,7 +189,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto leftBlock = subBlock.getSingleChannelBlock(0);
         auto rightBlock = subBlock.getSingleChannelBlock(1);
         
-        performInnerLoopUpdate(getSampleRate(), blockSize);
+        performInnerLoopUpdate(blockSize);
         
         juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
         juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
@@ -298,7 +298,7 @@ void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channe
 }
 
 // for some reason compiler will not let me use the alias for return type here.
-juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
     ParamLayout layout;
     
@@ -350,16 +350,16 @@ void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
     preUpdateCutFilter<7>(sampleRate, false);
 }
 
-void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int numSamplesToSkip)
+void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
 {
-    loopUpdateCutFilter<0>(sampleRate, true, numSamplesToSkip);
-    loopUpdateParametricFilter<1>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<2>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<3>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<4>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<5>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<6>(sampleRate, numSamplesToSkip);
-    loopUpdateCutFilter<7>(sampleRate, false, numSamplesToSkip);
+    loopUpdateCutFilter<0>(numSamplesToSkip);
+    loopUpdateParametricFilter<1>(numSamplesToSkip);
+    loopUpdateParametricFilter<2>(numSamplesToSkip);
+    loopUpdateParametricFilter<3>(numSamplesToSkip);
+    loopUpdateParametricFilter<4>(numSamplesToSkip);
+    loopUpdateParametricFilter<5>(numSamplesToSkip);
+    loopUpdateParametricFilter<6>(numSamplesToSkip);
+    loopUpdateCutFilter<7>(numSamplesToSkip);
 }
 
 void ParametricEQAudioProcessor::updateTrims()
