@@ -170,7 +170,9 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
          buffer.clear (i, 0, buffer.getNumSamples());
     
     updateTrims();
-    performPreLoopUpdate(getSampleRate());
+    
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    performPreLoopUpdate(mode, getSampleRate());
     
     juce::dsp::AudioBlock<float> block(buffer);
 
@@ -302,6 +304,16 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
     ParamLayout layout;
     
+     
+    juce::StringArray modes;
+    
+    for (const auto& [mode, stringRep] : mapModeToString)
+    {
+        modes.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Processing Mode", "Processing Mode", modes, 0));
+    
     layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
@@ -338,16 +350,16 @@ void ParametricEQAudioProcessor::initializeFilters(Channel channel, double sampl
 }
 
 
-void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
+void ParametricEQAudioProcessor::performPreLoopUpdate(ChannelMode mode, double sampleRate)
 {
-    preUpdateCutFilter<0>(sampleRate, true);
-    preUpdateParametricFilter<1>(sampleRate);
-    preUpdateParametricFilter<2>(sampleRate);
-    preUpdateParametricFilter<3>(sampleRate);
-    preUpdateParametricFilter<4>(sampleRate);
-    preUpdateParametricFilter<5>(sampleRate);
-    preUpdateParametricFilter<6>(sampleRate);
-    preUpdateCutFilter<7>(sampleRate, false);
+    preUpdateCutFilter<0>(mode, sampleRate, true);
+    preUpdateParametricFilter<1>(mode, sampleRate);
+    preUpdateParametricFilter<2>(mode, sampleRate);
+    preUpdateParametricFilter<3>(mode, sampleRate);
+    preUpdateParametricFilter<4>(mode, sampleRate);
+    preUpdateParametricFilter<5>(mode, sampleRate);
+    preUpdateParametricFilter<6>(mode, sampleRate);
+    preUpdateCutFilter<7>(mode, sampleRate, false);
 }
 
 void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
