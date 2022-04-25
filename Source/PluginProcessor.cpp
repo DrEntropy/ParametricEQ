@@ -117,7 +117,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     outputTrim.prepare(spec);
     
     
-    initializeFilters(sampleRate);
+    initializeFilters(Channel::Left, sampleRate);
+    initializeFilters(Channel::Right, sampleRate);
 
 }
 
@@ -188,7 +189,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto leftBlock = subBlock.getSingleChannelBlock(0);
         auto rightBlock = subBlock.getSingleChannelBlock(1);
         
-        performInnerLoopUpdate(getSampleRate(), blockSize);
+        performInnerLoopUpdate(blockSize);
         
         juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
         juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
@@ -228,7 +229,8 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
      if (xmlState.get() != nullptr)
                 if (xmlState->hasTagName (apvts.state.getType()))
                     apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
-    initializeFilters(getSampleRate());
+    initializeFilters(Channel::Left, getSampleRate());
+    initializeFilters(Channel::Right, getSampleRate());
 }
 
 //==============================================================================
@@ -238,21 +240,24 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new ParametricEQAudioProcessor();
 }
 
-void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, int filterNum, bool isCut)
+void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Channel channel, int filterNum, bool isCut)
 {
-    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(filterNum),createBypassParamString(filterNum),false) );
+    auto label = createBypassParamString(channel, filterNum);
+    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,false) );
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(filterNum), createFreqParamString(filterNum),
+    label = createFreqParamString(channel, filterNum);
+    layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
     
     if(!isCut)
     {
-        
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+        label = createQParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
         
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(filterNum),createGainParamString(filterNum),
+        label = createGainParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
         juce::StringArray types;
         
@@ -260,12 +265,13 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
         {
             types.add(stringRep);
         }
-
-        layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(filterNum), createTypeParamString(filterNum), types, 10));
+        label = createTypeParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, 10));
     }
     else
     {
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+        label = createQParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(0.1f, 10.f, 0.01f, 1.0f), 0.71f));
         juce::StringArray slopes;
         
@@ -273,37 +279,41 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
         {
             slopes.add(stringRep);
         }
-
-        layout.add(std::make_unique<juce::AudioParameterChoice>(createSlopeParamString(filterNum),
-                                                                createSlopeParamString(filterNum), slopes, 0));
+        
+        label = createSlopeParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, slopes, 0));
     }
 }
 
-
-
-juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channel channel)
 {
-    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    addFilterParamToLayout(layout, channel, 0, true);
+    addFilterParamToLayout(layout, channel, 1, false);
+    addFilterParamToLayout(layout, channel, 2, false);
+    addFilterParamToLayout(layout, channel, 3, false);
+    addFilterParamToLayout(layout, channel, 4, false);
+    addFilterParamToLayout(layout, channel, 5, false);
+    addFilterParamToLayout(layout, channel, 6, false);
+    addFilterParamToLayout(layout, channel, 7, true);
+}
+
+// for some reason compiler will not let me use the alias for return type here.
+ParamLayout ParametricEQAudioProcessor::createParameterLayout()
+{
+    ParamLayout layout;
     
     layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
-
-    addFilterParamToLayout(layout, 0, true);
-    addFilterParamToLayout(layout, 1, false);
-    addFilterParamToLayout(layout, 2, false);
-    addFilterParamToLayout(layout, 3, false);
-    addFilterParamToLayout(layout, 4, false);
-    addFilterParamToLayout(layout, 5, false);
-    addFilterParamToLayout(layout, 6, false);
-    addFilterParamToLayout(layout, 7, true);
-    
+    createFilterLayouts(layout, Channel::Left);
+    createFilterLayouts(layout, Channel::Right);
+ 
     return layout;
 }
 
 
-void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
+void ParametricEQAudioProcessor::initializeFilters(Channel channel, double sampleRate)
 {
     // check if on realtime thread
     auto messMan = juce::MessageManager::getInstanceWithoutCreating();
@@ -311,18 +321,18 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
     
     // initialize filters
    
-    initializeChain<1>(getParametericFilterParams<1>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<2>(getParametericFilterParams<2>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<3>(getParametericFilterParams<3>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<4>(getParametericFilterParams<4>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<5>(getParametericFilterParams<5>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<6>(getParametericFilterParams<6>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<1>(getParametericFilterParams<1>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<2>(getParametericFilterParams<2>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<3>(getParametericFilterParams<3>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<4>(getParametericFilterParams<4>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<5>(getParametericFilterParams<5>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<6>(getParametericFilterParams<6>(channel, sampleRate), onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
-    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(sampleRate, true);
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true);
     initializeChain<0>(lowCutParams,onRealTimeThread,sampleRate);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(sampleRate, false);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false);
     initializeChain<7>(highCutParams,onRealTimeThread,sampleRate);
  
 }
@@ -340,16 +350,16 @@ void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
     preUpdateCutFilter<7>(sampleRate, false);
 }
 
-void ParametricEQAudioProcessor::performInnerLoopUpdate(double sampleRate, int numSamplesToSkip)
+void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
 {
-    loopUpdateCutFilter<0>(sampleRate, true, numSamplesToSkip);
-    loopUpdateParametricFilter<1>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<2>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<3>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<4>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<5>(sampleRate, numSamplesToSkip);
-    loopUpdateParametricFilter<6>(sampleRate, numSamplesToSkip);
-    loopUpdateCutFilter<7>(sampleRate, false, numSamplesToSkip);
+    loopUpdateCutFilter<0>(numSamplesToSkip);
+    loopUpdateParametricFilter<1>(numSamplesToSkip);
+    loopUpdateParametricFilter<2>(numSamplesToSkip);
+    loopUpdateParametricFilter<3>(numSamplesToSkip);
+    loopUpdateParametricFilter<4>(numSamplesToSkip);
+    loopUpdateParametricFilter<5>(numSamplesToSkip);
+    loopUpdateParametricFilter<6>(numSamplesToSkip);
+    loopUpdateCutFilter<7>(numSamplesToSkip);
 }
 
 void ParametricEQAudioProcessor::updateTrims()
