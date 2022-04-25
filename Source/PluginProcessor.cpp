@@ -172,17 +172,12 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     updateTrims();
     
     ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    
     performPreLoopUpdate(mode, getSampleRate());
     
     juce::dsp::AudioBlock<float> block(buffer);
+    
     int numSamples = buffer.getNumSamples();
-    
-    // for saving temporary single channel data
-    juce::AudioBuffer<float> tempBuffer(1, numSamples);
-    juce::dsp::AudioBlock<float> tempBlock(tempBuffer);
-
-    
-
     int offset = 0;
     
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
@@ -193,10 +188,10 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(mode == ChannelMode::MidSide)
     {
-        // left is middle = L+R, right is side = L-R
-        tempBlock.copyFrom(leftBlock);
+        // left is middle = (L+R)/2, right is side = (L-R)/2
         leftBlock.add(rightBlock).multiplyBy(0.5);
-        rightBlock.subtract(tempBlock).multiplyBy(-0.5);
+        // right = -1*(R-Lnew) =  (L+R)/2 - R= (L-R)/2
+        rightBlock.subtract(leftBlock).negate();
     }
     
     while(offset < numSamples)
@@ -217,10 +212,10 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(mode == ChannelMode::MidSide)
     {
-        // left is M+S //right is M-S
-        tempBlock.copyFrom(leftBlock);
+        // left is M+S
         leftBlock.add(rightBlock);
-        rightBlock.subtract(tempBlock).negate();
+        // right is M-S.   Right =-1( 2S-Lnew) = (M+S) - 2S = M-S
+        rightBlock.multiplyBy(2.0).subtract(leftBlock).negate();
     }
     
  
