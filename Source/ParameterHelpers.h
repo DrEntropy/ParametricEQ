@@ -14,15 +14,18 @@
 #include <JuceHeader.h>
 #include "FilterInfo.h"
 
+enum class Channel { Left, Right};
 
-juce::String createGainParamString(int filterNum);
+juce::String createGainParamString(Channel channel, int filterNum);
 
-juce::String createQParamString(int filterNum);
+juce::String createQParamString(Channel channel, int filterNum);
 
-juce::String createFreqParamString(int filterNum);
+juce::String createFreqParamString(Channel channel, int filterNum);
 
-juce::String createBypassParamString(int filterNum);
+juce::String createBypassParamString(Channel channel, int filterNum);
 
-juce::String createTypeParamString(int filterNum);
+juce::String createTypeParamString(Channel channel, int filterNum);
 
-juce::String createSlopeParamString(int filterNum);
+juce::String createSlopeParamString(Channel channel, int filterNum);
+
+juce::String createChannelString(Channel channel);

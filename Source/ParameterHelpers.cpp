@@ -10,39 +10,46 @@
 
 #include "ParameterHelpers.h"
 
-juce::String createParamString(juce::String label, int filterNum)
+juce::String createChannelString(Channel channel)
 {
-    return "Filter_" + juce::String(filterNum)+"_"+ label;
+   if (channel == Channel::Left)
+       return "left_";
+    return "right_";
+}
+
+juce::String createParamString(Channel channel, juce::String label, int filterNum)
+{
+    return "Filter_" + createChannelString(channel) + juce::String(filterNum)+"_"+ label;
 }
 
 
-juce::String createGainParamString(int filterNum)
+juce::String createGainParamString(Channel channel, int filterNum)
 {
-    return createParamString("gain",filterNum);
+    return createParamString(channel, "gain",filterNum);
 }
 
-juce::String createQParamString(int filterNum)
+juce::String createQParamString(Channel channel, int filterNum)
 {
-    return createParamString("Q",filterNum);
+    return createParamString(channel, "Q",filterNum);
 }
 
-juce::String createFreqParamString(int filterNum)
+juce::String createFreqParamString(Channel channel, int filterNum)
 {
-    return createParamString("freq",filterNum);
+    return createParamString(channel, "freq",filterNum);
 }
 
-juce::String createBypassParamString(int filterNum)
+juce::String createBypassParamString(Channel channel, int filterNum)
 {
-    return createParamString("bypass",filterNum);
+    return createParamString(channel, "bypass",filterNum);
 }
 
-juce::String createTypeParamString(int filterNum)
+juce::String createTypeParamString(Channel channel, int filterNum)
 {
-    return createParamString("type",filterNum);
+    return createParamString(channel, "type",filterNum);
 }
 
 
-juce::String createSlopeParamString(int filterNum)
+juce::String createSlopeParamString(Channel channel, int filterNum)
 {
-    return createParamString("slope",filterNum);
+    return createParamString(channel, "slope",filterNum);
 }
