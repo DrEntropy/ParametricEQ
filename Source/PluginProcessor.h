@@ -185,7 +185,7 @@ private:
     }
     
   
-    void initializeFilters(double sampleRate);
+    void initializeFilters(Channel channel, double sampleRate);
     void performInnerLoopUpdate(double sampleRate, int samplesToSkip);
     void performPreLoopUpdate(double sampleRate);
     void updateTrims();

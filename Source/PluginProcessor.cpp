@@ -117,7 +117,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     outputTrim.prepare(spec);
     
     
-    initializeFilters(sampleRate);
+    initializeFilters(Channel::Left, sampleRate);
+    initializeFilters(Channel::Right, sampleRate);
 
 }
 
@@ -228,7 +229,8 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
      if (xmlState.get() != nullptr)
                 if (xmlState->hasTagName (apvts.state.getType()))
                     apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
-    initializeFilters(getSampleRate());
+    initializeFilters(Channel::Left, getSampleRate());
+    initializeFilters(Channel::Right, getSampleRate());
 }
 
 //==============================================================================
@@ -295,9 +297,10 @@ void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channe
     addFilterParamToLayout(layout, channel, 7, true);
 }
 
-ParamLayout ParametricEQAudioProcessor::createParameterLayout()
+// for some reason compiler will not let me use the alias for return type here.
+juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
 {
-    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    ParamLayout layout;
     
     layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
@@ -310,7 +313,7 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 }
 
 
-void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
+void ParametricEQAudioProcessor::initializeFilters(Channel channel, double sampleRate)
 {
     // check if on realtime thread
     auto messMan = juce::MessageManager::getInstanceWithoutCreating();
@@ -318,18 +321,18 @@ void ParametricEQAudioProcessor::initializeFilters(double sampleRate)
     
     // initialize filters
    
-    initializeChain<1>(getParametericFilterParams<1>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<2>(getParametericFilterParams<2>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<3>(getParametericFilterParams<3>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<4>(getParametericFilterParams<4>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<5>(getParametericFilterParams<5>(sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<6>(getParametericFilterParams<6>(sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<1>(getParametericFilterParams<1>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<2>(getParametericFilterParams<2>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<3>(getParametericFilterParams<3>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<4>(getParametericFilterParams<4>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<5>(getParametericFilterParams<5>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<6>(getParametericFilterParams<6>(channel, sampleRate), onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
-    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(sampleRate, true);
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true);
     initializeChain<0>(lowCutParams,onRealTimeThread,sampleRate);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(sampleRate, false);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false);
     initializeChain<7>(highCutParams,onRealTimeThread,sampleRate);
  
 }
