@@ -175,31 +175,55 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     performPreLoopUpdate(mode, getSampleRate());
     
     juce::dsp::AudioBlock<float> block(buffer);
+    int numSamples = buffer.getNumSamples();
+    
+    // for saving temporary single channel data
+    juce::AudioBuffer<float> tempBuffer(1, numSamples);
+    juce::dsp::AudioBlock<float> tempBlock(tempBuffer);
 
     
-    int numSamples = buffer.getNumSamples();
+
     int offset = 0;
     
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+    
+    if(mode == ChannelMode::MidSide)
+    {
+        // left is middle = L+R, right is side = L-R
+        tempBlock.copyFrom(leftBlock);
+        leftBlock.add(rightBlock).multiplyBy(0.5);
+        rightBlock.subtract(tempBlock).multiplyBy(-0.5);
+    }
+    
     while(offset < numSamples)
     {
         int blockSize = std::min(numSamples - offset, innerLoopSize);
-        auto subBlock =  block.getSubBlock(offset, blockSize);
-        
-        auto leftBlock = subBlock.getSingleChannelBlock(0);
-        auto rightBlock = subBlock.getSingleChannelBlock(1);
-        
+        auto leftSubBlock =  leftBlock.getSubBlock(offset, blockSize);
+        auto rightSubBlock = rightBlock.getSubBlock(offset, blockSize);
+ 
         performInnerLoopUpdate(blockSize);
         
-        juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-        juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+        juce::dsp::ProcessContextReplacing<float> leftContext(leftSubBlock);
+        juce::dsp::ProcessContextReplacing<float> rightContext(rightSubBlock);
         leftChain.process(leftContext);
         rightChain.process(rightContext);
                 
         offset += innerLoopSize;
     }
+    
+    if(mode == ChannelMode::MidSide)
+    {
+        // left is M+S //right is M-S
+        tempBlock.copyFrom(leftBlock);
+        leftBlock.add(rightBlock);
+        rightBlock.subtract(tempBlock).negate();
+    }
+    
+ 
     
     outputTrim.process(stereoContext);
 }
