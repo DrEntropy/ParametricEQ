@@ -238,21 +238,24 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new ParametricEQAudioProcessor();
 }
 
-void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, int filterNum, bool isCut)
+void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Channel channel, int filterNum, bool isCut)
 {
-    layout.add(std::make_unique<juce::AudioParameterBool>(createBypassParamString(filterNum),createBypassParamString(filterNum),false) );
+    auto label = createBypassParamString(channel, filterNum);
+    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,false) );
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(createFreqParamString(filterNum), createFreqParamString(filterNum),
+    label = createFreqParamString(channel, filterNum);
+    layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
     
     
     if(!isCut)
     {
-        
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+        label = createQParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
         
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createGainParamString(filterNum),createGainParamString(filterNum),
+        label = createGainParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
         juce::StringArray types;
         
@@ -260,12 +263,13 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
         {
             types.add(stringRep);
         }
-
-        layout.add(std::make_unique<juce::AudioParameterChoice>(createTypeParamString(filterNum), createTypeParamString(filterNum), types, 10));
+        label = createTypeParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, 10));
     }
     else
     {
-        layout.add(std::make_unique<juce::AudioParameterFloat>(createQParamString(filterNum), createQParamString(filterNum),
+        label = createQParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(0.1f, 10.f, 0.01f, 1.0f), 0.71f));
         juce::StringArray slopes;
         
@@ -273,15 +277,25 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, in
         {
             slopes.add(stringRep);
         }
-
-        layout.add(std::make_unique<juce::AudioParameterChoice>(createSlopeParamString(filterNum),
-                                                                createSlopeParamString(filterNum), slopes, 0));
+        
+        label = createSlopeParamString(channel, filterNum);
+        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, slopes, 0));
     }
 }
 
+void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channel channel)
+{
+    addFilterParamToLayout(layout, channel, 0, true);
+    addFilterParamToLayout(layout, channel, 1, false);
+    addFilterParamToLayout(layout, channel, 2, false);
+    addFilterParamToLayout(layout, channel, 3, false);
+    addFilterParamToLayout(layout, channel, 4, false);
+    addFilterParamToLayout(layout, channel, 5, false);
+    addFilterParamToLayout(layout, channel, 6, false);
+    addFilterParamToLayout(layout, channel, 7, true);
+}
 
-
-juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::createParameterLayout()
+ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
@@ -289,16 +303,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout ParametricEQAudioProcessor::
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
-
-    addFilterParamToLayout(layout, 0, true);
-    addFilterParamToLayout(layout, 1, false);
-    addFilterParamToLayout(layout, 2, false);
-    addFilterParamToLayout(layout, 3, false);
-    addFilterParamToLayout(layout, 4, false);
-    addFilterParamToLayout(layout, 5, false);
-    addFilterParamToLayout(layout, 6, false);
-    addFilterParamToLayout(layout, 7, true);
-    
+    createFilterLayouts(layout, Channel::Left);
+    createFilterLayouts(layout, Channel::Right);
+ 
     return layout;
 }
 
