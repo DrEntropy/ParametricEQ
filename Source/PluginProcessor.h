@@ -202,7 +202,7 @@ private:
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
     
-    void performHadamard(juce::dsp::AudioBlock<float>& A, juce::dsp::AudioBlock<float>& B);
+    void performMidSideTransform(juce::AudioBuffer<float>&);
  
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;

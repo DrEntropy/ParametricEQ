@@ -154,16 +154,30 @@ bool ParametricEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
-void ParametricEQAudioProcessor::performHadamard(juce::dsp::AudioBlock<float>& A, juce::dsp::AudioBlock<float>& B)
+void ParametricEQAudioProcessor::performMidSideTransform(juce::AudioBuffer<float>& buffer)
 {
-    static const float sqrt2 = juce::MathConstants<float>::sqrt2;
-    static const float invSqrt2 = 1.0f/sqrt2;
-    
-    // Hadamard transformation, note that this is involutory.
+    // AKA Hadamard transformation
     // Anew = (A+B)/sqrt(2), Bnew = (A-B)/sqrt(2)
-    A.add(B).multiplyBy(invSqrt2);
-    // Bnew = -1*(sqrt(2)B-Anew) =  (A+B)/sqrt(2) -  sqrt(2)B= (A-B)/sqrt(2)
-    B.multiplyBy(sqrt2).subtract(A).negate();
+    // note that this is involutory , i.e. a second call will undo the transformation
+    
+    static const float minus3db = 1.0f/juce::MathConstants<float>::sqrt2;
+
+    auto leftReadPtr = buffer.getReadPointer(0);
+    auto rightReadPtr = buffer.getReadPointer(1);
+
+    auto leftWritePtr = buffer.getWritePointer(0);
+    auto rightWritePtr = buffer.getWritePointer(1);
+    
+    int numSamples = buffer.getNumSamples();
+
+    for( int i=0; i < numSamples; i++ )
+    {
+         auto M = (leftReadPtr[i] + rightReadPtr[i]) * minus3db;
+         auto S = (leftReadPtr[i] - rightReadPtr[i]) * minus3db;
+
+         leftWritePtr[i] = M;
+         rightWritePtr[i] = S;
+    }
 }
 
 void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
@@ -195,13 +209,15 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+    if(mode == ChannelMode::MidSide)
+    {
+        performMidSideTransform(buffer);
+    }
+    
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
     
-    if(mode == ChannelMode::MidSide)
-    {
-        performHadamard(leftBlock,rightBlock);
-    }
+  
     
     while(offset < numSamples)
     {
@@ -221,7 +237,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(mode == ChannelMode::MidSide)
     {
-        performHadamard(leftBlock,rightBlock);  
+        performMidSideTransform(buffer);
     }
     
     outputTrim.process(stereoContext);
