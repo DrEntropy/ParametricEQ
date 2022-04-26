@@ -53,5 +53,3 @@ juce::String createSlopeParamString(Channel channel, int filterNum)
 {
     return createParamString(channel, "slope",filterNum);
 }
-
- 

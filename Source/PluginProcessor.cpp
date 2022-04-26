@@ -159,7 +159,7 @@ void ParametricEQAudioProcessor::performHadamard(juce::dsp::AudioBlock<float>& A
     static const float sqrt2 = juce::MathConstants<float>::sqrt2;
     static const float invSqrt2 = 1.0f/sqrt2;
     
-    // Hadamard transformation, not that this is involutory.
+    // Hadamard transformation, note that this is involutory.
     // Anew = (A+B)/sqrt(2), Bnew = (A-B)/sqrt(2)
     A.add(B).multiplyBy(invSqrt2);
     // Bnew = -1*(sqrt(2)B-Anew) =  (A+B)/sqrt(2) -  sqrt(2)B= (A-B)/sqrt(2)
