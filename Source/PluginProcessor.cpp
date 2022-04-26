@@ -154,6 +154,18 @@ bool ParametricEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
+void ParametricEQAudioProcessor::performHadamard(juce::dsp::AudioBlock<float>& A, juce::dsp::AudioBlock<float>& B)
+{
+    static const float sqrt2 = juce::MathConstants<float>::sqrt2;
+    static const float invSqrt2 = 1.0f/sqrt2;
+    
+    // Hadamard transformation, not that this is involutory.
+    // Anew = (A+B)/sqrt(2), Bnew = (A-B)/sqrt(2)
+    A.add(B).multiplyBy(invSqrt2);
+    // Bnew = -1*(sqrt(2)B-Anew) =  (A+B)/sqrt(2) -  sqrt(2)B= (A-B)/sqrt(2)
+    B.multiplyBy(sqrt2).subtract(A).negate();
+}
+
 void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -186,15 +198,9 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
     
-    static const float sqrt2 = juce::MathConstants<float>::sqrt2;
-    static const float invSqrt2 = 1.0f/sqrt2;
-    
     if(mode == ChannelMode::MidSide)
     {
-        // left is middle = (L+R)/sqrt(2), right is side = (L-R)/sqrt(2)
-        leftBlock.add(rightBlock).multiplyBy(invSqrt2);
-        // right = -1*(sqrt(2)R-Lnew) =  (L+R)/sqrt(2) -  sqrt(2)R= (L-R)/sqrt(2)
-        rightBlock.multiplyBy(sqrt2).subtract(leftBlock).negate();
+        performHadamard(leftBlock,rightBlock);
     }
     
     while(offset < numSamples)
@@ -215,10 +221,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(mode == ChannelMode::MidSide)
     {
-        // left is (M+S)/sqrt(2)
-        leftBlock.add(rightBlock).multiplyBy(invSqrt2);
-        // right is (M-S)/sqrt(2).   Right =-1( sqrt(2)*S-Lnew) = (M+S)/sqrt(2) - sqrt(2)S = (M-S)/sqrt(2)
-        rightBlock.multiplyBy(sqrt2).subtract(leftBlock).negate();
+        performHadamard(leftBlock,rightBlock);  
     }
     
     outputTrim.process(stereoContext);

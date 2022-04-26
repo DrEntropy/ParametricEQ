@@ -199,10 +199,10 @@ private:
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
     
-
-    
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
+    
+    void performHadamard(juce::dsp::AudioBlock<float>& A, juce::dsp::AudioBlock<float>& B);
  
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
