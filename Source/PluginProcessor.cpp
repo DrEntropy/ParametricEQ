@@ -186,12 +186,15 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
     
+    static const float sqrt2 = juce::MathConstants<float>::sqrt2;
+    static const float invSqrt2 = 1.0f/sqrt2;
+    
     if(mode == ChannelMode::MidSide)
     {
-        // left is middle = (L+R)/2, right is side = (L-R)/2
-        leftBlock.add(rightBlock).multiplyBy(0.5);
-        // right = -1*(R-Lnew) =  (L+R)/2 - R= (L-R)/2
-        rightBlock.subtract(leftBlock).negate();
+        // left is middle = (L+R)/sqrt(2), right is side = (L-R)/sqrt(2)
+        leftBlock.add(rightBlock).multiplyBy(invSqrt2);
+        // right = -1*(sqrt(2)R-Lnew) =  (L+R)/sqrt(2) -  sqrt(2)R= (L-R)/sqrt(2)
+        rightBlock.multiplyBy(sqrt2).subtract(leftBlock).negate();
     }
     
     while(offset < numSamples)
@@ -212,10 +215,10 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(mode == ChannelMode::MidSide)
     {
-        // left is M+S
-        leftBlock.add(rightBlock);
-        // right is M-S.   Right =-1( 2S-Lnew) = (M+S) - 2S = M-S
-        rightBlock.multiplyBy(2.0).subtract(leftBlock).negate();
+        // left is (M+S)/sqrt(2)
+        leftBlock.add(rightBlock).multiplyBy(invSqrt2);
+        // right is (M-S)/sqrt(2).   Right =-1( sqrt(2)*S-Lnew) = (M+S)/sqrt(2) - sqrt(2)S = (M-S)/sqrt(2)
+        rightBlock.multiplyBy(sqrt2).subtract(leftBlock).negate();
     }
     
  
