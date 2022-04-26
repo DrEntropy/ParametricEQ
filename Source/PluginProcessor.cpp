@@ -221,8 +221,6 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         rightBlock.multiplyBy(sqrt2).subtract(leftBlock).negate();
     }
     
- 
-    
     outputTrim.process(stereoContext);
 }
 
