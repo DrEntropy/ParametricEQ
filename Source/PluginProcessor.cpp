@@ -284,7 +284,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Channel channel, int filterNum, bool isCut)
 {
     auto label = createBypassParamString(channel, filterNum);
-    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,false) );
+    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,true) );
     
     label = createFreqParamString(channel, filterNum);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
