@@ -140,10 +140,15 @@ private:
     }
     
     template <const int filterNum>
-    void preUpdateParametricFilter(double sampleRate)
+    void preUpdateParametricFilter(ChannelMode mode, double sampleRate)
     {
         FilterParameters parametricParamsLeft = getParametericFilterParams<filterNum>(Channel::Left, sampleRate);
-        FilterParameters parametricParamsRight = getParametericFilterParams<filterNum>(Channel::Right, sampleRate);
+        FilterParameters parametricParamsRight;
+        
+        if(mode == ChannelMode::Stereo)
+            parametricParamsRight = parametricParamsLeft;
+        else
+            parametricParamsRight = getParametericFilterParams<filterNum>(Channel::Right, sampleRate);
         
         leftChain.get<filterNum>().performPreloopUpdate(parametricParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(parametricParamsRight);
@@ -157,13 +162,16 @@ private:
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
     }
     
-    
-    
     template <const int filterNum>
-    void preUpdateCutFilter(double sampleRate, bool isLowCut)
+    void preUpdateCutFilter(ChannelMode mode, double sampleRate, bool isLowCut)
     {
         HighCutLowCutParameters cutParamsLeft = getCutFilterParams<filterNum>(Channel::Left, sampleRate, isLowCut);
-        HighCutLowCutParameters cutParamsRight = getCutFilterParams<filterNum>(Channel::Right, sampleRate, isLowCut);
+        HighCutLowCutParameters cutParamsRight;
+        
+        if(mode == ChannelMode::Stereo)
+            cutParamsRight = cutParamsLeft;
+        else
+            cutParamsRight = getCutFilterParams<filterNum>(Channel::Right, sampleRate, isLowCut);
             
         leftChain.get<filterNum>().performPreloopUpdate(cutParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(cutParamsRight);
@@ -188,13 +196,13 @@ private:
   
     void initializeFilters(Channel channel, double sampleRate);
     void performInnerLoopUpdate(int samplesToSkip);
-    void performPreLoopUpdate(double sampleRate);
+    void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
-    
-
     
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
+    
+    void performMidSideTransform(juce::AudioBuffer<float>&);
  
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;

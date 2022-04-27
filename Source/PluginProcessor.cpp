@@ -154,6 +154,32 @@ bool ParametricEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 }
 #endif
 
+void ParametricEQAudioProcessor::performMidSideTransform(juce::AudioBuffer<float>& buffer)
+{
+    // AKA Hadamard transformation
+    // Anew = (A+B)/sqrt(2), Bnew = (A-B)/sqrt(2)
+    // note that this is involutory , i.e. a second call will undo the transformation
+    
+    static const float minus3db = 1.0f/juce::MathConstants<float>::sqrt2;
+
+    auto leftReadPtr = buffer.getReadPointer(0);
+    auto rightReadPtr = buffer.getReadPointer(1);
+
+    auto leftWritePtr = buffer.getWritePointer(0);
+    auto rightWritePtr = buffer.getWritePointer(1);
+    
+    int numSamples = buffer.getNumSamples();
+
+    for( int i=0; i < numSamples; i++ )
+    {
+         auto M = (leftReadPtr[i] + rightReadPtr[i]) * minus3db;
+         auto S = (leftReadPtr[i] - rightReadPtr[i]) * minus3db;
+
+         leftWritePtr[i] = M;
+         rightWritePtr[i] = S;
+    }
+}
+
 void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -170,10 +196,12 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
          buffer.clear (i, 0, buffer.getNumSamples());
     
     updateTrims();
-    performPreLoopUpdate(getSampleRate());
+    
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    
+    performPreLoopUpdate(mode, getSampleRate());
     
     juce::dsp::AudioBlock<float> block(buffer);
-
     
     int numSamples = buffer.getNumSamples();
     int offset = 0;
@@ -181,22 +209,35 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+    if(mode == ChannelMode::MidSide)
+    {
+        performMidSideTransform(buffer);
+    }
+    
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+    
+  
+    
     while(offset < numSamples)
     {
         int blockSize = std::min(numSamples - offset, innerLoopSize);
-        auto subBlock =  block.getSubBlock(offset, blockSize);
-        
-        auto leftBlock = subBlock.getSingleChannelBlock(0);
-        auto rightBlock = subBlock.getSingleChannelBlock(1);
-        
+        auto leftSubBlock =  leftBlock.getSubBlock(offset, blockSize);
+        auto rightSubBlock = rightBlock.getSubBlock(offset, blockSize);
+ 
         performInnerLoopUpdate(blockSize);
         
-        juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-        juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+        juce::dsp::ProcessContextReplacing<float> leftContext(leftSubBlock);
+        juce::dsp::ProcessContextReplacing<float> rightContext(rightSubBlock);
         leftChain.process(leftContext);
         rightChain.process(rightContext);
                 
         offset += innerLoopSize;
+    }
+    
+    if(mode == ChannelMode::MidSide)
+    {
+        performMidSideTransform(buffer);
     }
     
     outputTrim.process(stereoContext);
@@ -302,6 +343,16 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
     ParamLayout layout;
     
+     
+    juce::StringArray modes;
+    
+    for (const auto& [mode, stringRep] : mapModeToString)
+    {
+        modes.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Processing Mode", "Processing Mode", modes, 0));
+    
     layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
@@ -338,16 +389,16 @@ void ParametricEQAudioProcessor::initializeFilters(Channel channel, double sampl
 }
 
 
-void ParametricEQAudioProcessor::performPreLoopUpdate(double sampleRate)
+void ParametricEQAudioProcessor::performPreLoopUpdate(ChannelMode mode, double sampleRate)
 {
-    preUpdateCutFilter<0>(sampleRate, true);
-    preUpdateParametricFilter<1>(sampleRate);
-    preUpdateParametricFilter<2>(sampleRate);
-    preUpdateParametricFilter<3>(sampleRate);
-    preUpdateParametricFilter<4>(sampleRate);
-    preUpdateParametricFilter<5>(sampleRate);
-    preUpdateParametricFilter<6>(sampleRate);
-    preUpdateCutFilter<7>(sampleRate, false);
+    preUpdateCutFilter<0>(mode, sampleRate, true);
+    preUpdateParametricFilter<1>(mode, sampleRate);
+    preUpdateParametricFilter<2>(mode, sampleRate);
+    preUpdateParametricFilter<3>(mode, sampleRate);
+    preUpdateParametricFilter<4>(mode, sampleRate);
+    preUpdateParametricFilter<5>(mode, sampleRate);
+    preUpdateParametricFilter<6>(mode, sampleRate);
+    preUpdateCutFilter<7>(mode, sampleRate, false);
 }
 
 void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
