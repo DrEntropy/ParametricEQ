@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Meter.h"
 
 //==============================================================================
 /**
@@ -32,6 +33,7 @@ private:
     ParametricEQAudioProcessor& audioProcessor;
     
     juce::AudioBuffer<float> buffer;
+    Meter inputMeter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };
