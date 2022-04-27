@@ -119,6 +119,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
+    
+    inputBuffers.prepare(samplesPerBlock, 2);
 
 }
 
@@ -209,6 +211,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+    inputBuffers.push(buffer);
+    
     if(mode == ChannelMode::MidSide)
     {
         performMidSideTransform(buffer);
@@ -251,8 +255,8 @@ bool ParametricEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 {
-   // return new ParametricEQAudioProcessorEditor (*this);
-    return new  juce::GenericAudioProcessorEditor(*this);
+   return new ParametricEQAudioProcessorEditor (*this);
+   // return new  juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================

@@ -86,6 +86,8 @@ public:
     // =========================================================================
     
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
+    
+    Fifo<juce::AudioBuffer<float>, 100> inputBuffers;
 
 private:
     //==============================================================================
