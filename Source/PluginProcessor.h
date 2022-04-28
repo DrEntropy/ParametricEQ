@@ -86,6 +86,10 @@ public:
     // =========================================================================
     
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
+    
+    // Buffers for meters. 30 should be plenty, timer goes at 60 times a second,
+    // which is a duration of about 768 samples as 48k, which should only be few blocks.  
+    Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
 
 private:
     //==============================================================================
@@ -193,7 +197,6 @@ private:
         rightChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
     }
     
-  
     void initializeFilters(Channel channel, double sampleRate);
     void performInnerLoopUpdate(int samplesToSkip);
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
@@ -207,7 +210,4 @@ private:
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
-    
-
-    
 };
