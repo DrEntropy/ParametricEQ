@@ -120,7 +120,7 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
     
-    inputBuffers.prepare(samplesPerBlock, 2);
+    inputBuffers.prepare(samplesPerBlock, getTotalNumInputChannels());
 
 }
 
@@ -288,7 +288,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Channel channel, int filterNum, bool isCut)
 {
     auto label = createBypassParamString(channel, filterNum);
-    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,true) );
+    layout.add(std::make_unique<juce::AudioParameterBool>(label, label, true) );
     
     label = createFreqParamString(channel, filterNum);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,

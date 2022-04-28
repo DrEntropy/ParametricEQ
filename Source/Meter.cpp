@@ -34,7 +34,7 @@ void Meter::paint (juce::Graphics& g)
     
     g.fillAll(juce::Colours::black);
     g.setColour(juce::Colours::white);
-    juce::Rectangle<float> bar {getLocalBounds().toFloat()};
+    auto bar {getLocalBounds().toFloat()};
     
     float y = juce::jmap(peakDb, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getHeight(), 0.f);
     bar.setTop(y);
@@ -44,6 +44,6 @@ void Meter::paint (juce::Graphics& g)
 
 void Meter::update(float dbLevel)
 {
-    peakDb= dbLevel;
+    peakDb = dbLevel;
     repaint();
 }

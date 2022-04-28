@@ -17,7 +17,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
     setSize (800, 600);
-    startTimer(16); // about 60 hz
+    startTimerHz(60);  
 }
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
