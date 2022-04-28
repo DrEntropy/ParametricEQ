@@ -22,9 +22,19 @@ void DbScale::paint (juce::Graphics& g)
 void DbScale::buildBackgroundImage(int dbDivision, juce::Rectangle<int> meterBounds, int minDb, int maxDb)
 {
     jassert(minDb <= maxDb);
+    
     auto bounds = getLocalBounds();
+    
     if(bounds.isEmpty())
         return;
+    
+    auto scaleFactor = juce::Desktop::getInstance().getDisplays().getDisplayForPoint({0,0}) -> scale;
+    bkgd = juce::Image(juce::Image::RGB, bounds.getWidth() * scaleFactor, bounds.getHeight() * scaleFactor, true);
+    
+    auto g = juce::Graphics(bkgd);
+    
+    g.setColour(Colours::red);
+    g.drawRect(bounds);
     
 }
 
