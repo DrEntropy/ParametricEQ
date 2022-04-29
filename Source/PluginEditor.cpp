@@ -47,7 +47,7 @@ void ParametricEQAudioProcessorEditor::resized()
     inputScale.setBounds(scaledMeterBounds.removeFromLeft(meterWidth));
     auto meterBounds = scaledMeterBounds.withTrimmedTop(meterSpacer).withTrimmedBottom(meterSpacer);
     
-#ifdef TESTMETER
+#ifdef TEST_METER
     meterBounds.setY(JUCE_LIVE_CONSTANT(meterBounds.getY()));
     meterBounds.setHeight(JUCE_LIVE_CONSTANT(meterBounds.getHeight()));
 #endif

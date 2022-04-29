@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define TESTMETER
+//#define USE_TEST_OSC
 
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
@@ -213,7 +213,7 @@ private:
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
     
-#ifdef TESTMETER
+#ifdef USE_TEST_OSC
     juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
     juce::dsp::Gain<float> testOscGain;
 #endif
