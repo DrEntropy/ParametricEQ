@@ -45,8 +45,7 @@ void Meter::paint (juce::Graphics& g)
         g.setColour(juce::Colours::orange);
     
     float decayBarY =juce::jmap(decayingValueHolder.getCurrentValue(), NEGATIVE_INFINITY, MAX_DECIBELS, bounds.getHeight(), 0.f);
-    
-    g.fillRect(bounds.getX(), decayBarY - DECAY_BAR_THICK/2, bounds.getWidth(), DECAY_BAR_THICK);
+    g.fillRect(0.f, std::max(0.f,decayBarY - DECAY_BAR_THICK/2), bounds.getWidth(), DECAY_BAR_THICK);
 }
 
 
