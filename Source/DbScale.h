@@ -23,7 +23,7 @@ struct Tick
 class DbScale  : public juce::Component
 {
 public:
- 
+    DbScale(){}
     ~DbScale() override = default;
     void paint (juce::Graphics&) override;
     void buildBackgroundImage(int dbDivision, juce::Rectangle<int> meterBounds, int minDb, int maxDb);

@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Meter.h"
+#include "DbScale.h"
 
 //==============================================================================
 /**
@@ -34,6 +35,7 @@ private:
     
     juce::AudioBuffer<float> buffer;
     Meter inputMeter;
+    DbScale inputScale;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

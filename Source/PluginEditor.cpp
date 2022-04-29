@@ -16,6 +16,8 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
+    addAndMakeVisible(inputScale);
+ 
     setSize (800, 600);
     startTimerHz(60);  
 }
@@ -40,7 +42,11 @@ void ParametricEQAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     auto bounds = getLocalBounds();
-    inputMeter.setBounds(bounds.removeFromLeft(50));
+    auto scaledMeterBounds = bounds.removeFromLeft(50);
+    inputScale.setBounds(scaledMeterBounds.removeFromLeft(25));
+    auto meterBounds = scaledMeterBounds.withTrimmedTop(10).withTrimmedBottom(10);
+    inputMeter.setBounds(meterBounds);
+    inputScale.buildBackgroundImage(0, meterBounds, NEGATIVE_INFINITY, MAX_DECIBELS);
 }
 
 

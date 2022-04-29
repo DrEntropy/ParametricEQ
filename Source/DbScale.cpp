@@ -14,6 +14,7 @@
 //==============================================================================
  
 
+
 void DbScale::paint (juce::Graphics& g)
 {
     g.drawImage(bkgd, getLocalBounds().toFloat());
@@ -31,9 +32,11 @@ void DbScale::buildBackgroundImage(int dbDivision, juce::Rectangle<int> meterBou
     auto scaleFactor = juce::Desktop::getInstance().getDisplays().getDisplayForPoint({0,0}) -> scale;
     bkgd = juce::Image(juce::Image::RGB, bounds.getWidth() * scaleFactor, bounds.getHeight() * scaleFactor, true);
     
-    auto g = juce::Graphics(bkgd);
+    juce::Graphics g(bkgd);
     
-    g.setColour(Colours::red);
+    g.addTransform(juce::AffineTransform().scale(scaleFactor));
+    
+    g.setColour(juce::Colours::red);
     g.drawRect(bounds);
     
 }
