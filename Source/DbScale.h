@@ -31,6 +31,7 @@ public:
     
 private:
     juce::Image bkgd;
+    const int textHeight = 14;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DbScale)
 };

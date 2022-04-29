@@ -8,6 +8,8 @@
 
 #pragma once
 
+#define TESTMETER
+
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
 #include "FilterParameters.h"
@@ -210,4 +212,9 @@ private:
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
+    
+#ifdef TESTMETER
+    juce::dsp::Oscillator<float> testOsc;
+#endif
+    
 };

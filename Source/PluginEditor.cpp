@@ -45,8 +45,14 @@ void ParametricEQAudioProcessorEditor::resized()
     auto scaledMeterBounds = bounds.removeFromLeft(50);
     inputScale.setBounds(scaledMeterBounds.removeFromLeft(25));
     auto meterBounds = scaledMeterBounds.withTrimmedTop(10).withTrimmedBottom(10);
+    
+#ifdef TESTMETER
+    meterBounds.setY(JUCE_LIVE_CONSTANT(meterBounds.getY()));
+    meterBounds.setHeight(JUCE_LIVE_CONSTANT(meterBounds.getHeight()));
+#endif
+    
     inputMeter.setBounds(meterBounds);
-    inputScale.buildBackgroundImage(0, meterBounds, NEGATIVE_INFINITY, MAX_DECIBELS);
+    inputScale.buildBackgroundImage(TICK_INTERVAL, meterBounds, NEGATIVE_INFINITY, MAX_DECIBELS);
 }
 
 
