@@ -214,7 +214,8 @@ private:
     Trim inputTrim, outputTrim;
     
 #ifdef TESTMETER
-    juce::dsp::Oscillator<float> testOsc;
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
+    juce::dsp::Gain<float> testOscGain;
 #endif
     
 };

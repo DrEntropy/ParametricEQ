@@ -121,6 +121,12 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Right, sampleRate);
     
     inputBuffers.prepare(samplesPerBlock, getTotalNumInputChannels());
+    
+#ifdef TESTMETER
+    testOsc.prepare(spec);
+    testOsc.setFrequency(440.0f);
+    testOscGain.prepare(spec);
+#endif
 
 }
 
@@ -211,7 +217,26 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+#ifdef TESTMETER
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, numSamples);
+    
+    testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
+    for( auto j = 0; j < numSamples; ++j)
+        {
+            auto sample = testOsc.processSample(0.0f);
+            sample = testOscGain.processSample(sample);
+            buffer.setSample(0, j, sample);
+            buffer.setSample(1, j, sample);
+        }
+#endif
+        
     inputBuffers.push(buffer);
+
+#ifdef TESTMETER
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+#endif
     
     if(mode == ChannelMode::MidSide)
     {
