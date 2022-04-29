@@ -31,6 +31,7 @@ struct DecayingValueHolder : juce::Timer
     void setDecayRate(float dbPerSec);
     
     void timerCallback() override;
+    
 private:
     float currentValue { NEGATIVE_INFINITY };
     juce::int64 peakTime = getNow();
@@ -41,7 +42,6 @@ private:
     
     static juce::int64 getNow();
     void resetDecayRateMultiplier();
-  
   
     static const int frameRate { 60 };
     constexpr static float rateAccel { 1.1f };

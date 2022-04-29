@@ -22,8 +22,6 @@ void DecayingValueHolder::updateHeldValue(float input)
         
 }
 
-
-
 float DecayingValueHolder::getCurrentValue() const
 {
     return currentValue;
