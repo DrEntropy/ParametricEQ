@@ -12,9 +12,6 @@
 #include "DbScale.h"
 
 //==============================================================================
- 
-
-
 void DbScale::paint (juce::Graphics& g)
 {
     g.drawImage(bkgd, getLocalBounds().toFloat());
@@ -46,15 +43,14 @@ void DbScale::buildBackgroundImage(int dbDivision, juce::Rectangle<int> meterBou
         g.drawFittedText(std::to_string(static_cast<int>(tick.db)),
                          tickarea, juce::Justification::centred, 1);
     }
-    
 }
 
 std::vector<Tick> DbScale::getTicks(int dbDivision, juce::Rectangle<int> meterBounds, int minDb, int maxDb)
 {
     if(minDb > maxDb)
-        std::swap(minDb,maxDb);
+        std::swap(minDb, maxDb);
     
-    auto numTicks = static_cast<size_t>((maxDb - minDb)/ dbDivision);
+    auto numTicks = static_cast<size_t>((maxDb - minDb) / dbDivision);
     std::vector<Tick> ticks;
     ticks.reserve(numTicks);
     
