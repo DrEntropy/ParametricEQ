@@ -11,10 +11,11 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "DecayingValueHolder.h"
+#include "EQConstants.h"
 
-#define NEGATIVE_INFINITY -96.0f
-#define MAX_DECIBELS 12.0f
 #define TICK_INTERVAL 6
+#define DECAY_BAR_THICK 4.f
 
 //==============================================================================
 /*
@@ -33,5 +34,7 @@ public:
 
 private:
     float peakDb { NEGATIVE_INFINITY };
+    DecayingValueHolder decayingValueHolder;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Meter)
 };

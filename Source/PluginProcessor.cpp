@@ -230,7 +230,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             buffer.setSample(1, j, sample);
         }
 #endif
-        
+    
     inputBuffers.push(buffer);
     
     if(mode == ChannelMode::MidSide)
