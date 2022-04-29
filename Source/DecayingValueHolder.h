@@ -44,6 +44,6 @@ private:
   
   
     static const int frameRate { 60 };
-    constexpr static float rateAccel { 1.01f };
+    constexpr static float rateAccel { 1.1f };
 };
 
