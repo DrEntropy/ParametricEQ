@@ -16,6 +16,8 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
+    addAndMakeVisible(inputScale);
+ 
     setSize (800, 600);
     startTimerHz(60);  
 }
@@ -27,7 +29,6 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 //==============================================================================
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
     g.setColour (juce::Colours::white);
@@ -37,10 +38,22 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ParametricEQAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    const uint scaleAndMeterWidth = 50;
+    const uint meterWidth = 25;
+    const uint meterSpacer = 10;
+    
     auto bounds = getLocalBounds();
-    inputMeter.setBounds(bounds.removeFromLeft(50));
+    auto scaledMeterBounds = bounds.removeFromLeft(scaleAndMeterWidth);
+    inputScale.setBounds(scaledMeterBounds.removeFromLeft(meterWidth));
+    auto meterBounds = scaledMeterBounds.withTrimmedTop(meterSpacer).withTrimmedBottom(meterSpacer);
+    
+#ifdef TEST_METER
+    meterBounds.setY(JUCE_LIVE_CONSTANT(meterBounds.getY()));
+    meterBounds.setHeight(JUCE_LIVE_CONSTANT(meterBounds.getHeight()));
+#endif
+    
+    inputMeter.setBounds(meterBounds);
+    inputScale.buildBackgroundImage(TICK_INTERVAL, meterBounds, NEGATIVE_INFINITY, MAX_DECIBELS);
 }
 
 

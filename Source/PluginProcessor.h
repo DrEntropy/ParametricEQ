@@ -8,6 +8,8 @@
 
 #pragma once
 
+//#define USE_TEST_OSC
+
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
 #include "FilterParameters.h"
@@ -210,4 +212,10 @@ private:
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
+    
+#ifdef USE_TEST_OSC
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
+    juce::dsp::Gain<float> testOscGain;
+#endif
+    
 };
