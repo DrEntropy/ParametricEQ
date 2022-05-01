@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "DecayingValueHolder.h"
 #include "EQConstants.h"
+#include "Averager.h"
 
 #define TICK_INTERVAL 6
 #define DECAY_BAR_THICK 4.f
@@ -33,8 +34,12 @@ public:
     void update(float dbLevel);
 
 private:
+    
+    void paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bounds, float dWidth, juce::Colour color);
+    
     float peakDb { NEGATIVE_INFINITY };
     DecayingValueHolder decayingValueHolder;
+    Averager<float> averageDb { static_cast<size_t>(FRAME_RATE * AVG_TIME), NEGATIVE_INFINITY };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Meter)
 };

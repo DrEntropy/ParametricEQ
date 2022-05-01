@@ -23,22 +23,13 @@ Meter::~Meter()
 
 void Meter::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
+    auto bounds = getLocalBounds().toFloat();
     
     g.fillAll(juce::Colours::black);
-    g.setColour(juce::Colours::white);
-    auto bounds = getLocalBounds().toFloat();
-    auto bar { bounds };
     
-    float y = juce::jmap(peakDb, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getHeight(), 0.f);
-    bar.setTop(y);
-    g.fillRect (bar);
-    
+    paintBar(g, peakDb, bounds, 0, juce::Colours::darkgoldenrod);
+    paintBar(g, averageDb.getAvg(), bounds, bounds.getWidth()/4.0f, juce::Colours::gold);
+
     if (decayingValueHolder.isOverThreshold())
         g.setColour(juce::Colours::red);
     else
@@ -48,10 +39,22 @@ void Meter::paint (juce::Graphics& g)
     g.fillRect(0.f, std::max(0.f,decayBarY - DECAY_BAR_THICK/2), bounds.getWidth(), DECAY_BAR_THICK);
 }
 
+void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bounds, float dWidth, juce::Colour color)
+{
+    auto bar { bounds };
+    
+    g.setColour(color);
+    float y = juce::jmap(value, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getHeight(), 0.f);
+    bar.setTop(y);
+    bar.reduce(dWidth, 0);
+    g.fillRect(bar);
+}
+
 
 void Meter::update(float dbLevel)
 {
     peakDb = dbLevel;
+    averageDb.add(peakDb);
     decayingValueHolder.updateHeldValue(peakDb);
     repaint();
 }

@@ -19,7 +19,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(inputScale);
  
     setSize (800, 600);
-    startTimerHz(60);  
+    startTimerHz(FRAME_RATE);
 }
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
