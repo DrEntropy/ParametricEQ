@@ -57,8 +57,8 @@ struct Averager
         auto size = elements.size();
         if(size > 0)
         {
-            auto currentSum = sum;
-            auto currentWriteIndex = writeIndex;
+            float currentSum = sum;
+            size_t currentWriteIndex = writeIndex;
             
             currentSum += t - elements[currentWriteIndex];
             elements[currentWriteIndex] = t;
@@ -66,7 +66,8 @@ struct Averager
             currentWriteIndex = (currentWriteIndex + 1) % size;
 
             sum = currentSum;
-            avg = currentSum/size;
+            avg = currentSum / size;
+            writeIndex = currentWriteIndex;
         }
     }
     
