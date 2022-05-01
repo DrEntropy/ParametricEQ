@@ -32,18 +32,18 @@ struct Averager
             value = initialValue;
         }
 
-        writeIndex = 0;
+        writeIndex.store(0);
         auto size = elements.size();
         
         if(size > 0)
         {
-            avg = static_cast<float>(initialValue);
-            sum = initialValue * elements.size();
+            avg.store(static_cast<float>(initialValue));
+            sum.store(initialValue * elements.size());
         }
         else
         {
-            avg = 0.f;
-            sum = T(0);
+            avg.store(0.f);
+            sum.store(T(0));
         }
     }
     
@@ -57,23 +57,23 @@ struct Averager
         auto size = elements.size();
         if(size > 0)
         {
-            float currentSum = sum;
-            size_t currentWriteIndex = writeIndex;
+            float currentSum = sum.load();
+            size_t currentWriteIndex = writeIndex.load();
             
             currentSum += t - elements[currentWriteIndex];
             elements[currentWriteIndex] = t;
             
             currentWriteIndex = (currentWriteIndex + 1) % size;
 
-            sum = currentSum;
-            avg = currentSum / size;
-            writeIndex = currentWriteIndex;
+            sum.store(currentSum);
+            avg.store(currentSum / size);
+            writeIndex.store(currentWriteIndex);
         }
     }
     
     float getAvg() const
     {
-        return avg;
+        return avg.load();
     }
     
 private:
