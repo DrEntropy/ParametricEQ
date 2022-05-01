@@ -9,24 +9,75 @@
 */
 
 #pragma once
+#include <atomic>
 
 template<typename T>
 struct Averager
 {
-    Averager(size_t numElements, T initialValue);
+    Averager(size_t numElements, T initialValue)
+    {
+        resize(numElements, initialValue);
+    }
     
-    void resize(size_t numElements, T initialValue);
+    void resize(size_t numElements, T initialValue)
+    {
+        elements.resize(numElements);
+        clear(initialValue);
+    }
     
-    void clear(T initialValue);
+    void clear(T initialValue)
+    {
+        for( auto& value : elements)
+        {
+            value = initialValue;
+        }
+
+        writeIndex = 0;
+        auto size = elements.size();
+        
+        if(size > 0)
+        {
+            avg = static_cast<float>(initialValue);
+            sum = initialValue * elements.size();
+        }
+        else
+        {
+            avg = 0.f;
+            sum = T(0);
+        }
+    }
     
-    size_t getSize() const;
+    size_t getSize() const
+    {
+        return elements.size();
+    }
     
-    void add(T t);
+    void add(T t)
+    {
+        auto size = elements.size();
+        if(size > 0)
+        {
+            auto currentSum = sum;
+            auto currentWriteIndex = writeIndex;
+            
+            currentSum += t - elements[currentWriteIndex];
+            elements[currentWriteIndex] = t;
+            
+            currentWriteIndex = (currentWriteIndex + 1) % size;
+
+            sum = currentSum;
+            avg = currentSum/size;
+        }
+    }
     
-    float getAvg() const;
+    float getAvg() const
+    {
+        return avg;
+    }
+    
 private:
     std::vector<T> elements;
     std::atomic<float> avg { static_cast<float>( T() ) };
-    std::atomic<size_t> writeIndex = 0;
+    std::atomic<size_t> writeIndex {0};
     std::atomic<T> sum { 0 };
 };

@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "DecayingValueHolder.h"
 #include "EQConstants.h"
+#include "Averager.h"
 
 #define TICK_INTERVAL 6
 #define DECAY_BAR_THICK 4.f
@@ -35,6 +36,7 @@ public:
 private:
     float peakDb { NEGATIVE_INFINITY };
     DecayingValueHolder decayingValueHolder;
+    Averager<float> averageDb { static_cast<size_t>(FRAME_RATE * AVG_TIME), 0.0f};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Meter)
 };

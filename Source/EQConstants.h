@@ -12,3 +12,8 @@
 
 #define NEGATIVE_INFINITY -96.0f
 #define MAX_DECIBELS 12.0f
+
+
+#define FRAME_RATE 60.0f
+// time in seconds.
+#define AVG_TIME 0.5f

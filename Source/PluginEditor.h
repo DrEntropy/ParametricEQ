@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define TEST_METER
+//#define TEST_METER
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
