@@ -39,7 +39,7 @@ private:
     
     float peakDb { NEGATIVE_INFINITY };
     DecayingValueHolder decayingValueHolder;
-    Averager<float> averageDb { static_cast<size_t>(FRAME_RATE * AVG_TIME), NEGATIVE_INFINITY};
+    Averager<float> averageDb { static_cast<size_t>(FRAME_RATE * AVG_TIME), NEGATIVE_INFINITY };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Meter)
 };

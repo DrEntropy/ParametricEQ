@@ -23,16 +23,9 @@ Meter::~Meter()
 
 void Meter::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
+    auto bounds = getLocalBounds().toFloat();
     
     g.fillAll(juce::Colours::black);
-
-    auto bounds = getLocalBounds().toFloat();
     
     paintBar(g, peakDb, bounds, 0, juce::Colours::darkgoldenrod);
     paintBar(g, averageDb.getAvg(), bounds, bounds.getWidth()/4.0f, juce::Colours::gold);
@@ -54,7 +47,7 @@ void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bou
     float y = juce::jmap(value, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getHeight(), 0.f);
     bar.setTop(y);
     bar.reduce(dWidth, 0);
-    g.fillRect (bar);
+    g.fillRect(bar);
 }
 
 

@@ -79,6 +79,6 @@ struct Averager
 private:
     std::vector<T> elements;
     std::atomic<float> avg { static_cast<float>( T() ) };
-    std::atomic<size_t> writeIndex {0};
+    std::atomic<size_t> writeIndex { 0 };
     std::atomic<T> sum { 0 };
 };
