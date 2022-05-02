@@ -48,21 +48,20 @@ void ParametricEQAudioProcessorEditor::resized()
 
 void ParametricEQAudioProcessorEditor::timerCallback()
 {
-    auto& inputFifo = audioProcessor.inputBuffers;
+    auto& inputFifo = audioProcessor.inMeterValuesFifo;
+    auto& outputFifo = audioProcessor.outMeterValuesFifo;
     
     MeterValues inputValues;
     
     if(inputFifo.getNumAvailableForReading() > 0)
     {
-        while(inputFifo.pull(buffer))
+        while(inputFifo.pull(inputValues))
         {
             // nothing ES.85
         }
+        inputMeter.update(inputValues);
         // TODO this will be done in a helper  and in the plug in processor
-        inputValues.leftPeakDb.setGain(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
-        inputValues.rightPeakDb.setGain(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
-        inputValues.leftRmsDb.setGain(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
-        inputValues.rightRmsDb.setGain(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+
         inputMeter.update(inputValues);
     }
 }
