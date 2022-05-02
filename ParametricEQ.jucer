@@ -4,6 +4,9 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="Ndu9eN" name="MeterValues.h" compile="0" resource="0" file="Source/MeterValues.h"/>
+      <FILE id="Txj62t" name="StereoMeter.cpp" compile="1" resource="0" file="Source/StereoMeter.cpp"/>
+      <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
       <FILE id="Eb3Ucq" name="Averager.h" compile="0" resource="0" file="Source/Averager.h"/>
       <FILE id="KmcX3V" name="EQConstants.h" compile="0" resource="0" file="Source/EQConstants.h"/>
       <FILE id="Wpg4cq" name="DecayingValueHolder.cpp" compile="1" resource="0"

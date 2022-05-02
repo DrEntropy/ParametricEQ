@@ -8,12 +8,11 @@
 
 #pragma once
 
-//#define TEST_METER
+ 
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "Meter.h"
-#include "DbScale.h"
+#include "StereoMeter.h"
 
 //==============================================================================
 /**
@@ -36,8 +35,7 @@ private:
     ParametricEQAudioProcessor& audioProcessor;
     
     juce::AudioBuffer<float> buffer;
-    Meter inputMeter;
-    DbScale inputScale;
+    StereoMeter inputMeter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };
