@@ -272,6 +272,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 #endif
+    
     outputTrim.process(stereoContext);
     updateMeterFifos(outMeterValuesFifo, buffer);
 }

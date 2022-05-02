@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "Meter.h"
+#include "DbScale.h"
 
 //==============================================================================
 Meter::Meter(juce::String aLabel) : chanLabel {aLabel}
@@ -41,6 +42,32 @@ void Meter::paint (juce::Graphics& g)
     g.fillRect(0.f, std::max(0.f,decayBarY - DECAY_BAR_THICK/2), bounds.getWidth(), DECAY_BAR_THICK);
      
     g.drawFittedText(chanLabel, labelBounds, juce::Justification::centred, 1);
+    
+    // draw ticks on scale
+  
+    
+    auto scaleBounds = bounds.reduced(7, 0);
+    
+    paintInnerTicks(g, scaleBounds, juce::Colours::lightgrey);
+ 
+}
+
+void Meter::paintInnerTicks(juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour color)
+{
+    
+    g.setColour(color);
+    auto ticks = DbScale::getTicks(INNER_TICK_INTERVAL, bounds.toNearestInt(), NEGATIVE_INFINITY, MAX_DECIBELS);
+    
+    size_t i=0;
+    for(auto tick : ticks)
+    {
+        if( i != 0 && i < ticks.size() - 1)
+        {
+            juce::Rectangle<float> tickMark {bounds.getX(), tick.y-INNER_TICK_THICK/2,  bounds.getWidth(), INNER_TICK_THICK};
+            g.fillRect(tickMark);
+        }
+        i++;
+    }
 }
 
 void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bounds, float dWidth, juce::Colour color)

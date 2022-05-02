@@ -17,6 +17,8 @@
 
 #define TICK_INTERVAL 6
 #define DECAY_BAR_THICK 4.f
+#define INNER_TICK_INTERVAL 12
+#define INNER_TICK_THICK 2.f
 
 //==============================================================================
 /*
@@ -38,6 +40,8 @@ public:
 private:
     
     void paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bounds, float dWidth, juce::Colour color);
+    
+    void paintInnerTicks(juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour color);
     
     float peakDb { NEGATIVE_INFINITY };
     DecayingValueHolder decayingValueHolder;

@@ -17,6 +17,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
+    addAndMakeVisible(outputMeter);
  
     setSize (800, 600);
     startTimerHz(FRAME_RATE);
@@ -38,10 +39,14 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ParametricEQAudioProcessorEditor::resized()
 {
+    // to do, move magic numbers to a common spot
     const uint scaleAndMeterWidth = 75;
     auto bounds = getLocalBounds();
+ 
+    bounds.reduce(10, 10);
     
     inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
+    outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
      
 }
 
@@ -51,17 +56,23 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     auto& inputFifo = audioProcessor.inMeterValuesFifo;
     auto& outputFifo = audioProcessor.outMeterValuesFifo;
     
-    MeterValues inputValues;
+    MeterValues values;
     
     if(inputFifo.getNumAvailableForReading() > 0)
     {
-        while(inputFifo.pull(inputValues))
+        while(inputFifo.pull(values))
         {
             // nothing ES.85
         }
-        inputMeter.update(inputValues);
-        // TODO this will be done in a helper  and in the plug in processor
-
-        inputMeter.update(inputValues);
+        inputMeter.update(values);
+    }
+    
+    if(outputFifo.getNumAvailableForReading() > 0)
+    {
+        while(outputFifo.pull(values))
+        {
+            // nothing ES.85
+        }
+        outputMeter.update(values);
     }
 }

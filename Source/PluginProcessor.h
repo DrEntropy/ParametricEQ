@@ -103,14 +103,14 @@ private:
     template<typename T, typename U>
     void updateMeterFifos(T& fifo, U& buffer)
     {
-        MeterValues inputValues;
+        MeterValues values;
         
-        inputValues.leftPeakDb.setGain(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
-        inputValues.rightPeakDb.setGain(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
-        inputValues.leftRmsDb.setGain(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
-        inputValues.rightRmsDb.setGain(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+        values.leftPeakDb.setGain(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
+        values.rightPeakDb.setGain(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
+        values.leftRmsDb.setGain(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+        values.rightRmsDb.setGain(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
         
-        fifo.push(inputValues);
+        fifo.push(values);
     }
     
     template <const int filterNum>
