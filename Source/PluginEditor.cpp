@@ -38,7 +38,7 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ParametricEQAudioProcessorEditor::resized()
 {
-    const uint scaleAndMeterWidth = 50;
+    const uint scaleAndMeterWidth = 75;
     auto bounds = getLocalBounds();
     
     inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
@@ -58,8 +58,11 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         {
             // nothing ES.85
         }
+        // TODO this will be done in a helper  and in the plug in processor
         inputValues.leftPeakDb.setGain(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
         inputValues.rightPeakDb.setGain(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
+        inputValues.leftRmsDb.setGain(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+        inputValues.rightRmsDb.setGain(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
         inputMeter.update(inputValues);
     }
 }

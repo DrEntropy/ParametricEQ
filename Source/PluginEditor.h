@@ -35,7 +35,7 @@ private:
     ParametricEQAudioProcessor& audioProcessor;
     
     juce::AudioBuffer<float> buffer;
-    StereoMeter inputMeter;
+    StereoMeter inputMeter {"PRE EQ"};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };
