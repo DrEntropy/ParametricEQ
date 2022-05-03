@@ -10,6 +10,11 @@
 
 #include "DecayingValueHolder.h"
 
+DecayingValueHolder::DecayingValueHolder()
+{
+    setDecayRate(3); //default 3 dB/s
+    startTimerHz(frameRate);
+}
 
 void DecayingValueHolder::updateHeldValue(float input)
 {

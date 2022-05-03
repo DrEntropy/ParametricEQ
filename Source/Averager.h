@@ -29,10 +29,7 @@ struct Averager
     
     void clear(T initialValue)
     {
-        for( auto& value : elements)
-        {
-            value = initialValue;
-        }
+        elements.assign(getSize(), initialValue);
 
         writeIndex.store(0);
         avg.store(static_cast<float>(initialValue));
@@ -47,8 +44,8 @@ struct Averager
     void add(T t)
     {
         auto size = getSize();
-        float currentSum = sum.load();
-        size_t currentWriteIndex = writeIndex.load();
+        auto currentSum = sum.load();
+        auto currentWriteIndex = writeIndex.load();
             
         currentSum += t - elements[currentWriteIndex];
         elements[currentWriteIndex] = t;

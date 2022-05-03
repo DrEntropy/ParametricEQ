@@ -223,12 +223,12 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
     for( auto j = 0; j < numSamples; ++j)
-        {
-            auto sample = testOsc.processSample(0.0f);
-            sample = testOscGain.processSample(sample);
-            buffer.setSample(0, j, sample);
-            buffer.setSample(1, j, sample);
-        }
+    {
+        auto sample = testOsc.processSample(0.0f);
+        sample = testOscGain.processSample(sample);
+        buffer.setSample(0, j, sample);
+        buffer.setSample(1, j, sample);
+    }
 #endif
     
     inputBuffers.push(buffer);

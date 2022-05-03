@@ -18,10 +18,6 @@ Meter::Meter(juce::String aLabel) : chanLabel {aLabel}
     decayingValueHolder.setDecayRate(3.0f);
 }
 
-Meter::~Meter()
-{
-}
-
 void Meter::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
@@ -53,7 +49,7 @@ void Meter::paintInnerTicks(juce::Graphics& g, juce::Rectangle<float> bounds, ju
     g.setColour(color);
     auto ticks = DbScale::getTicks(INNER_TICK_INTERVAL, bounds.toNearestInt(), NEGATIVE_INFINITY, MAX_DECIBELS);
     
-    size_t i=0;
+    size_t i = 0;
     for(auto tick : ticks)
     {
         if( i != 0 && i < ticks.size() - 1)
@@ -61,14 +57,12 @@ void Meter::paintInnerTicks(juce::Graphics& g, juce::Rectangle<float> bounds, ju
             juce::Rectangle<float> tickMark {bounds.getX(), tick.y-INNER_TICK_THICK/2,  bounds.getWidth(), INNER_TICK_THICK};
             g.fillRect(tickMark);
         }
-        i++;
+        ++i;
     }
 }
 
-void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bounds, float dWidth, juce::Colour color)
+void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bar, float dWidth, juce::Colour color)
 {
-    auto bar { bounds };
-    
     g.setColour(color);
     float y = juce::jmap(value, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getY() + bar.getHeight(), bar.getY());
     bar.setTop(y);

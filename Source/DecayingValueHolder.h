@@ -16,12 +16,8 @@
 
 struct DecayingValueHolder : juce::Timer
 {
-    DecayingValueHolder()
-    {
-        setDecayRate(3); //default 3 dB/s
-        startTimerHz(frameRate);
-    }
-    
+    DecayingValueHolder();
+
     void updateHeldValue(float input);
     
     float getCurrentValue() const;

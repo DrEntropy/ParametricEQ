@@ -31,7 +31,7 @@ class Meter  : public juce::Component
 {
 public:
     Meter(juce::String);
-    ~Meter() override;
+    ~Meter() override = default;
 
     void paint (juce::Graphics&) override;
     
