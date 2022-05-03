@@ -62,7 +62,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     {
         while(inputFifo.pull(values))
         {
-            // nothing ES.85
+            // nothing  
         }
         inputMeter.update(values);
     }
