@@ -16,6 +16,9 @@
 #include "DbScale.h"
 #include "Fifo.h"
 
+#define LABEL_SPACE 30
+#define METER_WIDTH 25
+
 //==============================================================================
 /*
 */
@@ -37,8 +40,5 @@ private:
     
     const juce::String meterLabel;
  
-    static const uint labelSpace {30};
-    static const uint meterWidth {25};
-   
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoMeter)
 };

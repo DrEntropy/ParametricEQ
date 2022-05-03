@@ -233,10 +233,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     inputBuffers.push(buffer);
     
- 
     updateMeterFifos(inMeterValuesFifo, buffer);
  
-    
     if(mode == ChannelMode::MidSide)
     {
         performMidSideTransform(buffer);
@@ -244,8 +242,6 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
-    
-  
     
     while(offset < numSamples)
     {

@@ -19,6 +19,8 @@
 #define DECAY_BAR_THICK 4.f
 #define INNER_TICK_INTERVAL 12
 #define INNER_TICK_THICK 2.f
+#define INNER_TICK_SHRINK 7
+#define LABEL_SIZE 30
 
 //==============================================================================
 /*
@@ -48,8 +50,6 @@ private:
     Averager<float> averageDb { static_cast<size_t>(FRAME_RATE * AVG_TIME), NEGATIVE_INFINITY };
     
     const juce::String chanLabel;
-    
-    static const int labelSize {30};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Meter)
 };

@@ -90,10 +90,9 @@ public:
     
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
     
-    // Buffers for meters. 30 should be plenty, timer goes at 60 times a second,
+    // Buffers for meters and fft. 30 should be plenty, timer goes at 60 times a second,
     // which is a duration of about 768 samples as 48k, which should only be few blocks.  
     Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
-    
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
 
 private:
@@ -135,7 +134,7 @@ private:
         parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(channel, filterNum))-> load());
         
         return parametricParams;
-        
+
     }
     
     template <const int filterNum>

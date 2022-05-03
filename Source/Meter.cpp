@@ -25,7 +25,7 @@ Meter::~Meter()
 void Meter::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
-    auto labelBounds = bounds.removeFromTop(labelSize).toNearestInt();
+    auto labelBounds = bounds.removeFromTop(LABEL_SIZE).toNearestInt();
     
     g.setColour(juce::Colours::black);
     g.fillRect(bounds);
@@ -43,13 +43,8 @@ void Meter::paint (juce::Graphics& g)
      
     g.drawFittedText(chanLabel, labelBounds, juce::Justification::centred, 1);
     
-    // draw ticks on scale
-  
-    
-    auto scaleBounds = bounds.reduced(7, 0);
-    
+    auto scaleBounds = bounds.reduced(INNER_TICK_SHRINK, 0);
     paintInnerTicks(g, scaleBounds, juce::Colours::lightgrey);
- 
 }
 
 void Meter::paintInnerTicks(juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour color)
@@ -84,7 +79,7 @@ void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bou
 
 juce::Rectangle<int> Meter::getMeterBounds()
 {
-    return getBounds().withTrimmedTop(labelSize);
+    return getBounds().withTrimmedTop(LABEL_SIZE);
 }
 
 void Meter::update(float dbLevelPeak, float dbLevelRMS)
