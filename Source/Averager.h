@@ -10,6 +10,7 @@
 
 #pragma once
 #include <atomic>
+#include <JuceHeader.h>
 
 template<typename T>
 struct Averager
@@ -21,6 +22,7 @@ struct Averager
     
     void resize(size_t numElements, T initialValue)
     {
+        jassert(numElements > 0);
         elements.resize(numElements);
         clear(initialValue);
     }
@@ -33,18 +35,8 @@ struct Averager
         }
 
         writeIndex.store(0);
-        auto size = elements.size();
-        
-        if(size > 0)
-        {
-            avg.store(static_cast<float>(initialValue));
-            sum.store(initialValue * elements.size());
-        }
-        else
-        {
-            avg.store(0.f);
-            sum.store(T(0));
-        }
+        avg.store(static_cast<float>(initialValue));
+        sum.store(initialValue * getSize());
     }
     
     size_t getSize() const
@@ -54,21 +46,18 @@ struct Averager
     
     void add(T t)
     {
-        auto size = elements.size();
-        if(size > 0)
-        {
-            float currentSum = sum.load();
-            size_t currentWriteIndex = writeIndex.load();
+        auto size = getSize();
+        float currentSum = sum.load();
+        size_t currentWriteIndex = writeIndex.load();
             
-            currentSum += t - elements[currentWriteIndex];
-            elements[currentWriteIndex] = t;
+        currentSum += t - elements[currentWriteIndex];
+        elements[currentWriteIndex] = t;
             
-            currentWriteIndex = (currentWriteIndex + 1) % size;
+        currentWriteIndex = (currentWriteIndex + 1) % size;
 
-            sum.store(currentSum);
-            avg.store(currentSum / size);
-            writeIndex.store(currentWriteIndex);
-        }
+        sum.store(currentSum);
+        avg.store(currentSum / size);
+        writeIndex.store(currentWriteIndex);
     }
     
     float getAvg() const

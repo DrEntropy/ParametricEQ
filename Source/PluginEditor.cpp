@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "MeterValues.h"
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
@@ -16,7 +17,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
-    addAndMakeVisible(inputScale);
+    addAndMakeVisible(outputMeter);
  
     setSize (800, 600);
     startTimerHz(FRAME_RATE);
@@ -33,40 +34,45 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello EQ!", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("PFM11-23", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void ParametricEQAudioProcessorEditor::resized()
 {
-    const uint scaleAndMeterWidth = 50;
-    const uint meterWidth = 25;
-    const uint meterSpacer = 10;
-    
+    // to do, move magic numbers to a common spot
+    const uint scaleAndMeterWidth = 75;
     auto bounds = getLocalBounds();
-    auto scaledMeterBounds = bounds.removeFromLeft(scaleAndMeterWidth);
-    inputScale.setBounds(scaledMeterBounds.removeFromLeft(meterWidth));
-    auto meterBounds = scaledMeterBounds.withTrimmedTop(meterSpacer).withTrimmedBottom(meterSpacer);
+ 
+    bounds.reduce(10, 10);
     
-#ifdef TEST_METER
-    meterBounds.setY(JUCE_LIVE_CONSTANT(meterBounds.getY()));
-    meterBounds.setHeight(JUCE_LIVE_CONSTANT(meterBounds.getHeight()));
-#endif
-    
-    inputMeter.setBounds(meterBounds);
-    inputScale.buildBackgroundImage(TICK_INTERVAL, meterBounds, NEGATIVE_INFINITY, MAX_DECIBELS);
+    inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
+    outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
+     
 }
 
 
 void ParametricEQAudioProcessorEditor::timerCallback()
 {
-    auto& inputFifo = audioProcessor.inputBuffers;
+    auto& inputFifo = audioProcessor.inMeterValuesFifo;
+    auto& outputFifo = audioProcessor.outMeterValuesFifo;
+    
+    MeterValues values;
+    
     if(inputFifo.getNumAvailableForReading() > 0)
     {
-        while(inputFifo.pull(buffer))
+        while(inputFifo.pull(values))
         {
             // nothing ES.85
         }
-        auto magnitude = buffer.getMagnitude(0, 0, buffer.getNumSamples());
-        inputMeter.update(juce::Decibels::gainToDecibels(magnitude, NEGATIVE_INFINITY));
+        inputMeter.update(values);
+    }
+    
+    if(outputFifo.getNumAvailableForReading() > 0)
+    {
+        while(outputFifo.pull(values))
+        {
+            // nothing ES.85
+        }
+        outputMeter.update(values);
     }
 }
