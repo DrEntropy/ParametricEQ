@@ -8,6 +8,8 @@
 
 #pragma once
 
+//#define USE_TEST_OSC
+
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
 #include "FilterParameters.h"
@@ -17,6 +19,7 @@
 #include "FilterCoefficientGenerator.h"
 #include "ReleasePool.h"
 #include "FilterLink.h"
+#include "MeterValues.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using Trim = juce::dsp::Gain<float>;
@@ -86,10 +89,28 @@ public:
     // =========================================================================
     
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
+    
+    // Buffers for meters and fft. 30 should be plenty, timer goes at 60 times a second,
+    // which is a duration of about 768 samples as 48k, which should only be few blocks.  
+    Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
+    Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
+    
+    template<typename T, typename U>
+    void updateMeterFifos(T& fifo, U& buffer)
+    {
+        MeterValues values;
+        
+        values.leftPeakDb.setGain(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
+        values.rightPeakDb.setGain(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
+        values.leftRmsDb.setGain(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+        values.rightRmsDb.setGain(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+        
+        fifo.push(values);
+    }
     
     template <const int filterNum>
     FilterParameters getParametericFilterParams(Channel channel, double sampleRate)
@@ -113,7 +134,7 @@ private:
         parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(channel, filterNum))-> load());
         
         return parametricParams;
-        
+
     }
     
     template <const int filterNum>
@@ -193,7 +214,6 @@ private:
         rightChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
     }
     
-  
     void initializeFilters(Channel channel, double sampleRate);
     void performInnerLoopUpdate(int samplesToSkip);
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
@@ -208,6 +228,9 @@ private:
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
     
-
+#ifdef USE_TEST_OSC
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
+    juce::dsp::Gain<float> testOscGain;
+#endif
     
 };

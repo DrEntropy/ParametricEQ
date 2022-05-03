@@ -119,6 +119,14 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
+    
+    inputBuffers.prepare(samplesPerBlock, getTotalNumInputChannels());
+    
+#ifdef USE_TEST_OSC
+    testOsc.prepare(spec);
+    testOsc.setFrequency(440.0f);
+    testOscGain.prepare(spec);
+#endif
 
 }
 
@@ -209,6 +217,24 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
+#ifdef USE_TEST_OSC
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, numSamples);
+    
+    testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
+    for( auto j = 0; j < numSamples; ++j)
+    {
+        auto sample = testOsc.processSample(0.0f);
+        sample = testOscGain.processSample(sample);
+        buffer.setSample(0, j, sample);
+        buffer.setSample(1, j, sample);
+    }
+#endif
+    
+    inputBuffers.push(buffer);
+    
+    updateMeterFifos(inMeterValuesFifo, buffer);
+ 
     if(mode == ChannelMode::MidSide)
     {
         performMidSideTransform(buffer);
@@ -216,8 +242,6 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
-    
-  
     
     while(offset < numSamples)
     {
@@ -240,7 +264,13 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         performMidSideTransform(buffer);
     }
     
+#ifdef USE_TEST_OSC
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+#endif
+    
     outputTrim.process(stereoContext);
+    updateMeterFifos(outMeterValuesFifo, buffer);
 }
 
 //==============================================================================
@@ -251,8 +281,8 @@ bool ParametricEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ParametricEQAudioProcessor::createEditor()
 {
-   // return new ParametricEQAudioProcessorEditor (*this);
-    return new  juce::GenericAudioProcessorEditor(*this);
+   return new ParametricEQAudioProcessorEditor (*this);
+   // return new  juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -284,7 +314,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Channel channel, int filterNum, bool isCut)
 {
     auto label = createBypassParamString(channel, filterNum);
-    layout.add(std::make_unique<juce::AudioParameterBool>(label, label ,false) );
+    layout.add(std::make_unique<juce::AudioParameterBool>(label, label, true) );
     
     label = createFreqParamString(channel, filterNum);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
