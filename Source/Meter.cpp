@@ -34,8 +34,8 @@ void Meter::paint (juce::Graphics& g)
     else
         g.setColour(juce::Colours::orange);
     
-    float decayBarY =juce::jmap(decayingValueHolder.getCurrentValue(), NEGATIVE_INFINITY, MAX_DECIBELS,bounds.getY() + bounds.getHeight(), bounds.getY());
-    g.fillRect(0.f, std::max(0.f,decayBarY - DECAY_BAR_THICK/2), bounds.getWidth(), DECAY_BAR_THICK);
+    float decayBarY =juce::jmap(decayingValueHolder.getCurrentValue(), NEGATIVE_INFINITY, MAX_DECIBELS, bounds.getY() + bounds.getHeight(), bounds.getY());
+    g.fillRect(0.f, std::max(bounds.getY(), decayBarY - DECAY_BAR_THICK/2), bounds.getWidth(), DECAY_BAR_THICK);
      
     g.drawFittedText(chanLabel, labelBounds, juce::Justification::centred, 1);
     
@@ -65,6 +65,7 @@ void Meter::paintBar (juce::Graphics& g, float value, juce::Rectangle<float> bar
 {
     g.setColour(color);
     float y = juce::jmap(value, NEGATIVE_INFINITY, MAX_DECIBELS, bar.getY() + bar.getHeight(), bar.getY());
+    y = juce::jlimit(bar.getY(), bar.getY() + bar.getHeight(), y);
     bar.setTop(y);
     bar.reduce(dWidth, 0);
     g.fillRect(bar);
