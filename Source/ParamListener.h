@@ -15,12 +15,11 @@
 
 struct ParamListener : juce::Timer
 {
-    ParamListener(juce::RangedAudioParameter* parameter, std::function<void (float)> lambda);
-
+    ParamListener(juce::RangedAudioParameter* parameter, std::function<void(float)> lambda);
     void timerCallback() override;
     
 private:
-    juce::RangedAudioParameter*  audioParameter;
+    juce::RangedAudioParameter* audioParameter;
     float cachedValue;
-    std::function<void (float)> listener;
+    std::function<void(float)> listener;
 };

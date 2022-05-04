@@ -11,7 +11,7 @@
 #include "ParamListener.h"
 
 
-ParamListener::ParamListener(juce::RangedAudioParameter* parameter, std::function<void (float)> lambda) : audioParameter{ parameter }, listener {lambda}
+ParamListener::ParamListener(juce::RangedAudioParameter* parameter, std::function<void(float)> lambda) : audioParameter (parameter), listener (lambda)
 {
     jassert(parameter);
     jassert(lambda);
@@ -20,7 +20,6 @@ ParamListener::ParamListener(juce::RangedAudioParameter* parameter, std::functio
     
     startTimerHz(POLLING_FREQ);
 }
-
 
 void ParamListener::timerCallback()
 {
@@ -31,5 +30,4 @@ void ParamListener::timerCallback()
         cachedValue = value;
         listener(audioParameter->convertFrom0to1(value));
     }
-
 }
