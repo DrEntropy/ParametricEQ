@@ -13,6 +13,9 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "StereoMeter.h"
+#include "ParamListener.h"
+
+#define TEST_LISTENER
 
 //==============================================================================
 /**
@@ -37,6 +40,9 @@ private:
     juce::AudioBuffer<float> buffer;
     StereoMeter inputMeter {"PRE EQ"};
     StereoMeter outputMeter {"POST EQ"};
-
+    
+#ifdef TEST_LISTENER
+    ParamListener testListener;
+#endif
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

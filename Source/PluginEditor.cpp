@@ -13,6 +13,9 @@
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
+#ifdef TEST_LISTENER
+    ,testListener(p.apvts.getParameter("Processing Mode"), [](float v){DBG(" value changed" + std::to_string(v));})
+#endif
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
