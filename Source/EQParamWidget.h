@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "ParameterHelpers.h"
+#include "ParamListener.h"
 
  
 
@@ -76,12 +77,8 @@ public:
         setLookAndFeel(&textSliderLookAndFeel);
         
         addAndMakeVisible(frequencySlider);
-
-        
         addAndMakeVisible(qSlider);
-        
       
-        
         if(isCut)
             gainOrSlopeSlider.reset(new SlopeSlider());
         else
@@ -91,6 +88,33 @@ public:
         
         AttachSliders(Channel::Left);
         
+        addChildComponent(leftMidButton);
+        addChildComponent(rightSideButton);
+    
+        
+        auto safePtr = juce::Component::SafePointer<EQParamWidget>(this);
+        leftMidButton.onClick = [safePtr]()
+        {
+            if(auto* comp = safePtr.getComponent() )
+                comp->AttachSliders(Channel::Left);
+        };
+        rightSideButton.onClick = [safePtr]()
+        {
+            if(auto* comp = safePtr.getComponent() )
+                comp->AttachSliders(Channel::Right);
+        };
+        
+        
+        ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+        setProcessingMode(mode);
+        
+        modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
+                                            [safePtr](float v)
+                                             {
+                                              if(auto* comp = safePtr.getComponent() )
+                                                  comp->setProcessingMode(static_cast<ChannelMode>(v));
+                                             }));
+        
 
     }
     
@@ -99,10 +123,27 @@ public:
     {
         setLookAndFeel(nullptr);
     }
+    
+    void setProcessingMode(ChannelMode mode)
+    {
+        if(mode != ChannelMode::DualMono)
+        {
+            leftMidButton.setVisible(true);
+            rightSideButton.setVisible(true);
+        }
+        else
+        {
+            leftMidButton.setVisible(false);
+            rightSideButton.setVisible(false);
+        }
+    }
    
     void AttachSliders(Channel channel)
     {
+        frequencyAttachment.reset(); //must first delete old attachment before creating new one!
         frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, filterNumber), frequencySlider));
+        
+        qAttachment.reset();
         qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, filterNumber), qSlider));
         
         juce::String gainOrSlopeParamString;
@@ -112,6 +153,7 @@ public:
         else
             gainOrSlopeParamString = createGainParamString(channel, filterNumber);
         
+        gainOrSlopeAttachment.reset();
         gainOrSlopeAttachment.reset(new SliderAttachment(apvts, gainOrSlopeParamString, *gainOrSlopeSlider));
     }
 
@@ -127,11 +169,15 @@ public:
     {
         auto bounds = getLocalBounds();
         auto height = bounds.getHeight();
+        auto width = bounds.getWidth();
         frequencySlider.setBounds(bounds.removeFromTop(height/4));
         qSlider.setBounds(bounds.removeFromTop(height/4));
         gainOrSlopeSlider->setBounds(bounds.removeFromTop(height/4));
+        leftMidButton.setBounds(bounds.removeFromLeft(width/2));
+        rightSideButton.setBounds(bounds);
  
     }
+    
 
 private:
     
@@ -141,8 +187,11 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
     HertzSlider frequencySlider;
     QualitySlider qSlider;
-    
     std::unique_ptr<juce::Slider> gainOrSlopeSlider;
+    juce::TextButton leftMidButton, rightSideButton;
+    
+    // TODO add ParamListeneres for  bypass
+    std::unique_ptr<ParamListener> modeListener;
     
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     
