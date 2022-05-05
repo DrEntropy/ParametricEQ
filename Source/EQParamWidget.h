@@ -11,16 +11,15 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ParameterHelpers.h"
 
-// helper classes
+ 
 
 struct TextSliderLookAndFeel : juce::LookAndFeel_V4
 {
     
     
 };
-
-
 
 struct TextOnlyHorizontalSlider : juce::Slider
 {
@@ -72,29 +71,56 @@ struct GainSlider : TextOnlyHorizontalSlider
 class EQParamWidget  : public juce::Component
 {
 public:
-    EQParamWidget(int filterNumber, bool isCut)
+    EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut) : apvts (apvts), filterNumber (filterNumber), isCut (isCut)
     {
         setLookAndFeel(&textSliderLookAndFeel);
+        
         addAndMakeVisible(frequencySlider);
+
+        
         addAndMakeVisible(qSlider);
-        //gainOrSlopeSlider.reset(make_unique<SlopeSlider>());
-        //addAndMakeVisible(*gainOrSlopeSlider);
+        
+      
+        
+        if(isCut)
+            gainOrSlopeSlider.reset(new SlopeSlider());
+        else
+            gainOrSlopeSlider.reset(new GainSlider());
+        
+        addAndMakeVisible(*gainOrSlopeSlider);
+        
+        AttachSliders(Channel::Left);
         
 
     }
+    
 
     ~EQParamWidget() override
     {
         setLookAndFeel(nullptr);
     }
- 
+   
+    void AttachSliders(Channel channel)
+    {
+        frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, filterNumber), frequencySlider));
+        qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, filterNumber), qSlider));
+        
+        juce::String gainOrSlopeParamString;
+        
+        if(isCut)
+            gainOrSlopeParamString = createSlopeParamString(channel, filterNumber);
+        else
+            gainOrSlopeParamString = createGainParamString(channel, filterNumber);
+        
+        gainOrSlopeAttachment.reset(new SliderAttachment(apvts, gainOrSlopeParamString, *gainOrSlopeSlider));
+    }
 
     void paint (juce::Graphics& g) override
     {
- 
 
         g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
- 
+        g.setColour(juce::Colours::lightgrey);
+        g.drawRect(getLocalBounds(), 2);
     }
 
     void resized() override
@@ -103,18 +129,28 @@ public:
         auto height = bounds.getHeight();
         frequencySlider.setBounds(bounds.removeFromTop(height/4));
         qSlider.setBounds(bounds.removeFromTop(height/4));
+        gainOrSlopeSlider->setBounds(bounds.removeFromTop(height/4));
  
     }
 
 private:
+    
+    int filterNumber;
+    bool isCut;
+    
+    juce::AudioProcessorValueTreeState& apvts;
     HertzSlider frequencySlider;
     QualitySlider qSlider;
     
     std::unique_ptr<juce::Slider> gainOrSlopeSlider;
     
+    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    
+    std::unique_ptr<SliderAttachment> frequencyAttachment;
+    std::unique_ptr<SliderAttachment> qAttachment;
+    std::unique_ptr<SliderAttachment> gainOrSlopeAttachment;
+    
     TextSliderLookAndFeel textSliderLookAndFeel;
-    
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQParamWidget)
 };
