@@ -13,14 +13,13 @@
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
-#ifdef TEST_LISTENER
-    ,testListener(p.apvts.getParameter("Processing Mode"), [](float v){DBG(" value changed" + std::to_string(v));})
-#endif
+
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
+    addAndMakeVisible(eqParamContainer);
  
     setSize (800, 600);
     startTimerHz(FRAME_RATE);
@@ -50,6 +49,7 @@ void ParametricEQAudioProcessorEditor::resized()
     
     inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
     outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
+    eqParamContainer.setBounds(bounds.removeFromBottom(100));
      
 }
 
