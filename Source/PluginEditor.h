@@ -41,7 +41,7 @@ private:
     StereoMeter inputMeter {"PRE EQ"};
     StereoMeter outputMeter {"POST EQ"};
     
-    EQParamContainer eqParamContainer;
+    EQParamContainer eqParamContainer {audioProcessor.apvts};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

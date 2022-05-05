@@ -19,7 +19,7 @@
 class EQParamContainer  : public juce::Component
 {
 public:
-    EQParamContainer()
+    EQParamContainer(juce::AudioProcessorValueTreeState& apvts) : apvts(apvts)
     {
         addAndMakeVisible(lowCut);
 
@@ -45,7 +45,8 @@ public:
 
 private:
     
-    EQParamWidget lowCut {0, true};
+    juce::AudioProcessorValueTreeState& apvts;
+    EQParamWidget lowCut {apvts, 0, true};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQParamContainer)
 };
