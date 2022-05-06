@@ -22,8 +22,21 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
                                               float sliderPos, float minSliderPos, float maxSliderPos,
                                               const juce::Slider::SliderStyle style, juce::Slider& slider) override
     {
-        juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos,
-                                               style, slider);
+        // only override LinearHorizontal (but why? This is bar already. Also this doesnt work because the drawLinearSlider call for LinearHorizontal adds
+        // some padding for some reason.
+        if(style != juce::Slider::SliderStyle::LinearHorizontal)
+        {
+            juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos,
+                                                           style, slider);
+            return;
+        }
+    
+        auto bounds = slider.getLocalBounds().toFloat();
+        // rescale slider positions
+        sliderPos = juce::jmap(sliderPos, static_cast<float> (x), static_cast<float> (x) + width, 0.f, bounds.getWidth());
+        g.setColour (juce::Colours::black);
+        g.fillRect (juce::Rectangle<float> (0.f, 0.f, sliderPos,  bounds.getHeight()));
+       
     }
     
     
@@ -32,7 +45,7 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
 struct TextOnlyHorizontalSlider : juce::Slider
 {
     TextOnlyHorizontalSlider() : juce::Slider(juce::Slider::SliderStyle::LinearHorizontal,
-                                              juce::Slider::TextEntryBoxPosition::NoTextBox)
+                                              juce::Slider::TextEntryBoxPosition::NoTextBox )
     {
         /*
          setting this to false prevents the slider from snapping its value to wherever you click inside the slider bounds.
@@ -168,13 +181,14 @@ public:
     {
 
         g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-        g.setColour(juce::Colours::lightgrey);
+        g.setColour(juce::Colours::blue);
         g.drawRect(getLocalBounds(), 2);
     }
 
     void resized() override
     {
         auto bounds = getLocalBounds();
+        bounds.reduce(2,2);
         auto height = bounds.getHeight();
         auto width = bounds.getWidth();
         frequencySlider.setBounds(bounds.removeFromTop(height/4));
