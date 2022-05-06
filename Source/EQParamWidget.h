@@ -16,31 +16,7 @@
 
  
 
-struct EQParamLookAndFeel : juce::LookAndFeel_V4
-{
-    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
-                                              float sliderPos, float minSliderPos, float maxSliderPos,
-                                              const juce::Slider::SliderStyle style, juce::Slider& slider) override
-    {
-        // only override LinearHorizontal (but why? This is bar already. Also this doesnt work because the drawLinearSlider call for LinearHorizontal adds
-        // some padding for some reason.
-        if(style != juce::Slider::SliderStyle::LinearHorizontal)
-        {
-            juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos,
-                                                           style, slider);
-            return;
-        }
-    
-        auto bounds = slider.getLocalBounds().toFloat();
-        // rescale slider positions
-        sliderPos = juce::jmap(sliderPos, static_cast<float> (x), static_cast<float> (x) + width, 0.f, bounds.getWidth());
-        g.setColour (juce::Colours::black);
-        g.fillRect (juce::Rectangle<float> (0.f, 0.f, sliderPos,  bounds.getHeight()));
-       
-    }
-    
-    
-};
+
 
 struct TextOnlyHorizontalSlider : juce::Slider
 {
@@ -61,7 +37,8 @@ struct HertzSlider : TextOnlyHorizontalSlider
 {
     juce::String getDisplayString()
     {
-        return " Hz";
+        auto freq = getValue();
+        return std::to_string(freq) + " Hz";
     }
 };
 
@@ -87,6 +64,40 @@ struct GainSlider : TextOnlyHorizontalSlider
     {
         return " dB";
     }
+};
+
+
+struct EQParamLookAndFeel : juce::LookAndFeel_V4
+{
+    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
+                                              float sliderPos, float minSliderPos, float maxSliderPos,
+                                              const juce::Slider::SliderStyle style, juce::Slider& slider) override
+    {
+        // only override LinearHorizontal (but why? This is bar already. Also this doesnt work because the drawLinearSlider call for LinearHorizontal adds
+        // some padding for some reason.
+        
+        if(TextOnlyHorizontalSlider* textOnlyHSliderp = dynamic_cast<TextOnlyHorizontalSlider *> (&slider) )
+        {
+            auto bounds = slider.getLocalBounds().toFloat();
+            // rescale slider positions
+            sliderPos = juce::jmap(sliderPos, static_cast<float> (x), static_cast<float> (x) + width, 0.f, bounds.getWidth());
+            g.setColour (juce::Colours::black);
+            auto newBounds =juce::Rectangle<float> (0.f, 0.f, sliderPos,  bounds.getHeight());
+            g.fillRect (newBounds);
+            g.setColour (juce::Colours::white);
+            juce::String message =textOnlyHSliderp->getDisplayString();
+            g.drawFittedText(message,bounds.toNearestInt(), juce::Justification::centred, 1);
+        }
+        else
+        {
+            juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos,
+                                                           style, slider);
+        }
+ 
+        
+    }
+    
+    
 };
 
 class EQParamWidget  : public juce::Component
