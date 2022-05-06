@@ -16,8 +16,15 @@
 
  
 
-struct TextSliderLookAndFeel : juce::LookAndFeel_V4
+struct EQParamLookAndFeel : juce::LookAndFeel_V4
 {
+    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
+                                              float sliderPos, float minSliderPos, float maxSliderPos,
+                                              const juce::Slider::SliderStyle style, juce::Slider& slider) override
+    {
+        juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos,
+                                               style, slider);
+    }
     
     
 };
@@ -74,7 +81,7 @@ class EQParamWidget  : public juce::Component
 public:
     EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut) : apvts (apvts), filterNumber (filterNumber), isCut (isCut)
     {
-        setLookAndFeel(&textSliderLookAndFeel);
+        setLookAndFeel(&eQParamLookAndFeel);
         
         addAndMakeVisible(frequencySlider);
         addAndMakeVisible(qSlider);
@@ -199,7 +206,7 @@ private:
     std::unique_ptr<SliderAttachment> qAttachment;
     std::unique_ptr<SliderAttachment> gainOrSlopeAttachment;
     
-    TextSliderLookAndFeel textSliderLookAndFeel;
+    EQParamLookAndFeel eQParamLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQParamWidget)
 };
