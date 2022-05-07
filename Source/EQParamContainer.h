@@ -40,12 +40,14 @@ public:
     {
  
         g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
- 
+        
     }
+    
 
     void resized() override
     {
         auto bounds = getLocalBounds();
+        
         auto width = bounds.getWidth();
         lowCut.setBounds(bounds.removeFromLeft(width/8));
         param1.setBounds(bounds.removeFromLeft(width/8));
@@ -61,6 +63,7 @@ public:
 private:
     
     juce::AudioProcessorValueTreeState& apvts;
+    
     EQParamWidget lowCut {apvts, 0, true};
     EQParamWidget param1 {apvts, 1, false};
     EQParamWidget param2 {apvts, 2, false};
