@@ -17,7 +17,6 @@
 
 #define SLIDER_BORDER 2
 #define BUTTON_MARGIN 3
-#define BUTTONS_SIDE_MARGIN 5
 
 
 
@@ -160,6 +159,7 @@ private:
     std::unique_ptr<SliderAttachment> frequencyAttachment;
     std::unique_ptr<SliderAttachment> qAttachment;
     std::unique_ptr<SliderAttachment> gainOrSlopeAttachment;
+    
     
     EQParamLookAndFeel eQParamLookAndFeel;
     

@@ -49,7 +49,7 @@ void ParametricEQAudioProcessorEditor::resized()
     
     inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
     outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
-    eqParamContainer.setBounds(bounds.removeFromBottom(100));
+    eqParamContainer.setBounds(bounds.removeFromBottom(100).reduced(4));
      
 }
 

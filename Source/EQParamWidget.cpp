@@ -74,6 +74,7 @@ void EQParamWidget::setProcessingMode(ChannelMode mode)
     {
         leftMidButton.setVisible(false);
         rightSideButton.setVisible(false);
+        leftMidButton.setToggleState(true,juce::NotificationType::sendNotificationSync);
     }
 }
 
@@ -117,7 +118,12 @@ void EQParamWidget::resized()
     qSlider.setBounds(bounds.removeFromTop(height/4));
     gainOrSlopeSlider->setBounds(bounds.removeFromTop(height/4));
     
-    bounds.reduce(BUTTONS_SIDE_MARGIN, 0);
-    leftMidButton.setBounds(bounds.removeFromLeft(bounds.getWidth()/2).reduced(BUTTON_MARGIN));
-    rightSideButton.setBounds(bounds.reduced(BUTTON_MARGIN));
+    auto buttonHeight = bounds.getHeight();
+    
+    auto leftButtonBounds = bounds.removeFromLeft(bounds.getWidth()/2).reduced(BUTTON_MARGIN);
+    leftButtonBounds.setX(leftButtonBounds.getX()+leftButtonBounds.getWidth()-buttonHeight);
+    leftButtonBounds.setWidth(buttonHeight);
+    auto rightButtonBounds = bounds.reduced(BUTTON_MARGIN).withWidth(buttonHeight);
+    leftMidButton.setBounds(leftButtonBounds);
+    rightSideButton.setBounds(rightButtonBounds);
 }
