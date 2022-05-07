@@ -63,12 +63,12 @@ EQParamWidget::~EQParamWidget()
 
 void EQParamWidget::refreshButtons(ChannelMode mode)
 {
-    if(mode != ChannelMode::DualMono)
+    if(mode != ChannelMode::Stereo)
     {
         leftMidButton.setVisible(true);
-        leftMidButton.setButtonText(mode == ChannelMode::Stereo ? "L" : "M");
+        leftMidButton.setButtonText(mode == ChannelMode::DualMono ? "L" : "M");
         rightSideButton.setVisible(true);
-        rightSideButton.setButtonText(mode == ChannelMode::Stereo ? "R" : "S");
+        rightSideButton.setButtonText(mode == ChannelMode::DualMono ? "R" : "S");
     }
     else
     {
