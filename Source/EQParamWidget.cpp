@@ -45,13 +45,13 @@ EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filt
     
 
     ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
-    setProcessingMode(mode);
+    refreshButtons(mode);
     
     modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
                                         [safePtr](float v)
                                          {
                                           if(auto* comp = safePtr.getComponent() )
-                                              comp->setProcessingMode(static_cast<ChannelMode>(v));
+                                              comp->refreshButtons(static_cast<ChannelMode>(v));
                                          }));
 }
 
@@ -61,7 +61,7 @@ EQParamWidget::~EQParamWidget()
     setLookAndFeel(nullptr);
 }
 
-void EQParamWidget::setProcessingMode(ChannelMode mode)
+void EQParamWidget::refreshButtons(ChannelMode mode)
 {
     if(mode != ChannelMode::DualMono)
     {

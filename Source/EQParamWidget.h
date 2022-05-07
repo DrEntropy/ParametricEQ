@@ -132,7 +132,7 @@ class EQParamWidget  : public juce::Component
 public:
     EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut);
     ~EQParamWidget() override;
-    void setProcessingMode(ChannelMode mode);
+    void refreshButtons(ChannelMode mode);
     void setUpButton(juce::Button& button);
     void attachSliders(Channel channel);
     void paint (juce::Graphics& g) override;
