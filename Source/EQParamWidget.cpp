@@ -89,17 +89,17 @@ void EQParamWidget::attachSliders(Channel channel)
 {
     frequencyAttachment.reset(); //must first delete old attachment before creating new one!
     frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, filterNumber), frequencySlider));
-    
+
     qAttachment.reset();
     qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, filterNumber), qSlider));
-    
+
     juce::String gainOrSlopeParamString;
-    
+
     if(isCut)
         gainOrSlopeParamString = createSlopeParamString(channel, filterNumber);
     else
         gainOrSlopeParamString = createGainParamString(channel, filterNumber);
-    
+
     gainOrSlopeAttachment.reset();
     gainOrSlopeAttachment.reset(new SliderAttachment(apvts, gainOrSlopeParamString, *gainOrSlopeSlider));
 }

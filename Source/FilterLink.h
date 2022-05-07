@@ -153,8 +153,8 @@ struct FilterLink
                 if constexpr(std::is_same<FilterParameters, ParamType>::value)
                     newParams.gain = gainSmoother.getCurrentValue();
             }
-            coeffGen.changeParameters(newParams);
             
+            coeffGen.changeParameters(newParams);
         }
     }
     
@@ -163,8 +163,8 @@ struct FilterLink
     {
         updateParams(params);
         updateSmootherTargets();
-        
     }
+    
     void performInnerLoopFilterUpdate(bool onRealTimeThread, int numSamplesToSkip)
     {
         if(currentParams.bypassed)
@@ -175,8 +175,6 @@ struct FilterLink
         
         advanceSmoothers(numSamplesToSkip);
         checkIfStillSmoothing();
-            
-        
     }
     
     void initialize(const ParamType& params, float rampTime, bool onRealTimeThread, double sr)
@@ -247,5 +245,4 @@ private:
     juce::SmoothedValue<float> freqSmoother;
     juce::SmoothedValue<float> qualitySmoother;
     juce::SmoothedValue<Decibel<float>> gainSmoother;
-    
 };
