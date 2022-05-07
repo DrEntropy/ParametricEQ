@@ -125,8 +125,6 @@ void EQParamWidget::paintOverChildren(juce::Graphics& g)
     auto bottomY = y + 3 * (height / 4);
     
     g.drawLine(x, bottomY, x + width, bottomY, HALF_SLIDER_BORDER * 2);  // bottom line
-
-    
 }
 
 
