@@ -74,7 +74,7 @@ void EQParamWidget::setProcessingMode(ChannelMode mode)
     {
         leftMidButton.setVisible(false);
         rightSideButton.setVisible(false);
-        leftMidButton.setToggleState(true,juce::NotificationType::sendNotificationSync);
+        leftMidButton.setToggleState(true,juce::NotificationType::sendNotification);
     }
 }
 
