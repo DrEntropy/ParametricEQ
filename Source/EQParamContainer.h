@@ -47,15 +47,15 @@ public:
     void resized() override
     {
         auto bounds = getLocalBounds();
-        
         auto width = bounds.getWidth();
-        lowCut.setBounds(bounds.removeFromLeft(width/8));
-        param1.setBounds(bounds.removeFromLeft(width/8));
-        param2.setBounds(bounds.removeFromLeft(width/8));
-        param3.setBounds(bounds.removeFromLeft(width/8));
-        param4.setBounds(bounds.removeFromLeft(width/8));
-        param5.setBounds(bounds.removeFromLeft(width/8));
-        param6.setBounds(bounds.removeFromLeft(width/8));
+        
+        lowCut.setBounds(bounds.removeFromLeft(width / 8));
+        param1.setBounds(bounds.removeFromLeft(width / 8));
+        param2.setBounds(bounds.removeFromLeft(width / 8));
+        param3.setBounds(bounds.removeFromLeft(width / 8));
+        param4.setBounds(bounds.removeFromLeft(width / 8));
+        param5.setBounds(bounds.removeFromLeft(width / 8));
+        param6.setBounds(bounds.removeFromLeft(width / 8));
         highCut.setBounds(bounds);
         
     }
