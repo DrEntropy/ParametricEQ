@@ -15,7 +15,7 @@
 #include "ParamListener.h"
 #include "FilterInfo.h"
 
-#define SLIDER_BORDER 2
+#define HALF_SLIDER_BORDER 1
 #define BUTTON_MARGIN 3
 
 
@@ -90,8 +90,8 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
             auto bounds = slider.getLocalBounds().toFloat();
 
             g.setColour(juce::Colours::white);
-            g.drawRect(bounds, SLIDER_BORDER/2);
-            bounds.reduce(SLIDER_BORDER/2, SLIDER_BORDER/2);
+            g.drawRect(bounds, HALF_SLIDER_BORDER);
+            bounds.reduce(HALF_SLIDER_BORDER, HALF_SLIDER_BORDER);
             
             // rescale slider position
             sliderPos = juce::jmap(sliderPos, static_cast<float>(x), static_cast<float>(x) + width, bounds.getX(), bounds.getWidth());

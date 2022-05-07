@@ -112,19 +112,19 @@ void EQParamWidget::paint (juce::Graphics& g)
 void EQParamWidget::paintOverChildren(juce::Graphics& g)
 {
     auto bounds = getLocalBounds();
+
+
+    g.setColour(juce::Colours::white);
+
+    g.fillRect(bounds.removeFromTop(HALF_SLIDER_BORDER));  // rest of top line, made room for this in resized.
     
     auto x = bounds.getX();
     auto y = bounds.getY();
-    
     auto width = bounds.getWidth();
     auto height = bounds.getHeight();
-    auto sliderSectionHeight = 3 * height / 4;
+    auto bottomY = y + 3 * (height / 4);
     
-    // top and bottom seperators need to be thicker
-    g.setColour(juce::Colours::white);
-
-    g.fillRect(bounds.removeFromTop(SLIDER_BORDER / 2));  // rest of top line, made room for this in resized.
-    g.drawLine(x, y+sliderSectionHeight, x+width, y+sliderSectionHeight, SLIDER_BORDER);  // bottom line
+    g.drawLine(x, bottomY, x + width, bottomY, HALF_SLIDER_BORDER * 2);  // bottom line
 
     
 }
@@ -134,7 +134,7 @@ void EQParamWidget::paintOverChildren(juce::Graphics& g)
 void EQParamWidget::resized()  
 {
     auto bounds = getLocalBounds();
-    bounds.removeFromTop(SLIDER_BORDER / 2); // make room for thickening top line
+    bounds.removeFromTop(HALF_SLIDER_BORDER); // make room for thickening top line
     
     auto height = bounds.getHeight();
     frequencySlider.setBounds(bounds.removeFromTop(height / 4));
@@ -146,6 +146,7 @@ void EQParamWidget::resized()
     auto leftButtonBounds = bounds.removeFromLeft(bounds.getWidth() / 2).reduced(BUTTON_MARGIN);
     leftButtonBounds.setX(leftButtonBounds.getX() + leftButtonBounds.getWidth() - buttonHeight);
     leftButtonBounds.setWidth(buttonHeight);
+    
     auto rightButtonBounds = bounds.reduced(BUTTON_MARGIN).withWidth(buttonHeight);
     leftMidButton.setBounds(leftButtonBounds);
     rightSideButton.setBounds(rightButtonBounds);
