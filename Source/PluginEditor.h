@@ -14,8 +14,8 @@
 #include "PluginProcessor.h"
 #include "StereoMeter.h"
 #include "ParamListener.h"
+#include "EQParamContainer.h"
 
-#define TEST_LISTENER
 
 //==============================================================================
 /**
@@ -41,8 +41,7 @@ private:
     StereoMeter inputMeter {"PRE EQ"};
     StereoMeter outputMeter {"POST EQ"};
     
-#ifdef TEST_LISTENER
-    ParamListener testListener;
-#endif
+    EQParamContainer eqParamContainer {audioProcessor.apvts};
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };
