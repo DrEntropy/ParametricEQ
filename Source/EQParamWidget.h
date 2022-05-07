@@ -90,8 +90,8 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
             auto bounds = slider.getLocalBounds().toFloat();
 
             g.setColour(juce::Colours::white);
-            g.drawRect(bounds, SLIDER_BORDER);
-            bounds.reduce(SLIDER_BORDER, SLIDER_BORDER);
+            g.drawRect(bounds, SLIDER_BORDER/2);
+            bounds.reduce(SLIDER_BORDER/2, SLIDER_BORDER/2);
             
             // rescale slider position
             sliderPos = juce::jmap(sliderPos, static_cast<float>(x), static_cast<float>(x) + width, bounds.getX(), bounds.getWidth());
@@ -136,6 +136,7 @@ public:
     void setUpButton(juce::Button& button);
     void attachSliders(Channel channel);
     void paint (juce::Graphics& g) override;
+    void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
  
 
