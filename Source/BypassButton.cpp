@@ -13,7 +13,7 @@
 
 BypassButton::BypassButton() : Button("")
 {
-    //nothing 
+    setClickingTogglesState(true);
 }
 
 
@@ -22,10 +22,11 @@ void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlig
     // this is all just placeholder
     auto bounds = getLocalBounds().toFloat();
     g.setColour(juce::Colours::lightblue);
-    if(shouldDrawButtonAsDown)
+    if(getToggleState())
     {
         g.setColour(juce::Colours::blue);
     }
+    
     g.fillRect(bounds);
     g.setColour(juce::Colours::darkblue);
     g.drawRect(bounds, 2);

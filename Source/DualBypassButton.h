@@ -19,7 +19,7 @@
 class DualBypassButton  : public juce::Component
 {
 public:
-    DualBypassButton(int filterNum);
+    DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts);
     ~DualBypassButton() override = default;
 
     void paint (juce::Graphics&) override;
@@ -29,6 +29,13 @@ private:
     int filterNum;
     BypassButton leftMidBypass;
     BypassButton rightSideBypass;
+    
+    //juce::ToggleButton leftMidBypass;
+    //juce::ToggleButton rightSideBypass;
+    
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    std::unique_ptr<ButtonAttachment> leftMidAttachment;
+    std::unique_ptr<ButtonAttachment> rightSideAttachment;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualBypassButton)
 };

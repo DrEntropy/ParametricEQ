@@ -10,12 +10,16 @@
 
 #include <JuceHeader.h>
 #include "DualBypassButton.h"
+#include "ParameterHelpers.h"
 
 //==============================================================================
-DualBypassButton::DualBypassButton(int filterNum):filterNum(filterNum)
+DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts):filterNum(filterNum)
 {
     addAndMakeVisible(leftMidBypass);
     addAndMakeVisible(rightSideBypass);
+    
+    leftMidAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Left, filterNum), leftMidBypass));
+    rightSideAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Right, filterNum), rightSideBypass));
 }
 
 

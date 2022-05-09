@@ -44,7 +44,7 @@ private:
     
     EQParamContainer eqParamContainer {audioProcessor.apvts};
     
-    BypassButtonContainer bypassButtonContainer;
+    BypassButtonContainer bypassButtonContainer {audioProcessor.apvts};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

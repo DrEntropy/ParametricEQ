@@ -19,7 +19,7 @@
 class BypassButtonContainer  : public juce::Component
 {
 public:
-    BypassButtonContainer();
+    BypassButtonContainer(juce::AudioProcessorValueTreeState& apvts);
     ~BypassButtonContainer() override = default;
 
     void paint (juce::Graphics&) override;
