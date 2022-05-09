@@ -15,6 +15,7 @@
 #include "StereoMeter.h"
 #include "ParamListener.h"
 #include "EQParamContainer.h"
+#include "BypassButtonContainer.h"
 
 
 //==============================================================================
@@ -42,6 +43,8 @@ private:
     StereoMeter outputMeter {"POST EQ"};
     
     EQParamContainer eqParamContainer {audioProcessor.apvts};
+    
+    BypassButtonContainer bypassButtonContainer;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

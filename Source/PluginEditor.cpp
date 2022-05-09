@@ -20,8 +20,10 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
+    
+    addAndMakeVisible(bypassButtonContainer);
  
-    setSize (800, 600);
+    setSize (1200, 800);
     startTimerHz(FRAME_RATE);
 }
 
@@ -44,12 +46,20 @@ void ParametricEQAudioProcessorEditor::resized()
     // to do, move magic numbers to a common spot
     const uint scaleAndMeterWidth = 75;
     auto bounds = getLocalBounds();
+    
+    auto bottomBounds = bounds.removeFromBottom(100); // placeholder for bottom controls
  
     bounds.reduce(10, 10);
     
     inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
     outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
+    
+    //  These magic numbers are placeholders
     eqParamContainer.setBounds(bounds.removeFromBottom(100).reduced(4));
+    
+    auto topBounds = bounds.removeFromTop(50);
+
+    bypassButtonContainer.setBounds(bounds.removeFromTop(50));
      
 }
 

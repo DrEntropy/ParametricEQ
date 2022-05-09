@@ -4,6 +4,17 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="lkw9tg" name="BypassButtonContainer.cpp" compile="1" resource="0"
+            file="Source/BypassButtonContainer.cpp"/>
+      <FILE id="YzBCSE" name="BypassButtonContainer.h" compile="0" resource="0"
+            file="Source/BypassButtonContainer.h"/>
+      <FILE id="U2LhAs" name="DualBypassButton.cpp" compile="1" resource="0"
+            file="Source/DualBypassButton.cpp"/>
+      <FILE id="Vs0BBY" name="DualBypassButton.h" compile="0" resource="0"
+            file="Source/DualBypassButton.h"/>
+      <FILE id="Z4Xq6i" name="BypassButton.cpp" compile="1" resource="0"
+            file="Source/BypassButton.cpp"/>
+      <FILE id="H5B7ig" name="BypassButton.h" compile="0" resource="0" file="Source/BypassButton.h"/>
       <FILE id="UYjRSf" name="EQParamWidget.cpp" compile="1" resource="0"
             file="Source/EQParamWidget.cpp"/>
       <FILE id="RtJHmX" name="EQParamWidget.h" compile="0" resource="0" file="Source/EQParamWidget.h"/>
