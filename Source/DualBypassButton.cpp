@@ -17,9 +17,17 @@ DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeS
 {
     addAndMakeVisible(leftMidBypass);
     addAndMakeVisible(rightSideBypass);
-    
+ 
     leftMidAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Left, filterNum), leftMidBypass));
     rightSideAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Right, filterNum), rightSideBypass));
+    
+    auto safePtr = juce::Component::SafePointer<DualBypassButton>(this);
+    modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
+                                        [safePtr](float v)
+                                         {
+                                          if(auto* comp = safePtr.getComponent() )
+                                              comp->refreshButtons(static_cast<ChannelMode>(v));
+                                         }));
 }
 
 
@@ -37,6 +45,11 @@ void DualBypassButton::paint (juce::Graphics& g)
 
 }
 
+void DualBypassButton::paintOverChildren(juce::Graphics& g)
+{
+    g.drawFittedText("testing", getLocalBounds(), juce::Justification::centred, 1);
+}
+
 void DualBypassButton::resized()
 {
     auto bounds = getLocalBounds();
@@ -44,4 +57,10 @@ void DualBypassButton::resized()
     rightSideBypass.setBounds(bounds);
     
 
+}
+
+
+void DualBypassButton::refreshButtons(ChannelMode mode)
+{
+    // TODO
 }

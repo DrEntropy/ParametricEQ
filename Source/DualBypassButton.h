@@ -12,6 +12,8 @@
 
 #include <JuceHeader.h>
 #include "BypassButton.h"
+#include "ParamListener.h"
+#include "ParameterHelpers.h"
 
 //==============================================================================
 /*
@@ -23,9 +25,13 @@ public:
     ~DualBypassButton() override = default;
 
     void paint (juce::Graphics&) override;
+    void paintOverChildren (juce::Graphics&) override;
     void resized() override;
 
 private:
+    
+    void refreshButtons(ChannelMode mode);
+    
     int filterNum;
     BypassButton leftMidBypass;
     BypassButton rightSideBypass;
@@ -36,6 +42,8 @@ private:
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     std::unique_ptr<ButtonAttachment> leftMidAttachment;
     std::unique_ptr<ButtonAttachment> rightSideAttachment;
+    
+    std::unique_ptr<ParamListener> modeListener;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualBypassButton)
 };
