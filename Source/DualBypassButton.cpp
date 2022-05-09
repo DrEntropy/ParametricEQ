@@ -13,7 +13,7 @@
 #include "ParameterHelpers.h"
 
 //==============================================================================
-DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts):filterNum(filterNum)
+DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts):filterNum(filterNum), apvts(apvts)
 {
     addAndMakeVisible(leftMidBypass);
     addAndMakeVisible(rightSideBypass);
@@ -52,15 +52,24 @@ void DualBypassButton::paintOverChildren(juce::Graphics& g)
 
 void DualBypassButton::resized()
 {
-    auto bounds = getLocalBounds();
-    leftMidBypass.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
-    rightSideBypass.setBounds(bounds);
-    
-
+    refreshButtons(static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()));
 }
 
 
 void DualBypassButton::refreshButtons(ChannelMode mode)
 {
-    // TODO
+    auto bounds = getLocalBounds();
+    
+    if(mode == ChannelMode::Stereo)
+    {
+        rightSideBypass.setVisible(false);
+        leftMidBypass.setBounds(bounds);
+    }
+    else
+    {
+        rightSideBypass.setVisible(true);
+        leftMidBypass.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
+        rightSideBypass.setBounds(bounds);
+        
+    }
 }

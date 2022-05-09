@@ -45,5 +45,7 @@ private:
     
     std::unique_ptr<ParamListener> modeListener;
     
+    juce::AudioProcessorValueTreeState& apvts;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualBypassButton)
 };
