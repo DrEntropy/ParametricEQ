@@ -69,7 +69,8 @@ void ParametricEQAudioProcessorEditor::resized()
 
     bypassButtonContainer.setBounds(bounds.removeFromTop(BYPASS_SWITCH_HEIGHT));
     
-    globalBypass.setBounds(topBounds.removeFromTop(BYPASS_SWITCH_HEIGHT + BYPASS_SWITCH_V_MARGIN).withTrimmedBottom(BYPASS_SWITCH_V_MARGIN)
+    
+    globalBypass.setBounds(topBounds.withTrimmedBottom(2 * BYPASS_SWITCH_V_MARGIN)
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
      
 }
