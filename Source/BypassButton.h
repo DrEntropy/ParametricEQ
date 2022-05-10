@@ -20,6 +20,12 @@ public:
     virtual void paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
     
 private:
+    
+    bool isShowingAsOn()
+    {
+        return !getToggleState();
+    }
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassButton)
 };
 

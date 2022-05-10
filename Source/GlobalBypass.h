@@ -64,11 +64,11 @@ protected:
     }
     
 private:
-    
     bool isShowingAsOn()
     {
         return !getToggleState();
     }
+    
     ParametricEQAudioProcessor& processor;
     
     

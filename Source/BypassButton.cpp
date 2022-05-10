@@ -21,10 +21,10 @@ void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlig
 {
     // this is all just placeholder
     auto bounds = getLocalBounds().toFloat();
-    g.setColour(juce::Colours::lightblue);
-    if(getToggleState())
+    g.setColour(juce::Colours::darkblue);
+    if(isShowingAsOn())
     {
-        g.setColour(juce::Colours::blue);
+        g.setColour(juce::Colours::green);
     }
     
     g.fillRect(bounds);

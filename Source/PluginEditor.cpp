@@ -46,24 +46,31 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 void ParametricEQAudioProcessorEditor::resized()
 {
     // to do, move magic numbers to a common spot
-    const uint scaleAndMeterWidth = 75;
+    
+//#define BYPASS_SWITCH_HEIGHT 50
+//#define BYPASS_SWITCH_V_MARGIN 5
+////#define GLOBAL_SWITCH_RIGHT_MARGIN 15
+//    PARAM_CONTROLS_MARGIN 4
+//   #define PARAM_CONTROLS_HEIGHT 100
+ 
     auto bounds = getLocalBounds();
     
-    auto bottomBounds = bounds.removeFromBottom(100); // placeholder for bottom controls
+    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
  
-    bounds.reduce(10, 10);
+    bounds.reduce(OVERALL_MARGIN, OVERALL_MARGIN);
     
-    inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
-    outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
+    inputMeter.setBounds(bounds.removeFromLeft(SCALE_AND_METER_WIDTH));
+    outputMeter.setBounds(bounds.removeFromRight(SCALE_AND_METER_WIDTH));
     
     //  These magic numbers are placeholders
-    eqParamContainer.setBounds(bounds.removeFromBottom(100).reduced(4));
+    eqParamContainer.setBounds(bounds.removeFromBottom(PARAM_CONTROLS_HEIGHT).reduced(PARAM_CONTROLS_MARGIN));
     
-    auto topBounds = bounds.removeFromTop(50);
+    auto topBounds = bounds.removeFromTop(BYPASS_SWITCH_HEIGHT + 2 * BYPASS_SWITCH_V_MARGIN);
 
-    bypassButtonContainer.setBounds(bounds.removeFromTop(50));
+    bypassButtonContainer.setBounds(bounds.removeFromTop(BYPASS_SWITCH_HEIGHT));
     
-    globalBypass.setBounds(topBounds.removeFromRight(50));
+    globalBypass.setBounds(topBounds.removeFromTop(BYPASS_SWITCH_HEIGHT + BYPASS_SWITCH_V_MARGIN).withTrimmedBottom(BYPASS_SWITCH_V_MARGIN)
+                                    .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
      
 }
 
