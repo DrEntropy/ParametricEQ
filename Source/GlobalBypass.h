@@ -30,15 +30,33 @@ public:
     {
         // this is all just placeholder
         auto bounds = getLocalBounds().toFloat();
+        g.setColour(juce::Colours::darkblue);
+        g.fillRect(bounds);
+        
         g.setColour(juce::Colours::blue);
         if(isShowingAsOn())
         {
             g.setColour(juce::Colours::green);
         }
         
-        g.fillRect(bounds.reduced(4));
-        g.setColour(juce::Colours::darkblue);
-        g.drawRect(bounds, 2);
+        juce::Path powerButton;
+        
+        auto size = juce::jmin(bounds.getWidth(),bounds.getHeight()) - 12;  // a bit shrinking
+        auto r = bounds.withSizeKeepingCentre(size,size).toFloat();
+        float ang = 30.f; //degrees
+        size -= 6;
+        powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size*0.5, size*0.5, 0.f, juce::degreesToRadians(ang), juce::degreesToRadians(360.f-ang), true);
+            
+        // line from center to top of box r
+        powerButton.startNewSubPath(r.getCentreX(), r.getY());
+        powerButton.lineTo(r.getCentre());
+            
+        juce::PathStrokeType pst(4, juce::PathStrokeType::curved);
+
+        g.strokePath(powerButton, pst);
+ 
+  
+        g.drawRect(bounds, 4);
     }
     
     void timerCallback() override
