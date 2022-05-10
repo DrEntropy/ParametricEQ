@@ -16,6 +16,7 @@
 #include "ParamListener.h"
 #include "EQParamContainer.h"
 #include "BypassButtonContainer.h"
+#include "GlobalBypass.h"
 
 
 //==============================================================================
@@ -45,6 +46,8 @@ private:
     EQParamContainer eqParamContainer {audioProcessor.apvts};
     
     BypassButtonContainer bypassButtonContainer {audioProcessor.apvts};
+    
+    GlobalBypass globalBypass {audioProcessor};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

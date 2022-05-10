@@ -22,6 +22,8 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(eqParamContainer);
     
     addAndMakeVisible(bypassButtonContainer);
+    
+    addAndMakeVisible(globalBypass);
  
     setSize (1200, 800);
     startTimerHz(FRAME_RATE);
@@ -60,6 +62,8 @@ void ParametricEQAudioProcessorEditor::resized()
     auto topBounds = bounds.removeFromTop(50);
 
     bypassButtonContainer.setBounds(bounds.removeFromTop(50));
+    
+    globalBypass.setBounds(topBounds.removeFromRight(50));
      
 }
 

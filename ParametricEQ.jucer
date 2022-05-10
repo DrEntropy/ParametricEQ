@@ -61,6 +61,7 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="QN9OEj" name="DbScale.cpp" compile="1" resource="0" file="Source/DbScale.cpp"/>
       <FILE id="st6py3" name="DbScale.h" compile="0" resource="0" file="Source/DbScale.h"/>
+      <FILE id="l4eoXH" name="GlobalBypass.h" compile="0" resource="0" file="Source/GlobalBypass.h"/>
       <FILE id="IGcODe" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="PKgxTq" name="PluginEditor.cpp" compile="1" resource="0"
