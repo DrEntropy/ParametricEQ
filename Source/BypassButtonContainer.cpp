@@ -14,8 +14,8 @@
 //==============================================================================
 BypassButtonContainer::BypassButtonContainer(juce::AudioProcessorValueTreeState& apvts)
 {
-    int filterNum=0;
-    for(auto& buttonp:bypassButtons)
+    int filterNum = 0;
+    for(auto& buttonp : bypassButtons)
     {
         buttonp.reset(new DualBypassButton(filterNum, apvts));
         addAndMakeVisible(*buttonp);

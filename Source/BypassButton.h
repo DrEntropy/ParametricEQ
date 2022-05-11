@@ -19,7 +19,7 @@ public:
     BypassButton();
     ~BypassButton() override = default;
     
-    virtual void paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+    void paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
     
     bool onLeft{true}, isPaired{false};
     

@@ -57,16 +57,14 @@ public:
     void timerCallback() override
     {
         bool atLeastOneOn = processor.isAnyActiveOn();
-        if(!atLeastOneOn && isShowingAsOn())
-        {
-            setToggleState(true, juce::NotificationType::dontSendNotification);
-            DBG("All off");
-        }
-       
-        if(atLeastOneOn && ! isShowingAsOn())
+
+        if(atLeastOneOn)
         {
             setToggleState(false, juce::NotificationType::dontSendNotification);
-            DBG("at lease one  on");
+        }
+        else
+        {
+            setToggleState(true, juce::NotificationType::dontSendNotification);
         }
     }
 
