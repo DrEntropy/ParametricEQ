@@ -37,3 +37,10 @@ void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlig
     }
      
 }
+
+
+
+bool BypassButton::isShowingAsOn()
+{
+    return !getToggleState();
+}

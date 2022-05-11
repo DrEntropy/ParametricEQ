@@ -25,10 +25,8 @@ public:
     
 private:
     
-    bool isShowingAsOn()
-    {
-        return !getToggleState();
-    }
+    bool isShowingAsOn();
+ 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassButton)
 };
