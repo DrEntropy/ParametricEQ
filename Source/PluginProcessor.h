@@ -88,6 +88,10 @@ public:
     
     // =========================================================================
     
+    bool isAnyActiveOn();  // returns true if all channels filteres bypassed, 8 or 16
+    
+    void setBypassed(bool state);  // sets ALL filters to bypassed or not depending on state
+     
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
     
     // Buffers for meters and fft. 30 should be plenty, timer goes at 60 times a second,
@@ -98,6 +102,8 @@ public:
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessor)
+    
+    void setBoolParamState(bool state, juce::AudioParameterBool* param);
     
     template<typename T, typename U>
     void updateMeterFifos(T& fifo, U& buffer)

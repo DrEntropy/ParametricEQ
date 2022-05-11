@@ -22,7 +22,7 @@ StereoMeter::StereoMeter(juce::String label) : meterLabel{label}
 
 void StereoMeter::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
   
     auto bounds = getLocalBounds();
  
