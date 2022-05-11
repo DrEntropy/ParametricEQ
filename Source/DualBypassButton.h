@@ -25,9 +25,10 @@ public:
     ~DualBypassButton() override = default;
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
+   
 
 private:
-    
+    bool isShowingAsOn(Channel channel);
     void refreshButtons(ChannelMode mode);
     
     bool isPaired {false};
