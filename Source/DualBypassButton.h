@@ -29,7 +29,6 @@ public:
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
    
-
 private:
     bool isShowingAsOn(Channel channel);
     void refreshButtons(ChannelMode mode);
@@ -54,9 +53,6 @@ private:
     int filterNum;
     BypassButton leftMidBypass;
     BypassButton rightSideBypass;
-    
-    //juce::ToggleButton leftMidBypass;
-    //juce::ToggleButton rightSideBypass;
     
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     std::unique_ptr<ButtonAttachment> leftMidAttachment;

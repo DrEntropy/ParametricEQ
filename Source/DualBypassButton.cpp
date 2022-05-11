@@ -156,7 +156,6 @@ void DualBypassButton::drawShelf(PathPoints pp, juce::Graphics& g, juce::AffineT
 
 void DualBypassButton::drawPeak(PathPoints pp, juce::Graphics& g, juce::Colour leftColor, juce::Colour rightColor)
 {
-    
     auto leftpath = juce::Path();
     auto rightpath = juce::Path();
     
@@ -175,7 +174,6 @@ void DualBypassButton::drawPeak(PathPoints pp, juce::Graphics& g, juce::Colour l
 
     g.setColour(rightColor);
     g.strokePath(leftpath, pst, flipped);
-    
 }
 
 
