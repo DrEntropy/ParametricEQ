@@ -30,8 +30,8 @@ public:
     {
         // this is all just placeholder
         auto bounds = getLocalBounds().toFloat();
-        g.setColour(juce::Colours::darkblue);
-        g.fillRect(bounds);
+        //g.setColour(juce::Colours::darkblue);
+        //g.fillRect(bounds);
         
         g.setColour(juce::Colours::blue);
         if(isShowingAsOn())

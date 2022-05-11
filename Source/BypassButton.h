@@ -11,6 +11,8 @@
 #pragma once
 #include <JuceHeader.h>
 
+#define SINGLE_BYPASS_MARGIN 5
+
 class BypassButton : public juce::Button
 {
 public:
@@ -18,6 +20,8 @@ public:
     ~BypassButton() override = default;
     
     virtual void paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+    
+    bool onLeft{true}, isPaired{false};
     
 private:
     

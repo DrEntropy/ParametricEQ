@@ -32,6 +32,8 @@ private:
     
     void refreshButtons(ChannelMode mode);
     
+    bool isPaired {false};
+    
     int filterNum;
     BypassButton leftMidBypass;
     BypassButton rightSideBypass;

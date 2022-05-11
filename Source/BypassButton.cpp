@@ -19,15 +19,21 @@ BypassButton::BypassButton() : Button("")
 
 void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-    // this is all just placeholder
+  
     auto bounds = getLocalBounds().toFloat();
-    g.setColour(juce::Colours::darkblue);
+    bounds.removeFromTop(SINGLE_BYPASS_MARGIN);
+    bounds.removeFromBottom(SINGLE_BYPASS_MARGIN);
+   
     if(isShowingAsOn())
     {
+        if(onLeft)
+            bounds.removeFromLeft(SINGLE_BYPASS_MARGIN);
+        
+        if(!onLeft || !isPaired)
+            bounds.removeFromRight(SINGLE_BYPASS_MARGIN);
+ 
         g.setColour(juce::Colours::green);
+        g.fillRect(bounds);
     }
-    
-    g.fillRect(bounds);
-    g.setColour(juce::Colours::darkblue);
-    g.drawRect(bounds, 2);
+     
 }

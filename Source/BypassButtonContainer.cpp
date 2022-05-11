@@ -26,7 +26,7 @@ BypassButtonContainer::BypassButtonContainer(juce::AudioProcessorValueTreeState&
 
 void BypassButtonContainer::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 }
 
 

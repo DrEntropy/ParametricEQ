@@ -17,6 +17,10 @@ DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeS
 {
     addAndMakeVisible(leftMidBypass);
     addAndMakeVisible(rightSideBypass);
+    
+    rightSideBypass.onLeft = false;
+    leftMidBypass.onLeft = true;
+    rightSideBypass.isPaired = true;  //never on its own.
  
     leftMidAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Left, filterNum), leftMidBypass));
     rightSideAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Right, filterNum), rightSideBypass));
@@ -41,13 +45,16 @@ void DualBypassButton::paint (juce::Graphics& g)
        drawing code..
     */
 
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
 }
 
 void DualBypassButton::paintOverChildren(juce::Graphics& g)
 {
+    auto bounds = getLocalBounds().toFloat();
+    g.setColour(juce::Colours::blue);  // note need to draw different colors depending on button state!
     g.drawFittedText("testing", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawRect(bounds, 2);
 }
 
 void DualBypassButton::resized()
@@ -62,14 +69,17 @@ void DualBypassButton::refreshButtons(ChannelMode mode)
     
     if(mode == ChannelMode::Stereo)
     {
+        isPaired = false;
+        leftMidBypass.isPaired = false;
         rightSideBypass.setVisible(false);
         leftMidBypass.setBounds(bounds);
     }
     else
     {
+        isPaired = true;
+        leftMidBypass.isPaired = true;
         rightSideBypass.setVisible(true);
         leftMidBypass.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
         rightSideBypass.setBounds(bounds);
-        
     }
 }

@@ -36,8 +36,8 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 //==============================================================================
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colours::midnightblue);
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("PFM11-23", getLocalBounds(), juce::Justification::centred, 1);
