@@ -23,8 +23,6 @@ class DualBypassButton  : public juce::Component
 public:
     DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts);
     ~DualBypassButton() override = default;
-
-    void paint (juce::Graphics&) override;
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
 

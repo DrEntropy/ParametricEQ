@@ -36,23 +36,10 @@ DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeS
 
 
 
-void DualBypassButton::paint (juce::Graphics& g)
-{
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
-}
-
 void DualBypassButton::paintOverChildren(juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
-    g.setColour(juce::Colours::blue);  // note need to draw different colors depending on button state!
+    g.setColour(juce::Colours::lightblue);  // note need to draw different colors depending on button state!
     g.drawFittedText("testing", getLocalBounds(), juce::Justification::centred, 1);
     g.drawRect(bounds, 2);
 }

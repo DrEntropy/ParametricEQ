@@ -36,22 +36,13 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 //==============================================================================
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-    g.fillAll(juce::Colours::midnightblue);
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("PFM11-23", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
 }
 
 void ParametricEQAudioProcessorEditor::resized()
 {
     // to do, move magic numbers to a common spot
     
-//#define BYPASS_SWITCH_HEIGHT 50
-//#define BYPASS_SWITCH_V_MARGIN 5
-////#define GLOBAL_SWITCH_RIGHT_MARGIN 15
-//    PARAM_CONTROLS_MARGIN 4
-//   #define PARAM_CONTROLS_HEIGHT 100
  
     auto bounds = getLocalBounds();
     

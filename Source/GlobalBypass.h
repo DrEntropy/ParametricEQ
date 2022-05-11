@@ -33,7 +33,7 @@ public:
         //g.setColour(juce::Colours::darkblue);
         //g.fillRect(bounds);
         
-        g.setColour(juce::Colours::blue);
+        g.setColour(juce::Colours::lightblue);
         if(isShowingAsOn())
         {
             g.setColour(juce::Colours::green);
