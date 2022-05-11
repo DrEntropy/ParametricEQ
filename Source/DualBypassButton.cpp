@@ -70,3 +70,12 @@ void DualBypassButton::refreshButtons(ChannelMode mode)
         rightSideBypass.setBounds(bounds);
     }
 }
+
+
+bool DualBypassButton::isShowingAsOn(Channel channel)
+{
+    if(channel == Channel::Left)
+        return leftMidBypass.isShowingAsOn();
+    
+    return rightSideBypass.isShowingAsOn();
+}
