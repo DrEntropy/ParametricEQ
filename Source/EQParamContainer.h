@@ -32,18 +32,8 @@ public:
 
     }
 
-    ~EQParamContainer() override
-    {
-    }
-
-    void paint (juce::Graphics& g) override
-    {
+    ~EQParamContainer() override = default;
  
-        //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-        
-    }
-    
-
     void resized() override
     {
         auto bounds = getLocalBounds();
@@ -57,7 +47,6 @@ public:
         param5.setBounds(bounds.removeFromLeft(width / 8));
         param6.setBounds(bounds.removeFromLeft(width / 8));
         highCut.setBounds(bounds);
-        
     }
 
 private:
