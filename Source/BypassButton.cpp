@@ -19,7 +19,6 @@ BypassButton::BypassButton() : Button("")
 
 void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-  
     auto bounds = getLocalBounds().toFloat();
     bounds.removeFromTop(SINGLE_BYPASS_MARGIN);
     bounds.removeFromBottom(SINGLE_BYPASS_MARGIN);
@@ -35,7 +34,6 @@ void BypassButton::paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlig
         g.setColour(juce::Colours::green);
         g.fillRect(bounds);
     }
-     
 }
 
 

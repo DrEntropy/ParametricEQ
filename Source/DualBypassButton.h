@@ -18,6 +18,9 @@
 //==============================================================================
 /*
 */
+
+
+
 class DualBypassButton  : public juce::Component
 {
 public:
@@ -32,6 +35,21 @@ private:
     void refreshButtons(ChannelMode mode);
     
     bool isPaired {false};
+    
+    struct PathPoints
+    {
+        float xStart, xLeft, xMid, xRight, xEnd;
+        float yTop, yMid, yBottom;
+    };
+    
+    PathPoints computePathPoints(juce::Rectangle<float>& bounds);
+    void drawCut(PathPoints, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour, juce::Colour);
+    void drawShelf(PathPoints, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour, juce::Colour);
+    void drawPeak(PathPoints, juce::Graphics& g, juce::Colour leftColor, juce::Colour rightColor);
+    
+    // colors for drawing the lines
+    const juce::Colour onColor = juce::Colours::darkblue;
+    const juce::Colour offColor = juce::Colours::lightblue;
     
     int filterNum;
     BypassButton leftMidBypass;

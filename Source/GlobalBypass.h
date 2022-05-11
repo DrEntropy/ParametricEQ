@@ -28,12 +28,9 @@ public:
     
     void paintButton (juce::Graphics& g,bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
-        // this is all just placeholder
         auto bounds = getLocalBounds().toFloat();
-        //g.setColour(juce::Colours::darkblue);
-        //g.fillRect(bounds);
-        
         g.setColour(juce::Colours::lightblue);
+        
         if(isShowingAsOn())
         {
             g.setColour(juce::Colours::green);
@@ -54,8 +51,6 @@ public:
         juce::PathStrokeType pst(4, juce::PathStrokeType::curved);
 
         g.strokePath(powerButton, pst);
- 
-  
         g.drawRect(bounds, 4);
     }
     
@@ -88,7 +83,6 @@ private:
     }
     
     ParametricEQAudioProcessor& processor;
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlobalBypass)
 };
