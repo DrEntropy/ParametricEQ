@@ -106,7 +106,7 @@ void EQParamWidget::attachSliders(Channel channel)
 
 void EQParamWidget::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 }
 
 void EQParamWidget::paintOverChildren(juce::Graphics& g)

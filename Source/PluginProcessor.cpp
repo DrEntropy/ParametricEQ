@@ -318,7 +318,7 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Cha
     
     label = createFreqParamString(channel, filterNum);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
-                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), 20.0f));
+                                       juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f), (filterNum == 7 ? 20000.0f : 20.0f)));
     
     
     if(!isCut)
@@ -337,7 +337,16 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Cha
             types.add(stringRep);
         }
         label = createTypeParamString(channel, filterNum);
-        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, 10));
+        uint peak = static_cast<uint>(FilterInfo::FilterType::PeakFilter);
+        uint lowShelf = static_cast<uint>(FilterInfo::FilterType::LowShelf);
+        uint highShelf = static_cast<uint>(FilterInfo::FilterType::HighShelf);
+        
+        if(filterNum == 1)
+            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, lowShelf));
+        else if(filterNum == 6)
+            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, highShelf));
+        else
+            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, peak));
     }
     else
     {
@@ -451,4 +460,46 @@ void ParametricEQAudioProcessor::updateTrims()
     inputTrim.setGainDecibels(inputGain);
     outputTrim.setGainDecibels(outputGain);
  
+}
+
+
+
+bool ParametricEQAudioProcessor::isAnyActiveOn()
+{
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    
+    bool isAnyOn = false;
+    
+    for(int filterNum = 0; filterNum < 8; ++filterNum)
+    {
+        bool isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Left, filterNum))->load() < 0.5f;
+        isAnyOn |= isOn;
+        if(mode != ChannelMode::Stereo)
+        {
+            bool isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Right, filterNum))->load() < 0.5f;
+            isAnyOn |= isOn;
+        }
+    }
+     
+    return isAnyOn;
+}
+
+
+void ParametricEQAudioProcessor::setBypassed(bool state)
+{
+    for(int filterNum = 0; filterNum < 8; ++filterNum)
+    {
+        auto leftBypass = dynamic_cast<juce::AudioParameterBool *> (apvts.getParameter(createBypassParamString(Channel::Left, filterNum)));
+        auto rightBypass = dynamic_cast<juce::AudioParameterBool *> (apvts.getParameter(createBypassParamString(Channel::Right, filterNum)));
+        setBoolParamState(state, leftBypass);
+        setBoolParamState(state, rightBypass);
+    }    
+}
+
+
+void ParametricEQAudioProcessor::setBoolParamState(bool state, juce::AudioParameterBool* param)
+{
+    param -> beginChangeGesture();
+    *param = state;
+    param -> endChangeGesture();
 }

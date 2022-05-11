@@ -15,7 +15,20 @@
 #include "StereoMeter.h"
 #include "ParamListener.h"
 #include "EQParamContainer.h"
+#include "BypassButtonContainer.h"
+#include "GlobalBypass.h"
 
+
+//layout defines
+#define OVERALL_MARGIN 10
+#define BYPASS_SWITCH_HEIGHT 50
+#define BYPASS_SWITCH_V_MARGIN 5
+#define GLOBAL_SWITCH_RIGHT_MARGIN 15
+#define SCALE_AND_METER_WIDTH 75
+#define BOTTOM_CONTROLS_HEIGHT 100
+
+#define PARAM_CONTROLS_MARGIN 4
+#define PARAM_CONTROLS_HEIGHT 100
 
 //==============================================================================
 /**
@@ -42,6 +55,10 @@ private:
     StereoMeter outputMeter {"POST EQ"};
     
     EQParamContainer eqParamContainer {audioProcessor.apvts};
+    
+    BypassButtonContainer bypassButtonContainer {audioProcessor.apvts};
+    
+    GlobalBypass globalBypass {audioProcessor};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

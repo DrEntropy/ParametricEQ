@@ -20,8 +20,12 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
+    
+    addAndMakeVisible(bypassButtonContainer);
+    
+    addAndMakeVisible(globalBypass);
  
-    setSize (800, 600);
+    setSize (1200, 800);
     startTimerHz(FRAME_RATE);
 }
 
@@ -32,24 +36,33 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 //==============================================================================
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("PFM11-23", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
 }
 
 void ParametricEQAudioProcessorEditor::resized()
 {
     // to do, move magic numbers to a common spot
-    const uint scaleAndMeterWidth = 75;
-    auto bounds = getLocalBounds();
- 
-    bounds.reduce(10, 10);
     
-    inputMeter.setBounds(bounds.removeFromLeft(scaleAndMeterWidth));
-    outputMeter.setBounds(bounds.removeFromRight(scaleAndMeterWidth));
-    eqParamContainer.setBounds(bounds.removeFromBottom(100).reduced(4));
+ 
+    auto bounds = getLocalBounds();
+    
+    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
+ 
+    bounds.reduce(OVERALL_MARGIN, OVERALL_MARGIN);
+    
+    inputMeter.setBounds(bounds.removeFromLeft(SCALE_AND_METER_WIDTH));
+    outputMeter.setBounds(bounds.removeFromRight(SCALE_AND_METER_WIDTH));
+    
+    //  These magic numbers are placeholders
+    eqParamContainer.setBounds(bounds.removeFromBottom(PARAM_CONTROLS_HEIGHT).reduced(PARAM_CONTROLS_MARGIN));
+    
+    auto topBounds = bounds.removeFromTop(BYPASS_SWITCH_HEIGHT + 2 * BYPASS_SWITCH_V_MARGIN);
+
+    bypassButtonContainer.setBounds(bounds.removeFromTop(BYPASS_SWITCH_HEIGHT));
+    
+    
+    globalBypass.setBounds(topBounds.withTrimmedBottom(2 * BYPASS_SWITCH_V_MARGIN)
+                                    .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
      
 }
 
