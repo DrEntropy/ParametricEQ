@@ -330,23 +330,6 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Cha
         label = createGainParamString(channel, filterNum);
         layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
-        juce::StringArray types;
-        
-        for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
-        {
-            types.add(stringRep);
-        }
-        label = createTypeParamString(channel, filterNum);
-        uint peak = static_cast<uint>(FilterInfo::FilterType::PeakFilter);
-        uint lowShelf = static_cast<uint>(FilterInfo::FilterType::LowShelf);
-        uint highShelf = static_cast<uint>(FilterInfo::FilterType::HighShelf);
-        
-        if(filterNum == 1)
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, lowShelf));
-        else if(filterNum == 6)
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, highShelf));
-        else
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, peak));
     }
     else
     {

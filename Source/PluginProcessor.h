@@ -127,13 +127,23 @@ private:
         float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
         bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
         
-        FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(channel, filterNum))->load());
-        
-        
         FilterParameters parametricParams;
         
+        
+        switch(filterNum)
+        {
+            case 1:
+                parametricParams.filterType =  FilterType::LowShelf;
+                break;
+            case 6:
+                parametricParams.filterType = FilterType::HighShelf;
+                break;
+            default:
+                parametricParams.filterType = FilterType::PeakFilter;
+        }
+            
+        
         parametricParams.frequency = frequency;
-        parametricParams.filterType = filterType;
         parametricParams.sampleRate = sampleRate;
         parametricParams.quality = quality;
         parametricParams.bypassed = bypassed;
