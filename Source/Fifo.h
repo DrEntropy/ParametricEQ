@@ -138,7 +138,7 @@ struct Fifo
             return false;
     }
     
-    int getNumAvailableForReading() const
+    size_t getNumAvailableForReading() const
     {
         return fifo.getNumReady();
     }
