@@ -12,7 +12,7 @@
 #include <JuceHeader.h>
 #include "Fifo.h"
 #include "ParameterHelpers.h"
-#define FIFO_DEPTH 100
+#define SINGLE_CHANNEL_BUFFER_FIFO_DEPTH 100
 
 template<typename BlockType>
 struct SingleChannelSampleFifo
@@ -78,7 +78,7 @@ struct SingleChannelSampleFifo
 private:
     Channel channelToUse;
     int fifoIndex = 0;
-    Fifo<BlockType, FIFO_DEPTH> audioBufferFifo;
+    Fifo<BlockType, SINGLE_CHANNEL_BUFFER_FIFO_DEPTH> audioBufferFifo;
     BlockType bufferToFill;
     juce::Atomic<bool> prepared = false;
     juce::Atomic<int> size = 0;
