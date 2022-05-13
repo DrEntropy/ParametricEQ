@@ -20,6 +20,7 @@
 #include "ReleasePool.h"
 #include "FilterLink.h"
 #include "MeterValues.h"
+#include "SingleChannelSampleFifo.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using Trim = juce::dsp::Gain<float>;
@@ -98,6 +99,8 @@ public:
     // which is a duration of about 768 samples as 48k, which should only be few blocks.  
     Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
+    
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>;
 
 private:
     //==============================================================================
