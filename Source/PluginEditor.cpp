@@ -60,9 +60,6 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 
 void ParametricEQAudioProcessorEditor::resized()
 {
-    // to do, move magic numbers to a common spot
-    
- 
     auto bounds = getLocalBounds();
     
     auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
@@ -84,7 +81,6 @@ void ParametricEQAudioProcessorEditor::resized()
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
     
     centerBounds = bounds.toFloat();
-     
 }
 
 
@@ -101,6 +97,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         {
             // nothing  
         }
+        
         inputMeter.update(values);
     }
     
@@ -108,8 +105,9 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     {
         while(outputFifo.pull(values))
         {
-            // nothing ES.85
+            // nothing
         }
+        
         outputMeter.update(values);
     }
     
@@ -119,11 +117,12 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         auto fftSize = fftDataGenerator.getFFTSize();
         audioProcessor.sCSFifo.getAudioBuffer(buffer);
         fftDataGenerator.produceFFTDataForRendering(buffer);
-        if(fftDataGenerator.getNumAvailableFFTDataBlocks() >0 )
+        if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
         {
             fftDataGenerator.getFFTData(std::move(fftData));
             analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, 0.0f, NEGATIVE_INFINITY, MAX_DECIBELS);
         }
+        
         repaint();
     }
 }

@@ -28,7 +28,7 @@ struct AnalyzerPathGenerator
     
     size_t getNumPathsAvailable() const;
     bool getPath(juce::Path& path);
-private:
     
+private:
     Fifo<juce::Path, PATH_FIFO_DEPTH> pathFifo;
 };

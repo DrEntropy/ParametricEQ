@@ -31,8 +31,6 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     size_t numBins = fftSize/2;
     float maxLogFreq = std::log(static_cast<float>( numBins ));
     
-  
-    
     // make space from dc to first bin same as from first bin to second bin.
     // in the end we probably dont want to draw the dc component?
     startX = juce::jmap(std::log(2.f), std::log(1.f), maxLogFreq, startX, endX);
@@ -44,7 +42,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     {
         y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
         
-        auto logFreq = std::log(static_cast<float>( i ));
+        auto logFreq = std::log(static_cast<float>(i));
  
         float x = juce::jmap(logFreq, std::log(1.f), maxLogFreq, startX, endX);
         

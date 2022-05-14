@@ -12,6 +12,7 @@
 #include <JuceHeader.h>
 #include "Fifo.h"
 #include "ParameterHelpers.h"
+
 #define SINGLE_CHANNEL_BUFFER_FIFO_DEPTH 100
 
 template<typename BlockType>
@@ -20,7 +21,6 @@ struct SingleChannelSampleFifo
     using SampleType = typename BlockType::SampleType;
     
     SingleChannelSampleFifo(Channel ch) : channelToUse {ch}, prepared {false} {}
-    
     
     void update(const BlockType& buffer)
     {
@@ -31,7 +31,6 @@ struct SingleChannelSampleFifo
             for (auto i = 0; i < buffer.getNumSamples(); ++i)
                 pushNextSampleIntoFifo (channelData[i]);
         }
-       
     }
     
     void pushNextSampleIntoFifo(SampleType sample)
@@ -55,7 +54,7 @@ struct SingleChannelSampleFifo
         prepared.set(false);
         size.set(bufferSize);
         fifoIndex = 0;
-        bufferToFill.setSize (1, bufferSize, false, false, true);
+        bufferToFill.setSize(1, bufferSize, false, false, true);
         audioBufferFifo.prepare(bufferSize,0);
         prepared.set(true);
     }

@@ -77,7 +77,6 @@ struct Fifo
         auto readHandle = fifo.read(1);
         if (readHandle.blockSize1 > 0)
         {
-            // note, a copy is returned, make sure somewhere this is dealt with!
             t = buffer[readHandle.startIndex1];
             return true;
         }

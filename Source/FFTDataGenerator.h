@@ -35,6 +35,7 @@ struct FFTDataGenerator
     
     size_t getNumAvailableFFTDataBlocks() const;
     bool getFFTData(std::vector<float>&& fftData);
+    
 private:
     FFTOrder order;
     std::vector<float> fftData;
