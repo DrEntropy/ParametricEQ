@@ -116,7 +116,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         std::vector<float> fftData;
        
         auto fftSize = fftDataGenerator.getFFTSize();
-        auto binWidth = audioProcessor.getSampleRate()/fftSize;
+        auto binWidth = audioProcessor.getSampleRate() / fftSize;
         
         audioProcessor.sCSFifo.getAudioBuffer(buffer);
         fftDataGenerator.produceFFTDataForRendering(buffer);
