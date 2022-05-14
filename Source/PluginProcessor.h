@@ -250,7 +250,7 @@ private:
     Trim inputTrim, outputTrim;
     
 #ifdef USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};
     juce::dsp::Gain<float> testOscGain;
 #endif
     
