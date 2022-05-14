@@ -21,6 +21,7 @@
 #include "FilterLink.h"
 #include "MeterValues.h"
 #include "SingleChannelSampleFifo.h"
+#include "FFTDataGenerator.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using Trim = juce::dsp::Gain<float>;
@@ -101,6 +102,8 @@ public:
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
     
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
+    
+    FFTOrder fftOrder {FFTOrder::FFT2048};
 
 private:
     //==============================================================================

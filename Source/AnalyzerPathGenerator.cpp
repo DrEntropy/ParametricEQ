@@ -12,18 +12,17 @@
 
 
 void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
-                  juce::Rectangle<float> fftBounds,
-                  size_t fftSize,
-                  float binWidth,
-                  float negativeInfinity,
-                  float maxDb)
+                                         juce::Rectangle<float> fftBounds,
+                                         size_t fftSize, float binWidth,
+                                         float negativeInfinity,
+                                         float maxDb)
 {
     juce::Path fftPath;
     
     auto startX = fftBounds.getX();
-    auto width  = fftBounds.getWidth();
+    auto endX  = startX + fftBounds.getWidth();
     auto height = fftBounds.getHeight();
-    auto topY = fftBounds.getY();  // the op.
+    auto topY = fftBounds.getY();
     
     auto y = juce::jmap(renderData[0], negativeInfinity, maxDb, topY + height, topY);
     
@@ -36,7 +35,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     
     // make space from dc to first bin same as from first bin to second bin.
     // in the end we probably dont want to draw the dc component?
-    startX = juce::jmap(std::log(2.f), std::log(1.f), maxLogFreq, startX, startX + width);
+    startX = juce::jmap(std::log(2.f), std::log(1.f), maxLogFreq, startX, endX);
     
     
     auto prevX = startX;
@@ -47,13 +46,14 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
         
         auto logFreq = std::log(static_cast<float>( i ));
  
-        float x = juce::jmap(logFreq, std::log(1.f), maxLogFreq, startX, startX + width);
+        float x = juce::jmap(logFreq, std::log(1.f), maxLogFreq, startX, endX);
         
         // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)
+        {
             fftPath.lineTo(x, y);
-        
-        prevX = x;
+            prevX = x;
+        }
     }
     
     pathFifo.push(fftPath);

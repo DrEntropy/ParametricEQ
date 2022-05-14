@@ -27,7 +27,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
  
     setSize (1200, 800);
     
-    fftDataGenerator.changeOrder(FFTOrder::FFT2048);
+    fftDataGenerator.changeOrder(audioProcessor.fftOrder);
     //placeholder buffer
     buffer.setSize(1, fftDataGenerator.getFFTSize(), false, false, true);
     
@@ -42,10 +42,12 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
+    
     g.setColour(juce::Colours::red);
-    g.drawRect(centerBounds.toNearestInt());
     juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
     juce::Path fftPath;
+    g.reduceClipRegion(centerBounds.toNearestInt());
+    
     if(analyzerPathGenerator.getNumPathsAvailable() > 0)
     {
         analyzerPathGenerator.getPath(fftPath);
@@ -120,7 +122,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         if(fftDataGenerator.getNumAvailableFFTDataBlocks() >0 )
         {
             fftDataGenerator.getFFTData(std::move(fftData));
-            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, 0.0f);
+            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, 0.0f, NEGATIVE_INFINITY, MAX_DECIBELS);
         }
         repaint();
     }
