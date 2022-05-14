@@ -21,7 +21,7 @@ struct AnalyzerPathGenerator
      */
     void generatePath(const std::vector<float>& renderData,
                       juce::Rectangle<float> fftBounds,
-                      int fftSize,
+                      size_t fftSize,
                       float binWidth,
                       float negativeInfinity = -60.f,
                       float maxDb = 12.f);

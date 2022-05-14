@@ -43,7 +43,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
         
          // only draw one bin per x in the GUI.  As you progress from left to right, the width of each bin becomes more narrow in terms of pixels.
          // If you compute the x position of the bin’s center frequency, you can determine if it is overlapping the previous bin’s x coordinate or not.
-        float x = juce::jmap(logFreq, 0.f, maxLogFreq, currX, startX + width);
+        float x = juce::jmap(logFreq, 0.f, maxLogFreq, startX, startX + width);
         if(x - prevX > 1.f)
             fftPath.lineTo(x, y);
         
