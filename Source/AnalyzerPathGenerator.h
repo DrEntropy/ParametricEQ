@@ -26,7 +26,7 @@ struct AnalyzerPathGenerator
                       float negativeInfinity = -60.f,
                       float maxDb = 12.f);
     
-    int getNumPathsAvailable() const;
+    size_t getNumPathsAvailable() const;
     bool getPath(juce::Path&& path);
 private:
     Fifo<juce::Path, PATH_FIFO_DEPTH> pathFifo;
