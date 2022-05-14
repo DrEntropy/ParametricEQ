@@ -119,8 +119,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
-    
-    inputBuffers.prepare(samplesPerBlock, getTotalNumInputChannels());
+    // how can i get this number?
+    sCSFifo.prepare(1 << static_cast<int>(FFTOrder::FFT2048));
     
 #ifdef USE_TEST_OSC
     testOsc.prepare(spec);
@@ -231,7 +231,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 #endif
     
-    inputBuffers.push(buffer);
+    
+    sCSFifo.update(buffer);
     
     updateMeterFifos(inMeterValuesFifo, buffer);
  

@@ -97,10 +97,10 @@ public:
     
     // Buffers for meters and fft. 30 should be plenty, timer goes at 60 times a second,
     // which is a duration of about 768 samples as 48k, which should only be few blocks.  
-    Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
+    //Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
     
-    SingleChannelSampleFifo<juce::AudioBuffer<float>>;
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
 
 private:
     //==============================================================================
@@ -215,7 +215,6 @@ private:
             
         leftChain.get<filterNum>().performPreloopUpdate(cutParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(cutParamsRight);
-   
     }
     
     template <const int filterNum>

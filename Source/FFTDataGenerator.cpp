@@ -35,10 +35,9 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
 
     //  next, normalize the fft values in fftData. this is accomplished by dividing every index by the number of bins
     // the number of bins is HALF the fftSize and convert every index in fftData to Decibels, using juce::Decibels::gainToDecibels
-    
-    std::for_each(fftData.begin(), fftData.end(), [&](float &value){
-        return juce::Decibels::gainToDecibels(2.0 * value / size);
-    });
+    for(auto& value : fftData)
+        value = juce::Decibels::gainToDecibels(2.0 * value / size);
+  
 
     // finally, push fftData into the Fifo for others to consume.
     fftDataFifo.push(fftData);
@@ -52,7 +51,7 @@ void FFTDataGenerator::changeOrder(FFTOrder newOrder)
     // the window  use blackmanHarris for the windowing function
     window = std::make_unique<juce::dsp::WindowingFunction<float>>(size, juce::dsp::WindowingFunction<float>::blackmanHarris);
     // the forwardFFT
-    forwardFFT = std::make_unique<juce::dsp::FFT>(order);
+    forwardFFT = std::make_unique<juce::dsp::FFT>(static_cast<int>(order));
     // the fftData, filled with zeros (again?)
     fftData.clear();
     fftData.resize(2 * size,0.f);
