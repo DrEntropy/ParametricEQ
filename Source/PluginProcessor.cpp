@@ -119,12 +119,14 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
-    // how can i get this number?
-    sCSFifo.prepare(1 << static_cast<int>(FFTOrder::FFT2048));
+    auto fftSize = 1 << static_cast<int>(fftOrder);
+    sCSFifo.prepare(fftSize);
     
 #ifdef USE_TEST_OSC
     testOsc.prepare(spec);
-    testOsc.setFrequency(440.0f);
+    auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
+    auto centerFreq =  centerIndex * sampleRate / fftSize;
+    testOsc.setFrequency(centerFreq);
     testOscGain.prepare(spec);
 #endif
 
