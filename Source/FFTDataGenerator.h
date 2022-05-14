@@ -15,7 +15,12 @@
 
 #define FFT_FIFO_DEPTH 100
 
-using FFTOrder = uint;
+enum class FFTOrder
+{
+    FFT2048 = 11,
+    FFT4096 = 12,
+    FFT8192 = 13
+};
 
 struct FFTDataGenerator
 {
@@ -26,7 +31,7 @@ struct FFTDataGenerator
     
     void changeOrder(FFTOrder order);
     
-    size_t getFFTSize() const { return 1 << order; }
+    size_t getFFTSize() const { return 1 << static_cast<int>(order); }
     
     size_t getNumAvailableFFTDataBlocks() const;
     bool getFFTData(std::vector<float>&& fftData);
