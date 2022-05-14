@@ -25,25 +25,31 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     auto height = fftBounds.getHeight();
     auto topY = fftBounds.getY();  // the op.
     
-    auto y = juce::jmap(renderData[0], negativeInfinity, maxDb, topY, topY - height);
+    auto y = juce::jmap(renderData[0], negativeInfinity, maxDb, topY + height, topY);
     
     fftPath.startNewSubPath(startX, y);
     
     size_t numBins = fftSize/2;
     float maxLogFreq = std::log(static_cast<float>( numBins ));
     
-    auto prevX = startX;
+  
     
-    // not that last bin at N/2+1 is the nyquist bin
+    // make space from dc to first bin same as from first bin to second bin.
+    // in the end we probably dont want to draw the dc component?
+    startX = juce::jmap(std::log(2.f), std::log(1.f), maxLogFreq, startX, startX + width);
+    
+    
+    auto prevX = startX;
+     
     for(size_t i = 1; i <= numBins; ++i)
     {
-        y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY, topY - height);
+        y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
         
         auto logFreq = std::log(static_cast<float>( i ));
+ 
+        float x = juce::jmap(logFreq, std::log(1.f), maxLogFreq, startX, startX + width);
         
-         // only draw one bin per x in the GUI.  As you progress from left to right, the width of each bin becomes more narrow in terms of pixels.
-         // If you compute the x position of the bin’s center frequency, you can determine if it is overlapping the previous bin’s x coordinate or not.
-        float x = juce::jmap(logFreq, 0.f, maxLogFreq, startX, startX + width);
+        // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)
             fftPath.lineTo(x, y);
         

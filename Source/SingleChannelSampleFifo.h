@@ -19,19 +19,16 @@ struct SingleChannelSampleFifo
 {
     using SampleType = typename BlockType::SampleType;
     
-    SingleChannelSampleFifo(Channel ch) : channelToUse {ch}, prepared {false}
-    {
-        
-    }
+    SingleChannelSampleFifo(Channel ch) : channelToUse {ch}, prepared {false} {}
     
     
     void update(const BlockType& buffer)
     {
         if (buffer.getNumChannels() > 0)
         {
-            auto* channelData = buffer.getReadPointer (channelToUse, bufferToFill.startSample);
+            auto* channelData = buffer.getReadPointer (static_cast<int>(channelToUse));
  
-            for (auto i = 0; i < buffer.getnumSamples(); ++i)
+            for (auto i = 0; i < buffer.getNumSamples(); ++i)
                 pushNextSampleIntoFifo (channelData[i]);
         }
        
@@ -39,6 +36,7 @@ struct SingleChannelSampleFifo
     
     void pushNextSampleIntoFifo(SampleType sample)
     {
+        jassert(prepared.get());
         if (fifoIndex == size.get())
         {
             audioBufferFifo.push(bufferToFill);
@@ -57,13 +55,16 @@ struct SingleChannelSampleFifo
         prepared.set(false);
         size.set(bufferSize);
         fifoIndex = 0;
-        bufferToFill.setSize (0, bufferSize, false, false, true);
+        bufferToFill.setSize (1, bufferSize, false, false, true);
         audioBufferFifo.prepare(bufferSize,0);
         prepared.set(true);
     }
     
     int getNumCompleteBuffersAvailable() const
     {
+        if(! prepared.get())
+            return 0;
+        
         return audioBufferFifo.getNumAvailableForReading();
     }
     

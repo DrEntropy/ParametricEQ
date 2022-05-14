@@ -26,6 +26,11 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(globalBypass);
  
     setSize (1200, 800);
+    
+    fftDataGenerator.changeOrder(FFTOrder::FFT2048);
+    //placeholder buffer
+    buffer.setSize(1, fftDataGenerator.getFFTSize(), false, false, true);
+    
     startTimerHz(FRAME_RATE);
 }
 
@@ -37,6 +42,18 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
+    g.setColour(juce::Colours::red);
+    g.drawRect(centerBounds.toNearestInt());
+    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
+    juce::Path fftPath;
+    if(analyzerPathGenerator.getNumPathsAvailable() > 0)
+    {
+        analyzerPathGenerator.getPath(fftPath);
+        g.strokePath(fftPath, pst);
+    }
+  
+        
+    
 }
 
 void ParametricEQAudioProcessorEditor::resized()
@@ -63,6 +80,8 @@ void ParametricEQAudioProcessorEditor::resized()
     
     globalBypass.setBounds(topBounds.withTrimmedBottom(2 * BYPASS_SWITCH_V_MARGIN)
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
+    
+    centerBounds = bounds.toFloat();
      
 }
 
@@ -90,5 +109,19 @@ void ParametricEQAudioProcessorEditor::timerCallback()
             // nothing ES.85
         }
         outputMeter.update(values);
+    }
+    
+    if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
+    {
+        std::vector<float> fftData;
+        auto fftSize = fftDataGenerator.getFFTSize();
+        audioProcessor.sCSFifo.getAudioBuffer(buffer);
+        fftDataGenerator.produceFFTDataForRendering(buffer);
+        if(fftDataGenerator.getNumAvailableFFTDataBlocks() >0 )
+        {
+            fftDataGenerator.getFFTData(std::move(fftData));
+            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, 0.0f);
+        }
+        repaint();
     }
 }
