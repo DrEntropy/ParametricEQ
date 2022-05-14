@@ -24,27 +24,24 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     auto height = fftBounds.getHeight();
     auto topY = fftBounds.getY();
     
-    auto y = juce::jmap(renderData[0], negativeInfinity, maxDb, topY + height, topY);
-    
-    fftPath.startNewSubPath(startX, y);
-    
     size_t numBins = fftSize/2;
-    float maxLogFreq = std::log(static_cast<float>( numBins ));
+    float maxLogFreq = std::log(20000.f);
+    float minLogFreq = std::log(20.0f);
     
-    // make space from dc to first bin same as from first bin to second bin.
-    // in the end we probably dont want to draw the dc component?
-    startX = juce::jmap(std::log(2.f), std::log(1.f), maxLogFreq, startX, endX);
-    
+    // skip dc component
+    auto y = juce::jmap(renderData[1], negativeInfinity, maxDb, topY + height, topY);
+    auto x = juce::jmap(std::log(binWidth), minLogFreq, maxLogFreq, startX, endX);
+    fftPath.startNewSubPath(x, y);
     
     auto prevX = startX;
      
-    for(size_t i = 1; i <= numBins; ++i)
+    for(size_t i = 2; i <= numBins; ++i)
     {
         y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
         
-        auto logFreq = std::log(static_cast<float>(i));
+        auto logFreq = std::log(i * binWidth);
  
-        float x = juce::jmap(logFreq, std::log(1.f), maxLogFreq, startX, endX);
+         x = juce::jmap(logFreq, minLogFreq, maxLogFreq, startX, endX);
         
         // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)

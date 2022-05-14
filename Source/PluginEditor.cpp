@@ -114,13 +114,16 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
     {
         std::vector<float> fftData;
+       
         auto fftSize = fftDataGenerator.getFFTSize();
+        auto binWidth = audioProcessor.getSampleRate()/fftSize;
+        
         audioProcessor.sCSFifo.getAudioBuffer(buffer);
         fftDataGenerator.produceFFTDataForRendering(buffer);
         if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
         {
             fftDataGenerator.getFFTData(std::move(fftData));
-            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, 0.0f, NEGATIVE_INFINITY, MAX_DECIBELS);
+            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, binWidth, NEGATIVE_INFINITY, MAX_DECIBELS);
         }
         
         repaint();
