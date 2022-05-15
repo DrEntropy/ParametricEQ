@@ -9,7 +9,7 @@
 */
 
 #include "FFTDataGenerator.h"
-#include <algorithm>
+#include "EQConstants.h"
 
 
 void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData)
@@ -34,7 +34,7 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
     
     // convert to dB
     for(auto& value : fftData)
-        value = juce::Decibels::gainToDecibels(value);
+        value = juce::Decibels::gainToDecibels(value, NEGATIVE_INFINITY);
   
     // finally, push fftData into the Fifo for others to consume.
     fftDataFifo.push(fftData);
