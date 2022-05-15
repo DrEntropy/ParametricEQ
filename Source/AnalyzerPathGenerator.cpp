@@ -28,21 +28,22 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     float maxLogFreq = std::log(20000.f);
     float minLogFreq = std::log(20.0f);
     
-    // skip dc component
-    auto y = juce::jmap(renderData[1], negativeInfinity, maxDb, topY + height, topY);
-    auto x = juce::jmap(std::log(binWidth), minLogFreq, maxLogFreq, startX, endX);
+    float x,y;
+    
+    auto mapXY = [&](size_t i)
+        {
+            x = juce::jmap(std::log(i * binWidth), minLogFreq, maxLogFreq, startX, endX);
+            y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
+        };
+
+    mapXY(1);
     fftPath.startNewSubPath(x, y);
     
     auto prevX = startX;
      
     for(size_t i = 2; i <= numBins; ++i)
     {
-        y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
-        
-        auto logFreq = std::log(i * binWidth);
- 
-         x = juce::jmap(logFreq, minLogFreq, maxLogFreq, startX, endX);
-        
+        mapXY(i);
         // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)
         {
