@@ -223,6 +223,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, numSamples);
     
+    testOsc.setFrequency(JUCE_LIVE_CONSTANT(15000.f));
+    
     testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
     for( auto j = 0; j < numSamples; ++j)
     {

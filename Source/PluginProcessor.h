@@ -103,7 +103,7 @@ public:
     
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
     
-    FFTOrder fftOrder {FFTOrder::FFT2048};
+    FFTOrder fftOrder {FFTOrder::FFT4096};
 
 private:
     //==============================================================================
