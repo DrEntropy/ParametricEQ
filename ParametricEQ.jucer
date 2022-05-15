@@ -4,6 +4,16 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="YLJxiI" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
+            file="Source/AnalyzerPathGenerator.cpp"/>
+      <FILE id="TgpeHQ" name="AnalyzerPathGenerator.h" compile="0" resource="0"
+            file="Source/AnalyzerPathGenerator.h"/>
+      <FILE id="mRdUhJ" name="FFTDataGenerator.cpp" compile="1" resource="0"
+            file="Source/FFTDataGenerator.cpp"/>
+      <FILE id="Ln1PZo" name="FFTDataGenerator.h" compile="0" resource="0"
+            file="Source/FFTDataGenerator.h"/>
+      <FILE id="SL7HdY" name="SingleChannelSampleFifo.h" compile="0" resource="0"
+            file="Source/SingleChannelSampleFifo.h"/>
       <FILE id="lkw9tg" name="BypassButtonContainer.cpp" compile="1" resource="0"
             file="Source/BypassButtonContainer.cpp"/>
       <FILE id="YzBCSE" name="BypassButtonContainer.h" compile="0" resource="0"

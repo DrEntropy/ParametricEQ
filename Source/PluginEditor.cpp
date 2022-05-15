@@ -26,6 +26,11 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(globalBypass);
  
     setSize (1200, 800);
+    
+    fftDataGenerator.changeOrder(audioProcessor.fftOrder);
+    //placeholder buffer
+    buffer.setSize(1, fftDataGenerator.getFFTSize(), false, false, true);
+    
     startTimerHz(FRAME_RATE);
 }
 
@@ -37,13 +42,25 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
+    
+    g.setColour(juce::Colours::red);
+    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
+    juce::Path fftPath;
+    g.reduceClipRegion(centerBounds.toNearestInt());
+    
+    if(analyzerPathGenerator.getNumPathsAvailable() > 0)
+    {
+        analyzerPathGenerator.getPath(fftPath);
+        g.strokePath(fftPath, pst);
+    }
+    
+    g.setColour(juce::Colours::lightblue);
+    g.drawRect(centerBounds);
+    
 }
 
 void ParametricEQAudioProcessorEditor::resized()
 {
-    // to do, move magic numbers to a common spot
-    
- 
     auto bounds = getLocalBounds();
     
     auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
@@ -63,7 +80,8 @@ void ParametricEQAudioProcessorEditor::resized()
     
     globalBypass.setBounds(topBounds.withTrimmedBottom(2 * BYPASS_SWITCH_V_MARGIN)
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
-     
+    
+    centerBounds = bounds.toFloat();
 }
 
 
@@ -80,6 +98,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         {
             // nothing  
         }
+        
         inputMeter.update(values);
     }
     
@@ -87,8 +106,27 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     {
         while(outputFifo.pull(values))
         {
-            // nothing ES.85
+            // nothing
         }
+        
         outputMeter.update(values);
+    }
+    
+    if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
+    {
+        std::vector<float> fftData;
+       
+        auto fftSize = fftDataGenerator.getFFTSize();
+        auto binWidth = audioProcessor.getSampleRate() / fftSize;
+        
+        audioProcessor.sCSFifo.getAudioBuffer(buffer);
+        fftDataGenerator.produceFFTDataForRendering(buffer);
+        if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+        {
+            fftDataGenerator.getFFTData(std::move(fftData));
+            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, binWidth, NEGATIVE_INFINITY, MAX_DECIBELS);
+        }
+        
+        repaint();
     }
 }

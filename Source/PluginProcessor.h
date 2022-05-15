@@ -20,6 +20,8 @@
 #include "ReleasePool.h"
 #include "FilterLink.h"
 #include "MeterValues.h"
+#include "SingleChannelSampleFifo.h"
+#include "FFTDataGenerator.h"
 
 using Filter = juce::dsp::IIR::Filter<float>;
 using Trim = juce::dsp::Gain<float>;
@@ -96,8 +98,12 @@ public:
     
     // Buffers for meters and fft. 30 should be plenty, timer goes at 60 times a second,
     // which is a duration of about 768 samples as 48k, which should only be few blocks.  
-    Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
+    //Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
+    
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
+    
+    FFTOrder fftOrder {FFTOrder::FFT2048};
 
 private:
     //==============================================================================
@@ -127,13 +133,23 @@ private:
         float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
         bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
         
-        FilterType filterType = static_cast<FilterType> (apvts.getRawParameterValue(createTypeParamString(channel, filterNum))->load());
-        
-        
         FilterParameters parametricParams;
         
+        
+        switch(filterNum)
+        {
+            case 1:
+                parametricParams.filterType =  FilterType::LowShelf;
+                break;
+            case 6:
+                parametricParams.filterType = FilterType::HighShelf;
+                break;
+            default:
+                parametricParams.filterType = FilterType::PeakFilter;
+        }
+            
+        
         parametricParams.frequency = frequency;
-        parametricParams.filterType = filterType;
         parametricParams.sampleRate = sampleRate;
         parametricParams.quality = quality;
         parametricParams.bypassed = bypassed;
@@ -202,7 +218,6 @@ private:
             
         leftChain.get<filterNum>().performPreloopUpdate(cutParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(cutParamsRight);
-   
     }
     
     template <const int filterNum>
@@ -235,7 +250,7 @@ private:
     Trim inputTrim, outputTrim;
     
 #ifdef USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); } , 128};
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};
     juce::dsp::Gain<float> testOscGain;
 #endif
     

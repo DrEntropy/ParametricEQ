@@ -119,12 +119,14 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
-    
-    inputBuffers.prepare(samplesPerBlock, getTotalNumInputChannels());
+    auto fftSize = 1 << static_cast<int>(fftOrder);
+    sCSFifo.prepare(fftSize);
     
 #ifdef USE_TEST_OSC
     testOsc.prepare(spec);
-    testOsc.setFrequency(440.0f);
+    auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
+    auto centerFreq =  centerIndex * sampleRate / fftSize;
+    testOsc.setFrequency(centerFreq);
     testOscGain.prepare(spec);
 #endif
 
@@ -231,7 +233,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 #endif
     
-    inputBuffers.push(buffer);
+    
+    sCSFifo.update(buffer);
     
     updateMeterFifos(inMeterValuesFifo, buffer);
  
@@ -330,23 +333,6 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout,Cha
         label = createGainParamString(channel, filterNum);
         layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                            juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
-        juce::StringArray types;
-        
-        for (const auto& [type, stringRep] : FilterInfo::mapFilterTypeToString)
-        {
-            types.add(stringRep);
-        }
-        label = createTypeParamString(channel, filterNum);
-        uint peak = static_cast<uint>(FilterInfo::FilterType::PeakFilter);
-        uint lowShelf = static_cast<uint>(FilterInfo::FilterType::LowShelf);
-        uint highShelf = static_cast<uint>(FilterInfo::FilterType::HighShelf);
-        
-        if(filterNum == 1)
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, lowShelf));
-        else if(filterNum == 6)
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, highShelf));
-        else
-            layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, types, peak));
     }
     else
     {
