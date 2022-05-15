@@ -17,6 +17,8 @@
 #include "EQParamContainer.h"
 #include "BypassButtonContainer.h"
 #include "GlobalBypass.h"
+#include "FFTDataGenerator.h"
+#include "AnalyzerPathGenerator.h"
 
 
 //layout defines
@@ -59,6 +61,11 @@ private:
     BypassButtonContainer bypassButtonContainer {audioProcessor.apvts};
     
     GlobalBypass globalBypass {audioProcessor};
+    
+    
+    FFTDataGenerator fftDataGenerator;
+    AnalyzerPathGenerator analyzerPathGenerator;
+    juce::Rectangle<float> centerBounds;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };
