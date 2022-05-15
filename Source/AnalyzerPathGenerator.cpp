@@ -45,7 +45,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     if(x > startX)
     {
         // interpolate for x=startX
-        auto index = MIN_FREQ/binWidth;
+        auto index = MIN_FREQ / binWidth;
         x = startX;
         auto gain = index * renderData[1] + (1 - index) * renderData[0];
         y = mapY(gain);
