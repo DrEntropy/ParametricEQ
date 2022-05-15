@@ -18,10 +18,6 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
     
     jassert(size == audioData.getNumSamples());
     
-    fftData.clear();
-    fftData.resize(2 * size,0.f);
-    
- 
     auto readPointer = audioData.getReadPointer(0);  //single channel
 
     // copy all of the samples from audioData into fftData, first half
@@ -52,9 +48,8 @@ void FFTDataGenerator::changeOrder(FFTOrder newOrder)
     window = std::make_unique<juce::dsp::WindowingFunction<float>>(size, juce::dsp::WindowingFunction<float>::blackmanHarris);
     // the forwardFFT
     forwardFFT = std::make_unique<juce::dsp::FFT>(static_cast<int>(order));
-    // the fftData, filled with zeros (again?)
-    fftData.clear();
-    fftData.resize(2 * size, 0.f);
+    // the fftData, filled with zeros
+    fftData.assign(2 * size, 0.f);
     
     fftDataFifo.prepare(2 * size);
 }
