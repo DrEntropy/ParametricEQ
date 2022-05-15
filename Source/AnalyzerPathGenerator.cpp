@@ -25,26 +25,30 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     auto topY = fftBounds.getY();
     
     size_t numBins = fftSize/2;
-    float maxLogFreq = std::log(20000.f);
-    float minLogFreq = std::log(20.0f);
+    float maxLogFreq = std::log(MAX_FREQ);
+    float minLogFreq = std::log(MIN_FREQ);
     
-    float x,y;
-    
-    auto mapXY = [&](size_t i)
+    auto mapX = [&](size_t i)
         {
-            x = juce::jmap(std::log(i * binWidth), minLogFreq, maxLogFreq, startX, endX);
-            y = juce::jmap(renderData[i], negativeInfinity, maxDb, topY + height, topY);
+           return juce::jmap(std::log(i * binWidth), minLogFreq, maxLogFreq, startX, endX);
         };
+    
+    auto mapY = [&](float gain)
+        {
+            return juce::jmap(gain, negativeInfinity, maxDb, topY + height, topY);
+        };
+    
 
-    mapXY(1);
+    auto x = mapX(1);
+    auto y = mapY(renderData[1]);
     
     if(x > startX)
     {
         // interpolate for x=startX
-        auto index = 20.f/binWidth;
+        auto index = MIN_FREQ/binWidth;
         x = startX;
         auto gain = index * renderData[1] + (1 - index) * renderData[0];
-        y = juce::jmap(gain, negativeInfinity, maxDb, topY + height, topY);
+        y = mapY(gain);
     }
     
     fftPath.startNewSubPath(x, y);
@@ -53,7 +57,8 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
      
     for(size_t i = 2; i <= numBins; ++i)
     {
-        mapXY(i);
+        x = mapX(i);
+        y = mapY(renderData[i]);
         // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)
         {

@@ -13,6 +13,8 @@
 #include "Fifo.h"
 
 #define PATH_FIFO_DEPTH 100
+#define MIN_FREQ 20.f
+#define MAX_FREQ 20000.f
 
 struct AnalyzerPathGenerator
 {
