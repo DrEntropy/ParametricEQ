@@ -27,15 +27,19 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
     window->multiplyWithWindowingTable(fftData.data(), size);
 
     // perform the forwardFFT frequencyOnlyForwardTransform on fftData
-    forwardFFT->performFrequencyOnlyForwardTransform(fftData.data());
+    forwardFFT->performFrequencyOnlyForwardTransform(fftData.data(), true);
 
     // normalize
-    auto numBins = size / 2.f;
-    juce::FloatVectorOperations::multiply(fftData.data(), 1.0f / numBins, size);
+    auto numBins = size / 2;
+    juce::FloatVectorOperations::multiply(fftData.data(), 1.0f / numBins, numBins + 1);
     
     // convert to dB
-    for(auto& value : fftData)
-        value = juce::Decibels::gainToDecibels(value, NEGATIVE_INFINITY);
+    
+    for( size_t i = 0; i <= numBins; ++i )
+     {
+         fftData[i] = juce::Decibels::gainToDecibels(fftData[i], NEGATIVE_INFINITY);
+     }
+    
   
     // finally, push fftData into the Fifo for others to consume.
     fftDataFifo.push(fftData);
