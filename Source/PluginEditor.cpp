@@ -53,8 +53,9 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
         analyzerPathGenerator.getPath(fftPath);
         g.strokePath(fftPath, pst);
     }
-  
-        
+    
+    g.setColour(juce::Colours::lightblue);
+    g.drawRect(centerBounds);
     
 }
 

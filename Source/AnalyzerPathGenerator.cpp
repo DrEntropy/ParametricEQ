@@ -39,7 +39,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     mapXY(1);
     fftPath.startNewSubPath(x, y);
     
-    auto prevX = startX;
+    auto prevX = x;
      
     for(size_t i = 2; i <= numBins; ++i)
     {
