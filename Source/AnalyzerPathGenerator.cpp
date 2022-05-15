@@ -37,6 +37,16 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
         };
 
     mapXY(1);
+    
+    if(x > startX)
+    {
+        // interpolate for x=startX
+        auto index = 20.f/binWidth;
+        x = startX;
+        auto gain = index * renderData[1] + (1 - index) * renderData[0];
+        y = juce::jmap(gain, negativeInfinity, maxDb, topY + height, topY);
+    }
+    
     fftPath.startNewSubPath(x, y);
     
     auto prevX = x;
@@ -50,6 +60,9 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
             fftPath.lineTo(x, y);
             prevX = x;
         }
+        
+        if(x > endX)
+            break;
     }
     
     pathFifo.push(fftPath);
