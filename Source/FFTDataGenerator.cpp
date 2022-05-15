@@ -30,7 +30,8 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
     forwardFFT->performFrequencyOnlyForwardTransform(fftData.data());
 
     // normalize
-    juce::FloatVectorOperations::multiply(fftData.data(), 2.0f / size, size * 2);
+    auto numBins = size / 2.f;
+    juce::FloatVectorOperations::multiply(fftData.data(), 1.0f / numBins, size);
     
     // convert to dB
     for(auto& value : fftData)
