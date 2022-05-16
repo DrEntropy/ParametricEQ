@@ -32,7 +32,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     setSize (1200, 800);
     
     
-    pathProducer->setDecayRate(20.f);
+    pathProducer->setDecayRate(6.f);
     pathProducer->changeOrder(FFTOrder::FFT4096);
 
     
