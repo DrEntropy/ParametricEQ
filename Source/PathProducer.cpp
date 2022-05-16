@@ -30,7 +30,6 @@ template<typename BlockType>
 void PathProducer<BlockType>::run()
 {
     BlockType buffer;
-    buffer.setSize(1, SCSF_SIZE, false, false, true);
     
     while(!threadShouldExit())
     {
@@ -40,7 +39,7 @@ void PathProducer<BlockType>::run()
             continue;
         }
         
-        int fftSize = getFFTSize();
+        size_t fftSize = getFFTSize();
         
         while(singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
         {
