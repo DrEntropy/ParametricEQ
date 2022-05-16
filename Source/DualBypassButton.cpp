@@ -12,6 +12,105 @@
 #include "DualBypassButton.h"
 #include "ParameterHelpers.h"
 
+struct PathPoints
+{
+    float xStart, xLeft, xMid, xRight, xEnd;
+    float yTop, yMid, yBottom;
+};
+
+
+PathPoints computePathPoints(juce::Rectangle<float>& bounds)
+{
+    PathPoints pathPoints;
+    
+    auto x = bounds.getX();
+    auto y = bounds.getY();
+    auto w = bounds.getWidth();
+    auto h = bounds.getHeight();
+    
+    pathPoints.xStart = x + w / 8.f;
+    pathPoints.xLeft  = x + 3.f * w / 8.f;
+    pathPoints.xMid =  x + w / 2.f;
+    pathPoints.xRight = x + 5.f * w / 8.f;
+    pathPoints.xEnd = x + 7 * w / 8.f;
+    pathPoints.yTop = y + h / 4.f;
+    pathPoints.yMid = y + h / 2.f;
+    pathPoints.yBottom = y + 3.f * h / 4.f;
+
+    return pathPoints;
+}
+
+
+
+void drawCut(PathPoints pp, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour leftColor, juce::Colour rightColor)
+{
+    auto leftpath = juce::Path();
+    auto rightpath = juce::Path();
+    
+    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
+    
+    leftpath.startNewSubPath(pp.xStart, pp.yBottom);
+    leftpath.lineTo(pp.xLeft, pp.yTop);
+    leftpath.lineTo(pp.xMid, pp.yTop);
+    
+    g.setColour(leftColor);
+    g.strokePath(leftpath, pst, transform);
+    
+    rightpath.startNewSubPath(pp.xMid, pp.yTop);
+    rightpath.lineTo(pp.xEnd, pp.yTop);
+
+    g.setColour(rightColor);
+    g.strokePath(rightpath, pst, transform);
+}
+ 
+
+void  drawShelf(PathPoints pp, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour leftColor, juce::Colour rightColor)
+{
+    auto leftpath = juce::Path();
+    auto rightpath = juce::Path();
+    
+    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
+    
+    leftpath.startNewSubPath(pp.xStart, pp.yBottom);
+    leftpath.lineTo(pp.xLeft, pp.yBottom);
+    leftpath.lineTo(pp.xMid, pp.yMid);
+    leftpath.startNewSubPath(pp.xStart, pp.yTop);
+    leftpath.lineTo(pp.xLeft, pp.yTop);
+    leftpath.lineTo(pp.xMid, pp.yMid);
+    
+    g.setColour(leftColor);
+    g.strokePath(leftpath, pst, transform);
+    
+    rightpath.startNewSubPath(pp.xMid, pp.yMid);
+    rightpath.lineTo(pp.xEnd, pp.yMid);
+
+    g.setColour(rightColor);
+    g.strokePath(rightpath, pst, transform);
+}
+
+void drawPeak(PathPoints pp, juce::Graphics& g, juce::Colour leftColor, juce::Colour rightColor)
+{
+    auto leftpath = juce::Path();
+    auto rightpath = juce::Path();
+    
+    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
+    
+    leftpath.startNewSubPath(pp.xStart, pp.yMid);
+    leftpath.lineTo(pp.xLeft, pp.yMid);
+    leftpath.lineTo(pp.xMid, pp.yTop);
+    leftpath.startNewSubPath(pp.xLeft, pp.yMid);
+    leftpath.lineTo(pp.xMid, pp.yBottom);
+    
+    g.setColour(leftColor);
+    g.strokePath(leftpath, pst);
+    
+    auto flipped = juce::AffineTransform().scale(-1.f, 1.f, pp.xMid, pp.yMid);
+
+    g.setColour(rightColor);
+    g.strokePath(leftpath, pst, flipped);
+}
+
+
 //==============================================================================
 DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts):filterNum(filterNum), apvts(apvts)
 {
@@ -87,94 +186,6 @@ void DualBypassButton::paintOverChildren(juce::Graphics& g)
 }
 
 
-DualBypassButton::PathPoints DualBypassButton::computePathPoints(juce::Rectangle<float>& bounds)
-{
-    PathPoints pathPoints;
-    
-    auto x = bounds.getX();
-    auto y = bounds.getY();
-    auto w = bounds.getWidth();
-    auto h = bounds.getHeight();
-    
-    pathPoints.xStart = x + w / 8.f;
-    pathPoints.xLeft  = x + 3.f * w / 8.f;
-    pathPoints.xMid =  x + w / 2.f;
-    pathPoints.xRight = x + 5.f * w / 8.f;
-    pathPoints.xEnd = x + 7 * w / 8.f;
-    pathPoints.yTop = y + h / 4.f;
-    pathPoints.yMid = y + h / 2.f;
-    pathPoints.yBottom = y + 3.f * h / 4.f;
-
-    return pathPoints;
-}
-
-void DualBypassButton::drawCut(PathPoints pp, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour leftColor, juce::Colour rightColor)
-{
-    auto leftpath = juce::Path();
-    auto rightpath = juce::Path();
-    
-    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
-    
-    leftpath.startNewSubPath(pp.xStart, pp.yBottom);
-    leftpath.lineTo(pp.xLeft, pp.yTop);
-    leftpath.lineTo(pp.xMid, pp.yTop);
-    
-    g.setColour(leftColor);
-    g.strokePath(leftpath, pst, transform);
-    
-    rightpath.startNewSubPath(pp.xMid, pp.yTop);
-    rightpath.lineTo(pp.xEnd, pp.yTop);
-
-    g.setColour(rightColor);
-    g.strokePath(rightpath, pst, transform);
-}
- 
-
-void DualBypassButton::drawShelf(PathPoints pp, juce::Graphics& g, juce::AffineTransform& transform, juce::Colour leftColor, juce::Colour rightColor)
-{
-    auto leftpath = juce::Path();
-    auto rightpath = juce::Path();
-    
-    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
-    
-    leftpath.startNewSubPath(pp.xStart, pp.yBottom);
-    leftpath.lineTo(pp.xLeft, pp.yBottom);
-    leftpath.lineTo(pp.xMid, pp.yMid);
-    leftpath.startNewSubPath(pp.xStart, pp.yTop);
-    leftpath.lineTo(pp.xLeft, pp.yTop);
-    leftpath.lineTo(pp.xMid, pp.yMid);
-    
-    g.setColour(leftColor);
-    g.strokePath(leftpath, pst, transform);
-    
-    rightpath.startNewSubPath(pp.xMid, pp.yMid);
-    rightpath.lineTo(pp.xEnd, pp.yMid);
-
-    g.setColour(rightColor);
-    g.strokePath(rightpath, pst, transform);
-}
-
-void DualBypassButton::drawPeak(PathPoints pp, juce::Graphics& g, juce::Colour leftColor, juce::Colour rightColor)
-{
-    auto leftpath = juce::Path();
-    auto rightpath = juce::Path();
-    
-    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
-    
-    leftpath.startNewSubPath(pp.xStart, pp.yMid);
-    leftpath.lineTo(pp.xLeft, pp.yMid);
-    leftpath.lineTo(pp.xMid, pp.yTop);
-    leftpath.startNewSubPath(pp.xLeft, pp.yMid);
-    leftpath.lineTo(pp.xMid, pp.yBottom);
-    
-    g.setColour(leftColor);
-    g.strokePath(leftpath, pst);
-    
-    auto flipped = juce::AffineTransform().scale(-1.f, 1.f, pp.xMid, pp.yMid);
-
-    g.setColour(rightColor);
-    g.strokePath(leftpath, pst, flipped);
-}
 
 
 void DualBypassButton::resized()
