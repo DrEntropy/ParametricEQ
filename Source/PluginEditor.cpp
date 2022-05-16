@@ -17,6 +17,10 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    
+    //TODO, deal with case where sample rate changes. Editor is not going to get reconstructed! but this is just a placeholder
+    pathProducer.reset(new PathProducer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.sCSFifo));
+    
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
@@ -27,9 +31,11 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
  
     setSize (1200, 800);
     
-    fftDataGenerator.changeOrder(audioProcessor.fftOrder);
-    //placeholder buffer
-    buffer.setSize(1, fftDataGenerator.getFFTSize(), false, false, true);
+    
+    pathProducer->setDecayRate(20.f);
+    pathProducer->changeOrder(FFTOrder::FFT4096);
+
+    
     
     startTimerHz(FRAME_RATE);
 }
@@ -48,9 +54,9 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
     juce::Path fftPath;
     g.reduceClipRegion(centerBounds.toNearestInt());
     
-    if(analyzerPathGenerator.getNumPathsAvailable() > 0)
+    if(pathProducer->getNumAvailableForReading() > 0)
     {
-        analyzerPathGenerator.getPath(fftPath);
+        pathProducer->pull(fftPath);
         g.strokePath(fftPath, pst);
     }
     
@@ -82,6 +88,7 @@ void ParametricEQAudioProcessorEditor::resized()
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
     
     centerBounds = bounds.toFloat();
+    pathProducer->setFFTRectBounds(centerBounds);
 }
 
 
@@ -112,21 +119,25 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         outputMeter.update(values);
     }
     
-    if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
-    {
-        std::vector<float> fftData;
-       
-        auto fftSize = fftDataGenerator.getFFTSize();
-        auto binWidth = audioProcessor.getSampleRate() / fftSize;
-        
-        audioProcessor.sCSFifo.getAudioBuffer(buffer);
-        fftDataGenerator.produceFFTDataForRendering(buffer);
-        if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
-        {
-            fftDataGenerator.getFFTData(std::move(fftData));
-            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, binWidth, NEGATIVE_INFINITY, MAX_DECIBELS);
-        }
-        
+    if(pathProducer->getNumAvailableForReading()>0)
         repaint();
-    }
+    
+//    if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
+//    {
+//        std::vector<float> fftData;
+//
+//        auto fftSize = fftDataGenerator.getFFTSize();
+//        auto binWidth = audioProcessor.getSampleRate() / fftSize;
+//
+//        audioProcessor.sCSFifo.getAudioBuffer(buffer);
+//        fftDataGenerator.produceFFTDataForRendering(buffer);
+//        if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+//        {
+//            fftDataGenerator.getFFTData(std::move(fftData));
+//            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, binWidth, NEGATIVE_INFINITY, MAX_DECIBELS);
+//        }
+//
+//        repaint();
+//    }
+    
 }

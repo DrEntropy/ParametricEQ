@@ -31,7 +31,7 @@ struct PathProducer : juce::Thread
     void setFFTRectBounds(juce::Rectangle<float>);
     
     void setDecayRate(float dr);
-    bool pull(juce::Path&&);
+    bool pull(juce::Path&);
     int getNumAvailableForReading() const;
     void toggleProcessing(bool);
     void changePathRange(float negativeInfinityDb, float maxDb);
@@ -40,6 +40,8 @@ private:
     SingleChannelSampleFifo<BlockType>* singleChannelSampleFifo;
     FFTDataGenerator fftDataGenerator;
     AnalyzerPathGenerator pathGenerator;
+    
+    size_t getNumBins();
     
     std::vector<float> renderData;
     

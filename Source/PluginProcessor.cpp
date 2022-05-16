@@ -119,8 +119,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
-    auto fftSize = 1 << static_cast<int>(fftOrder);
-    sCSFifo.prepare(fftSize);
+//    auto fftSize = 1 << static_cast<int>(fftOrder);
+//    sCSFifo.prepare(fftSize);
     
 #ifdef USE_TEST_OSC
     testOsc.prepare(spec);

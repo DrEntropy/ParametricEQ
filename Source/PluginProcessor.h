@@ -102,8 +102,6 @@ public:
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
     
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
-    
-    FFTOrder fftOrder {FFTOrder::FFT4096};
 
 private:
     //==============================================================================
