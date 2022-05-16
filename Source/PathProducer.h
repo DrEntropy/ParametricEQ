@@ -25,14 +25,14 @@ struct PathProducer : juce::Thread
     
     void run() override;
     void changeOrder(FFTOrder o);
-    int getFFTSize() const;
+    size_t getFFTSize() const;
     double getBinWidth() const;
     void pauseThread();
     void setFFTRectBounds(juce::Rectangle<float>);
     
     void setDecayRate(float dr);
     bool pull(juce::Path&);
-    int getNumAvailableForReading() const;
+    size_t getNumAvailableForReading() const;
     void toggleProcessing(bool);
     void changePathRange(float negativeInfinityDb, float maxDb);
     

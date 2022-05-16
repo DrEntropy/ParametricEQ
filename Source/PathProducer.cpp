@@ -95,7 +95,7 @@ void PathProducer<BlockType>::changeOrder(FFTOrder o)
 }
 
 template<typename BlockType>
-int PathProducer<BlockType>::getFFTSize() const
+size_t PathProducer<BlockType>::getFFTSize() const
 {
     return fftDataGenerator.getFFTSize();
 }
@@ -137,7 +137,7 @@ bool PathProducer<BlockType>::pull(juce::Path& path)
 }
 
 template<typename BlockType>
-int PathProducer<BlockType>::getNumAvailableForReading() const
+size_t PathProducer<BlockType>::getNumAvailableForReading() const
 {
     return pathGenerator.getNumPathsAvailable();
 }
