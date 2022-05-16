@@ -11,14 +11,11 @@
 #include "PathProducer.h"
 
 #define SCSF_SIZE 2048
-
+#define LOOP_DELAY 10
 
 
 template<typename BlockType>
-PathProducer<BlockType>::PathProducer(double sr, SingleChannelSampleFifo<BlockType>& fifoRef) : Thread("PathProducer"), singleChannelSampleFifo{&fifoRef}, sampleRate{sr}
-{
-    DBG(std::to_string(reinterpret_cast<u_long>(getThreadId())));
-}
+PathProducer<BlockType>::PathProducer(double sr, SingleChannelSampleFifo<BlockType>& fifoRef) : Thread("PathProducer"), singleChannelSampleFifo{&fifoRef}, sampleRate{sr} { }
  
 template<typename BlockType>
 PathProducer<BlockType>::~PathProducer()
@@ -35,7 +32,7 @@ void PathProducer<BlockType>::run()
     {
         if(!processingIsEnabled)
         {
-            wait(10);
+            wait(LOOP_DELAY);
             continue;
         }
         
@@ -64,11 +61,11 @@ void PathProducer<BlockType>::run()
         {
             std::vector<float> fftData;
             fftDataGenerator.getFFTData(std::move(fftData));
-            updateRenderData(renderData, fftData, getNumBins(), decayRateInDbPerSec.load());
+            updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(LOOP_DELAY) * decayRateInDbPerSec.load() / 1000.f);
             pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth());
         }
  
-        wait(10);
+        wait(LOOP_DELAY);
     }
 }
 

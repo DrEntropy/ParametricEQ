@@ -32,8 +32,8 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     setSize (1200, 800);
     
     
-    pathProducer->setDecayRate(6.f);
-    pathProducer->changeOrder(FFTOrder::FFT4096);
+    pathProducer->setDecayRate(120.f);
+    pathProducer->changeOrder(audioProcessor.fftOrder);
 
     
     
@@ -56,7 +56,9 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
     
     if(pathProducer->getNumAvailableForReading() > 0)
     {
-        pathProducer->pull(fftPath);
+        while(pathProducer->getNumAvailableForReading() > 0)
+            pathProducer->pull(fftPath);
+        
         g.strokePath(fftPath, pst);
     }
     
@@ -122,22 +124,6 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     if(pathProducer->getNumAvailableForReading()>0)
         repaint();
     
-//    if(audioProcessor.sCSFifo.getNumCompleteBuffersAvailable() > 0)
-//    {
-//        std::vector<float> fftData;
-//
-//        auto fftSize = fftDataGenerator.getFFTSize();
-//        auto binWidth = audioProcessor.getSampleRate() / fftSize;
-//
-//        audioProcessor.sCSFifo.getAudioBuffer(buffer);
-//        fftDataGenerator.produceFFTDataForRendering(buffer);
-//        if(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
-//        {
-//            fftDataGenerator.getFFTData(std::move(fftData));
-//            analyzerPathGenerator.generatePath(fftData, centerBounds, fftSize, binWidth, NEGATIVE_INFINITY, MAX_DECIBELS);
-//        }
-//
-//        repaint();
-//    }
+ 
     
 }
