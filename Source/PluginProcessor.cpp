@@ -123,6 +123,7 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 //    sCSFifo.prepare(fftSize);
     
 #ifdef USE_TEST_OSC
+    auto fftSize = 1 << static_cast<int>(fftOrder);
     testOsc.prepare(spec);
     auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
     auto centerFreq =  centerIndex * sampleRate / fftSize;
@@ -223,7 +224,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, numSamples);
     
-    testOsc.setFrequency(JUCE_LIVE_CONSTANT(15000.f));
+    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(15000.f));
     
     testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
     for( auto j = 0; j < numSamples; ++j)
