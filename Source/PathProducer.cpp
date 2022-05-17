@@ -145,7 +145,7 @@ size_t PathProducer<BlockType>::getNumAvailableForReading() const
 template<typename BlockType>
 void PathProducer<BlockType>::toggleProcessing(bool)
 {
-    processingIsEnabled = !processingIsEnabled;
+    processingIsEnabled.store(!processingIsEnabled.load());
 }
 
 template<typename BlockType>
