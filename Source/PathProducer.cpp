@@ -103,7 +103,7 @@ size_t PathProducer<BlockType>::getFFTSize() const
 template<typename BlockType>
 double PathProducer<BlockType>::getBinWidth() const
 {
-    return sampleRate / getFFTSize();
+    return sampleRate.load() / getFFTSize();
 }
 
 template<typename BlockType>
@@ -181,6 +181,13 @@ size_t PathProducer<BlockType>::getNumBins()
     return getFFTSize()/2;
 }
 
+template<typename BlockType>
+void PathProducer<BlockType>::updateSampleRate(double sr)
+{
+    pauseThread();
+    sampleRate.store(sr);
+    startThread();
+}
 
 
 template struct PathProducer< juce::AudioBuffer<float> >;

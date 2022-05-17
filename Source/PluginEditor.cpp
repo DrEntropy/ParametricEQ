@@ -104,16 +104,6 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     
     MeterValues values;
     
- 
-    // For testing, to be moved into SpectrumAnalyzer class.
-    if(sampleRateChangeNeeded.compareAndSetBool(false, true))
-    {
-        pathProducer->pauseThread();
-        pathProducer.reset(new PathProducer<juce::AudioBuffer<float>>(newSampleRate.get(), audioProcessor.sCSFifo));
-        pathProducer->setDecayRate(120.f);
-        pathProducer->changeOrder(audioProcessor.fftOrder);
-        pathProducer->setFFTRectBounds(centerBounds);
-    }
     
     if(inputFifo.getNumAvailableForReading() > 0)
     {
@@ -142,6 +132,6 @@ void ParametricEQAudioProcessorEditor::timerCallback()
 // functionality to be moved into SpectrumAnalyzer class
 void ParametricEQAudioProcessorEditor::sampleRateChanged(double sr)
 {
-    sampleRateChangeNeeded.set(true);
-    newSampleRate.set(sr);
+    if(pathProducer)
+        pathProducer->updateSampleRate(sr);
 }

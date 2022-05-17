@@ -22,7 +22,6 @@
 #include "MeterValues.h"
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
-#include "SampleRateListener.h"
 
 #define SCSF_SIZE 2048
 

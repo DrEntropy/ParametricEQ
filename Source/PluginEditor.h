@@ -19,7 +19,6 @@
 #include "GlobalBypass.h"
 #include "FFTDataGenerator.h"
 #include "PathProducer.h"
-#include "SampleRateListener.h"
 
 
 //layout defines
@@ -66,9 +65,6 @@ private:
     GlobalBypass globalBypass {audioProcessor};
     
     std::unique_ptr<PathProducer<juce::AudioBuffer<float>>> pathProducer;
-    
-    juce::Atomic<bool> sampleRateChangeNeeded {false};
-    juce::Atomic<double> newSampleRate;
     
     juce::Rectangle<float> centerBounds;
     

@@ -35,6 +35,7 @@ struct PathProducer : juce::Thread
     size_t getNumAvailableForReading() const;
     void toggleProcessing(bool);
     void changePathRange(float negativeInfinityDb, float maxDb);
+    void updateSampleRate(double sr);
     
 private:
     SingleChannelSampleFifo<BlockType>* singleChannelSampleFifo;
@@ -52,7 +53,7 @@ private:
     
     BlockType bufferForGenerator;
     
-    double sampleRate;
+    std::atomic<double> sampleRate;
     juce::Rectangle<float> fftBounds;
     /*
      This must be atomic because it's used in inside `run()` as well as 'setDecayRate()' which can be called from any thread.
