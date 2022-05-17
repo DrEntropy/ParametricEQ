@@ -37,23 +37,26 @@ void PathProducer<BlockType>::run()
         }
         
         size_t fftSize = getFFTSize();
+        auto BFGSize = bufferForGenerator.getNumSamples();
+        jassert(fftSize == BFGSize);
+        
+        BlockType tempBuffer(1, BFGSize);
         
         while(!threadShouldExit() && singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
         {
             auto success = singleChannelSampleFifo->getAudioBuffer(buffer);
             jassert(success);
             
-            int subBlocks = fftSize / SCSF_SIZE;
-            int blockStart = 0;
+            auto SCSFSize = buffer.getNumSamples();
+            jassert(SCSFSize <= BFGSize);
             
-            while(subBlocks > 1)
-            {
-                bufferForGenerator.copyFrom(0, blockStart, bufferForGenerator, 0, blockStart + SCSF_SIZE, SCSF_SIZE);
-                subBlocks--;
-                blockStart += SCSF_SIZE;
-            }
+            // copy shifted. Note if BFGSize == SCSFSize nothing happens.
+            tempBuffer.copyFrom(0, 0, bufferForGenerator, 0, SCSFSize, BFGSize - SCSFSize);
             
-            bufferForGenerator.copyFrom(0, blockStart, buffer, 0, 0, SCSF_SIZE);
+            // copy SCSF into tempBuffer's end
+            tempBuffer.copyFrom(0, BFGSize - SCSFSize, buffer, 0, 0, SCSFSize);
+            
+            std::swap(tempBuffer, bufferForGenerator);
             
             fftDataGenerator.produceFFTDataForRendering(bufferForGenerator);
         }
