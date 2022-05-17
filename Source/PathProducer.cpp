@@ -38,7 +38,7 @@ void PathProducer<BlockType>::run()
         
         size_t fftSize = getFFTSize();
         
-        while(singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
+        while(!threadShouldExit() && singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
         {
             auto success = singleChannelSampleFifo->getAudioBuffer(buffer);
             jassert(success);
@@ -58,7 +58,7 @@ void PathProducer<BlockType>::run()
             fftDataGenerator.produceFFTDataForRendering(bufferForGenerator);
         }
         
-        while(fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+        while(!threadShouldExit() && fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
         {
             std::vector<float> fftData;
             fftDataGenerator.getFFTData(std::move(fftData));
