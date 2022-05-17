@@ -46,6 +46,7 @@ void PathProducer<BlockType>::run()
         {
             auto success = singleChannelSampleFifo->getAudioBuffer(buffer);
             jassert(success);
+            juce::ignoreUnused(success);
             
             auto SCSFSize = buffer.getNumSamples();
             jassert(SCSFSize <= BFGSize);
@@ -109,7 +110,9 @@ double PathProducer<BlockType>::getBinWidth() const
 template<typename BlockType>
 void PathProducer<BlockType>::pauseThread()
 {
-       stopThread(2000);  
+    auto stopped = stopThread(500);
+    jassert(stopped);
+    juce::ignoreUnused(stopped);
 }
 
 template<typename BlockType>

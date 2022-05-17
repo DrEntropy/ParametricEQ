@@ -42,6 +42,7 @@ struct SingleChannelSampleFifo
         {
             bool success = audioBufferFifo.push(bufferToFill);
             jassert(success);
+            juce::ignoreUnused(success);
             fifoIndex = 0;
         }
         
