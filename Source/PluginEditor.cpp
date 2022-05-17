@@ -35,7 +35,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     pathProducer->setDecayRate(120.f);
     
     pathProducer->changeOrder(audioProcessor.fftOrder);
-    audioProcessor.setSampleRateListener(this);
+    audioProcessor.addSampleRateListener(this);
     
     
     startTimerHz(FRAME_RATE);
@@ -44,6 +44,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 {
+    audioProcessor.removeSampleRateListener(this);
 }
 
 //==============================================================================

@@ -97,7 +97,17 @@ public:
     
     void setBypassed(bool state);  // sets ALL filters to bypassed or not depending on state
     
-    void setSampleRateListener (SampleRateListener*);
+    struct SampleRateListener
+    {
+        virtual ~SampleRateListener() = default;
+        virtual void sampleRateChanged(double sr) = 0;
+    };
+
+    
+    void addSampleRateListener (SampleRateListener*);
+    void removeSampleRateListener (SampleRateListener*);
+    
+  
      
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
     
@@ -254,7 +264,8 @@ private:
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
-    SampleRateListener* sampleRateListener = nullptr;
+    
+    juce::ListenerList<SampleRateListener> sampleRateListeners;
     
 #ifdef USE_TEST_OSC
     juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};

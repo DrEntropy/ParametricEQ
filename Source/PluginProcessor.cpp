@@ -121,9 +121,9 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Right, sampleRate);
  
     sCSFifo.prepare(SCSF_SIZE);
+    
+    sampleRateListeners.call([sampleRate](SampleRateListener& srl){srl.sampleRateChanged(sampleRate);});
  
-    if(sampleRateListener)
-        sampleRateListener->sampleRateChanged(sampleRate);
     
     
 #ifdef USE_TEST_OSC
@@ -503,7 +503,14 @@ void ParametricEQAudioProcessor::setBoolParamState(bool state, juce::AudioParame
 }
 
 
-void ParametricEQAudioProcessor::setSampleRateListener (SampleRateListener* srl)
+void ParametricEQAudioProcessor::addSampleRateListener (SampleRateListener* srl)
 {
-    sampleRateListener = srl;
+    sampleRateListeners.add(srl);
+}
+
+
+void ParametricEQAudioProcessor::removeSampleRateListener (SampleRateListener* srl)
+{
+    jassert(sampleRateListeners.contains(srl));
+    sampleRateListeners.remove(srl);
 }

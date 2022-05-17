@@ -36,7 +36,7 @@
 //==============================================================================
 /**
 */
-class ParametricEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer, public SampleRateListener
+class ParametricEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer, public ParametricEQAudioProcessor::SampleRateListener
 {
 public:
     ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor&);
