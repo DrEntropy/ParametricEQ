@@ -31,8 +31,9 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
  
     setSize (1200, 800);
     
-    
+    // PLACEHOLDER FOR TESTING, will be replaced with audio paramter in PFM11-35
     pathProducer->setDecayRate(120.f);
+    
     pathProducer->changeOrder(audioProcessor.fftOrder);
 
     
