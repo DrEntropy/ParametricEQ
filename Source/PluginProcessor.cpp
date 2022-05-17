@@ -237,10 +237,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 #endif
     
-    
-    sCSFifo.update(buffer);
-    
-    updateMeterFifos(inMeterValuesFifo, buffer);
+    if(getActiveEditor())
+    {
+        sCSFifo.update(buffer);
+        updateMeterFifos(inMeterValuesFifo, buffer);
+    }
  
     if(mode == ChannelMode::MidSide)
     {
@@ -277,7 +278,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 #endif
     
     outputTrim.process(stereoContext);
-    updateMeterFifos(outMeterValuesFifo, buffer);
+    
+    if(getActiveEditor())
+    {
+        updateMeterFifos(outMeterValuesFifo, buffer);
+    }
 }
 
 //==============================================================================
