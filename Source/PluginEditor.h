@@ -19,6 +19,7 @@
 #include "GlobalBypass.h"
 #include "FFTDataGenerator.h"
 #include "PathProducer.h"
+#include "SampleRateListener.h"
 
 
 //layout defines
@@ -35,7 +36,7 @@
 //==============================================================================
 /**
 */
-class ParametricEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
+class ParametricEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer, public SampleRateListener
 {
 public:
     ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor&);
@@ -46,6 +47,8 @@ public:
     void resized() override;
     
     void timerCallback() override;
+    
+    void sampleRateChanged(double sr) override;
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -63,7 +66,12 @@ private:
     GlobalBypass globalBypass {audioProcessor};
     
     std::unique_ptr<PathProducer<juce::AudioBuffer<float>>> pathProducer;
+    
+    juce::Atomic<bool> sampleRateChangeNeeded {false};
+    juce::Atomic<double> newSampleRate;
+    
     juce::Rectangle<float> centerBounds;
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

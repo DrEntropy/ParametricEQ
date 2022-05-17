@@ -22,6 +22,7 @@
 #include "MeterValues.h"
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
+#include "SampleRateListener.h"
 
 #define SCSF_SIZE 2048
 
@@ -95,6 +96,8 @@ public:
     bool isAnyActiveOn();  // returns true if all channels filteres bypassed, 8 or 16
     
     void setBypassed(bool state);  // sets ALL filters to bypassed or not depending on state
+    
+    void setSampleRateListener (SampleRateListener*);
      
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Params", createParameterLayout() };
     
@@ -251,6 +254,7 @@ private:
     ParamLayout createParameterLayout();
     MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
+    SampleRateListener* sampleRateListener = nullptr;
     
 #ifdef USE_TEST_OSC
     juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};

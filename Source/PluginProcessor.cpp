@@ -122,6 +122,9 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
  
     sCSFifo.prepare(SCSF_SIZE);
  
+    if(sampleRateListener)
+        sampleRateListener->sampleRateChanged(sampleRate);
+    
     
 #ifdef USE_TEST_OSC
     auto fftSize = 1 << static_cast<int>(fftOrder);
@@ -497,4 +500,10 @@ void ParametricEQAudioProcessor::setBoolParamState(bool state, juce::AudioParame
     param -> beginChangeGesture();
     *param = state;
     param -> endChangeGesture();
+}
+
+
+void ParametricEQAudioProcessor::setSampleRateListener (SampleRateListener* srl)
+{
+    sampleRateListener = srl;
 }
