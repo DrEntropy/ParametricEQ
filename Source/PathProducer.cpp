@@ -40,7 +40,8 @@ void PathProducer<BlockType>::run()
         
         while(singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
         {
-            singleChannelSampleFifo->getAudioBuffer(buffer);
+            auto success = singleChannelSampleFifo->getAudioBuffer(buffer);
+            jassert(success);
             
             int subBlocks = fftSize / SCSF_SIZE;
             int blockStart = 0;

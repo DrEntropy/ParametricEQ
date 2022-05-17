@@ -40,7 +40,8 @@ struct SingleChannelSampleFifo
     {
         if (fifoIndex == size.get())
         {
-            audioBufferFifo.push(bufferToFill);
+            bool success = audioBufferFifo.push(bufferToFill);
+            jassert(success);
             fifoIndex = 0;
         }
         
