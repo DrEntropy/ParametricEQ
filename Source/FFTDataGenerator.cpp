@@ -33,6 +33,10 @@ void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>
     auto numBins = size / 2;
     juce::FloatVectorOperations::multiply(fftData.data(), 1.0f / numBins, numBins + 1);
     
+    // DC and nyquist are both frequency components so have different normalization.
+    fftData[0] *= 2.f;
+    fftData[numBins] *= 2.f;
+    
     // convert to dB
     
     for( size_t i = 0; i <= numBins; ++i )

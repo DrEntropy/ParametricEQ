@@ -4,74 +4,87 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
-      <FILE id="YLJxiI" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
-            file="Source/AnalyzerPathGenerator.cpp"/>
-      <FILE id="TgpeHQ" name="AnalyzerPathGenerator.h" compile="0" resource="0"
-            file="Source/AnalyzerPathGenerator.h"/>
-      <FILE id="mRdUhJ" name="FFTDataGenerator.cpp" compile="1" resource="0"
-            file="Source/FFTDataGenerator.cpp"/>
-      <FILE id="Ln1PZo" name="FFTDataGenerator.h" compile="0" resource="0"
-            file="Source/FFTDataGenerator.h"/>
-      <FILE id="SL7HdY" name="SingleChannelSampleFifo.h" compile="0" resource="0"
-            file="Source/SingleChannelSampleFifo.h"/>
-      <FILE id="lkw9tg" name="BypassButtonContainer.cpp" compile="1" resource="0"
-            file="Source/BypassButtonContainer.cpp"/>
-      <FILE id="YzBCSE" name="BypassButtonContainer.h" compile="0" resource="0"
-            file="Source/BypassButtonContainer.h"/>
-      <FILE id="U2LhAs" name="DualBypassButton.cpp" compile="1" resource="0"
-            file="Source/DualBypassButton.cpp"/>
-      <FILE id="Vs0BBY" name="DualBypassButton.h" compile="0" resource="0"
-            file="Source/DualBypassButton.h"/>
-      <FILE id="Z4Xq6i" name="BypassButton.cpp" compile="1" resource="0"
-            file="Source/BypassButton.cpp"/>
-      <FILE id="H5B7ig" name="BypassButton.h" compile="0" resource="0" file="Source/BypassButton.h"/>
-      <FILE id="UYjRSf" name="EQParamWidget.cpp" compile="1" resource="0"
-            file="Source/EQParamWidget.cpp"/>
-      <FILE id="RtJHmX" name="EQParamWidget.h" compile="0" resource="0" file="Source/EQParamWidget.h"/>
-      <FILE id="E8G1kP" name="EQParamContainer.h" compile="0" resource="0"
-            file="Source/EQParamContainer.h"/>
-      <FILE id="sVEB7X" name="ParamListener.cpp" compile="1" resource="0"
-            file="Source/ParamListener.cpp"/>
-      <FILE id="sZzueK" name="ParamListener.h" compile="0" resource="0" file="Source/ParamListener.h"/>
-      <FILE id="Ndu9eN" name="MeterValues.h" compile="0" resource="0" file="Source/MeterValues.h"/>
-      <FILE id="Txj62t" name="StereoMeter.cpp" compile="1" resource="0" file="Source/StereoMeter.cpp"/>
-      <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
-      <FILE id="Eb3Ucq" name="Averager.h" compile="0" resource="0" file="Source/Averager.h"/>
+      <GROUP id="{A5D7B329-6861-5696-8BE5-87A9ABC9229F}" name="Utilities">
+        <FILE id="OgseIV" name="Decibel.h" compile="0" resource="0" file="Source/Decibel.h"/>
+        <FILE id="MawBAi" name="Fifo.h" compile="0" resource="0" file="Source/Fifo.h"/>
+        <FILE id="xB6BvK" name="ReleasePool.h" compile="0" resource="0" file="Source/ReleasePool.h"/>
+        <FILE id="Eb3Ucq" name="Averager.h" compile="0" resource="0" file="Source/Averager.h"/>
+        <FILE id="Wpg4cq" name="DecayingValueHolder.cpp" compile="1" resource="0"
+              file="Source/DecayingValueHolder.cpp"/>
+        <FILE id="oE9RgW" name="DecayingValueHolder.h" compile="0" resource="0"
+              file="Source/DecayingValueHolder.h"/>
+        <FILE id="dqoskZ" name="HelperFunctions.h" compile="0" resource="0"
+              file="Source/HelperFunctions.h"/>
+      </GROUP>
+      <GROUP id="{683C66F1-38C1-D26C-2C8B-869DE4047265}" name="Filters">
+        <FILE id="tXb9LF" name="FilterInfo.h" compile="0" resource="0" file="Source/FilterInfo.h"/>
+        <FILE id="tifnVR" name="CoefficientsMaker.h" compile="0" resource="0"
+              file="Source/CoefficientsMaker.h"/>
+        <FILE id="qOCmsP" name="FilterParametersBase.h" compile="0" resource="0"
+              file="Source/FilterParametersBase.h"/>
+        <FILE id="WCCJln" name="CoeffTypeHelpers.h" compile="0" resource="0"
+              file="Source/CoeffTypeHelpers.h"/>
+        <FILE id="zR55yf" name="FilterCoefficientGenerator.h" compile="0" resource="0"
+              file="Source/FilterCoefficientGenerator.h"/>
+        <FILE id="V03Z1z" name="ParameterHelpers.cpp" compile="1" resource="0"
+              file="Source/ParameterHelpers.cpp"/>
+        <FILE id="dXZBq4" name="ParameterHelpers.h" compile="0" resource="0"
+              file="Source/ParameterHelpers.h"/>
+        <FILE id="EZTjc7" name="HighCutLowCutParameters.h" compile="0" resource="0"
+              file="Source/HighCutLowCutParameters.h"/>
+        <FILE id="jccJQr" name="FilterParameters.h" compile="0" resource="0"
+              file="Source/FilterParameters.h"/>
+        <FILE id="dttkDI" name="FilterLink.h" compile="0" resource="0" file="Source/FilterLink.h"/>
+      </GROUP>
+      <GROUP id="{3C610B2B-E5D4-D1C8-C9F6-45D81F320CF0}" name="Meters">
+        <FILE id="QN9OEj" name="DbScale.cpp" compile="1" resource="0" file="Source/DbScale.cpp"/>
+        <FILE id="st6py3" name="DbScale.h" compile="0" resource="0" file="Source/DbScale.h"/>
+        <FILE id="mi8KA6" name="Meter.cpp" compile="1" resource="0" file="Source/Meter.cpp"/>
+        <FILE id="SIfTZT" name="Meter.h" compile="0" resource="0" file="Source/Meter.h"/>
+        <FILE id="Ndu9eN" name="MeterValues.h" compile="0" resource="0" file="Source/MeterValues.h"/>
+        <FILE id="Txj62t" name="StereoMeter.cpp" compile="1" resource="0" file="Source/StereoMeter.cpp"/>
+        <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
+      </GROUP>
+      <GROUP id="{26A645A9-FD90-D699-F5BC-B2F6D94C0309}" name="SpectrumAnalyzer">
+        <FILE id="YLJxiI" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
+              file="Source/AnalyzerPathGenerator.cpp"/>
+        <FILE id="q0ug7t" name="PathProducer.cpp" compile="1" resource="0"
+              file="Source/PathProducer.cpp"/>
+        <FILE id="iSZv19" name="PathProducer.h" compile="0" resource="0" file="Source/PathProducer.h"/>
+        <FILE id="TgpeHQ" name="AnalyzerPathGenerator.h" compile="0" resource="0"
+              file="Source/AnalyzerPathGenerator.h"/>
+        <FILE id="mRdUhJ" name="FFTDataGenerator.cpp" compile="1" resource="0"
+              file="Source/FFTDataGenerator.cpp"/>
+        <FILE id="Ln1PZo" name="FFTDataGenerator.h" compile="0" resource="0"
+              file="Source/FFTDataGenerator.h"/>
+        <FILE id="SL7HdY" name="SingleChannelSampleFifo.h" compile="0" resource="0"
+              file="Source/SingleChannelSampleFifo.h"/>
+      </GROUP>
+      <GROUP id="{D0E99460-6292-8480-EA15-D8790AEF9C04}" name="EQParamControl">
+        <FILE id="l4eoXH" name="GlobalBypass.h" compile="0" resource="0" file="Source/GlobalBypass.h"/>
+        <FILE id="lkw9tg" name="BypassButtonContainer.cpp" compile="1" resource="0"
+              file="Source/BypassButtonContainer.cpp"/>
+        <FILE id="YzBCSE" name="BypassButtonContainer.h" compile="0" resource="0"
+              file="Source/BypassButtonContainer.h"/>
+        <FILE id="U2LhAs" name="DualBypassButton.cpp" compile="1" resource="0"
+              file="Source/DualBypassButton.cpp"/>
+        <FILE id="Vs0BBY" name="DualBypassButton.h" compile="0" resource="0"
+              file="Source/DualBypassButton.h"/>
+        <FILE id="Z4Xq6i" name="BypassButton.cpp" compile="1" resource="0"
+              file="Source/BypassButton.cpp"/>
+        <FILE id="H5B7ig" name="BypassButton.h" compile="0" resource="0" file="Source/BypassButton.h"/>
+        <FILE id="UYjRSf" name="EQParamWidget.cpp" compile="1" resource="0"
+              file="Source/EQParamWidget.cpp"/>
+        <FILE id="RtJHmX" name="EQParamWidget.h" compile="0" resource="0" file="Source/EQParamWidget.h"/>
+        <FILE id="E8G1kP" name="EQParamContainer.h" compile="0" resource="0"
+              file="Source/EQParamContainer.h"/>
+        <FILE id="sVEB7X" name="ParamListener.cpp" compile="1" resource="0"
+              file="Source/ParamListener.cpp"/>
+        <FILE id="sZzueK" name="ParamListener.h" compile="0" resource="0" file="Source/ParamListener.h"/>
+      </GROUP>
       <FILE id="KmcX3V" name="EQConstants.h" compile="0" resource="0" file="Source/EQConstants.h"/>
-      <FILE id="Wpg4cq" name="DecayingValueHolder.cpp" compile="1" resource="0"
-            file="Source/DecayingValueHolder.cpp"/>
-      <FILE id="oE9RgW" name="DecayingValueHolder.h" compile="0" resource="0"
-            file="Source/DecayingValueHolder.h"/>
-      <FILE id="dqoskZ" name="HelperFunctions.h" compile="0" resource="0"
-            file="Source/HelperFunctions.h"/>
-      <FILE id="WCCJln" name="CoeffTypeHelpers.h" compile="0" resource="0"
-            file="Source/CoeffTypeHelpers.h"/>
-      <FILE id="dttkDI" name="FilterLink.h" compile="0" resource="0" file="Source/FilterLink.h"/>
-      <FILE id="xB6BvK" name="ReleasePool.h" compile="0" resource="0" file="Source/ReleasePool.h"/>
-      <FILE id="zR55yf" name="FilterCoefficientGenerator.h" compile="0" resource="0"
-            file="Source/FilterCoefficientGenerator.h"/>
-      <FILE id="MawBAi" name="Fifo.h" compile="0" resource="0" file="Source/Fifo.h"/>
-      <FILE id="OgseIV" name="Decibel.h" compile="0" resource="0" file="Source/Decibel.h"/>
-      <FILE id="tifnVR" name="CoefficientsMaker.h" compile="0" resource="0"
-            file="Source/CoefficientsMaker.h"/>
-      <FILE id="V03Z1z" name="ParameterHelpers.cpp" compile="1" resource="0"
-            file="Source/ParameterHelpers.cpp"/>
-      <FILE id="dXZBq4" name="ParameterHelpers.h" compile="0" resource="0"
-            file="Source/ParameterHelpers.h"/>
-      <FILE id="EZTjc7" name="HighCutLowCutParameters.h" compile="0" resource="0"
-            file="Source/HighCutLowCutParameters.h"/>
-      <FILE id="jccJQr" name="FilterParameters.h" compile="0" resource="0"
-            file="Source/FilterParameters.h"/>
-      <FILE id="qOCmsP" name="FilterParametersBase.h" compile="0" resource="0"
-            file="Source/FilterParametersBase.h"/>
-      <FILE id="mi8KA6" name="Meter.cpp" compile="1" resource="0" file="Source/Meter.cpp"/>
-      <FILE id="SIfTZT" name="Meter.h" compile="0" resource="0" file="Source/Meter.h"/>
-      <FILE id="tXb9LF" name="FilterInfo.h" compile="0" resource="0" file="Source/FilterInfo.h"/>
       <FILE id="YwiiMC" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
-      <FILE id="QN9OEj" name="DbScale.cpp" compile="1" resource="0" file="Source/DbScale.cpp"/>
-      <FILE id="st6py3" name="DbScale.h" compile="0" resource="0" file="Source/DbScale.h"/>
-      <FILE id="l4eoXH" name="GlobalBypass.h" compile="0" resource="0" file="Source/GlobalBypass.h"/>
       <FILE id="IGcODe" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="PKgxTq" name="PluginEditor.cpp" compile="1" resource="0"

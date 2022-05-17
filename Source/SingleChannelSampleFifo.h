@@ -24,6 +24,9 @@ struct SingleChannelSampleFifo
     
     void update(const BlockType& buffer)
     {
+        if(!prepared.get())
+            return;
+        
         if (buffer.getNumChannels() > 0)
         {
             auto* channelData = buffer.getReadPointer (static_cast<int>(channelToUse));
@@ -35,10 +38,11 @@ struct SingleChannelSampleFifo
     
     void pushNextSampleIntoFifo(SampleType sample)
     {
-        jassert(prepared.get());
         if (fifoIndex == size.get())
         {
-            audioBufferFifo.push(bufferToFill);
+            bool success = audioBufferFifo.push(bufferToFill);
+            jassert(success);
+            juce::ignoreUnused(success);
             fifoIndex = 0;
         }
         

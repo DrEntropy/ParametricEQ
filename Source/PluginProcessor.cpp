@@ -119,10 +119,15 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
-    auto fftSize = 1 << static_cast<int>(fftOrder);
-    sCSFifo.prepare(fftSize);
+ 
+    sCSFifo.prepare(SCSF_SIZE);
+    
+    sampleRateListeners.call([sampleRate](SampleRateListener& srl){srl.sampleRateChanged(sampleRate);});
+ 
+    
     
 #ifdef USE_TEST_OSC
+    auto fftSize = 1 << static_cast<int>(fftOrder);
     testOsc.prepare(spec);
     auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
     auto centerFreq =  centerIndex * sampleRate / fftSize;
@@ -223,6 +228,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, numSamples);
     
+    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(15000.f));
+    
     testOscGain.setGainDecibels(JUCE_LIVE_CONSTANT(0.0f));
     for( auto j = 0; j < numSamples; ++j)
     {
@@ -233,10 +240,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 #endif
     
-    
-    sCSFifo.update(buffer);
-    
-    updateMeterFifos(inMeterValuesFifo, buffer);
+    if(getActiveEditor())
+    {
+        sCSFifo.update(buffer);
+        updateMeterFifos(inMeterValuesFifo, buffer);
+    }
  
     if(mode == ChannelMode::MidSide)
     {
@@ -273,7 +281,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 #endif
     
     outputTrim.process(stereoContext);
-    updateMeterFifos(outMeterValuesFifo, buffer);
+    
+    if(getActiveEditor())
+    {
+        updateMeterFifos(outMeterValuesFifo, buffer);
+    }
 }
 
 //==============================================================================
@@ -488,4 +500,17 @@ void ParametricEQAudioProcessor::setBoolParamState(bool state, juce::AudioParame
     param -> beginChangeGesture();
     *param = state;
     param -> endChangeGesture();
+}
+
+
+void ParametricEQAudioProcessor::addSampleRateListener (SampleRateListener* srl)
+{
+    sampleRateListeners.add(srl);
+}
+
+
+void ParametricEQAudioProcessor::removeSampleRateListener (SampleRateListener* srl)
+{
+    jassert(sampleRateListeners.contains(srl));
+    sampleRateListeners.remove(srl);
 }
