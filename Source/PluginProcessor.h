@@ -23,6 +23,8 @@
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
 
+#define SCSF_SIZE 2048
+
 using Filter = juce::dsp::IIR::Filter<float>;
 using Trim = juce::dsp::Gain<float>;
 using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;

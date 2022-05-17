@@ -10,7 +10,7 @@
 
 #include "PathProducer.h"
 
-#define SCSF_SIZE 2048
+
 #define LOOP_DELAY 10
 
 
@@ -85,8 +85,7 @@ void PathProducer<BlockType>::changeOrder(FFTOrder o)
     bufferForGenerator.setSize (1, getFFTSize(), false, false, true);
     bufferForGenerator.clear();
     
-    //prep SCSF to fixed size
-    singleChannelSampleFifo->prepare(SCSF_SIZE);
+
     
     while(!singleChannelSampleFifo->isPrepared())
         wait(5);
