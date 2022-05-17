@@ -39,6 +39,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     
     
     startTimerHz(FRAME_RATE);
+    
 }
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()

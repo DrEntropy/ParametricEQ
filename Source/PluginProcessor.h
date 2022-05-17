@@ -105,6 +105,7 @@ public:
     
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
     
+    //placeholder until controls are set up
     FFTOrder fftOrder {FFTOrder::FFT4096};
 
 private:
