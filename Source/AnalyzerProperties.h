@@ -39,7 +39,7 @@ enum class ProcessingModes
 
 inline const std::map<ParamNames, juce::String>& GetAnalyzerParams()
 {
-    static std::map<ParamNames, juce::String> map =
+    static const std::map<ParamNames, juce::String> map =
     {
         {ParamNames::EnableAnalyzer, "Enable Analyzer"},
         {ParamNames::AnalyzerDecayRate, "Analyzer Decay Rate"},
@@ -52,7 +52,7 @@ inline const std::map<ParamNames, juce::String>& GetAnalyzerParams()
 
 inline const std::map<FFTOrder, juce::String>& GetAnalyzerPoints()
 {
-    static std::map<FFTOrder, juce::String> map =
+    static const std::map<FFTOrder, juce::String> map =
     {
         {FFTOrder::FFT2048, "2048"},
         {FFTOrder::FFT4096, "4096"},
@@ -64,7 +64,7 @@ inline const std::map<FFTOrder, juce::String>& GetAnalyzerPoints()
 
 inline const std::map<ProcessingModes, juce::String>& GetProcessingModes()
 {
-    static std::map<ProcessingModes, juce::String> map =
+    static const std::map<ProcessingModes, juce::String> map =
     {
         {ProcessingModes::Pre, "Pre"},
         {ProcessingModes::Post, "Post"}
@@ -76,7 +76,7 @@ inline const std::map<ProcessingModes, juce::String>& GetProcessingModes()
 
 inline const juce::String getAnalyzerParamName(ParamNames name)
 {
-    auto params = GetAnalyzerParams();
+    auto const params = GetAnalyzerParams();
     return params.at(name);
 }
 
