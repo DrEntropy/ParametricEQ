@@ -46,7 +46,7 @@ private:
     
     void setActive(bool a);
     void updateDecayRate(float dr);
-    void updateOrder(float value);
+    void updateOrder(float);
     void animate();
     
     DbScale analyzerScale, eqScale;

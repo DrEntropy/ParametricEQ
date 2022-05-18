@@ -73,4 +73,11 @@ inline const std::map<ProcessingModes, juce::String>& GetProcessingModes()
     return map;
 }
 
+
+inline const juce::String getAnalyzerParamName(ParamNames name)
+{
+    auto params = GetAnalyzerParams();
+    return params.at(name);
+}
+
 }

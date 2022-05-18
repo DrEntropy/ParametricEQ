@@ -28,6 +28,8 @@ void PathProducer<BlockType>::run()
 {
     BlockType buffer;
     
+    previousTime = juce::Time::currentTimeMillis();
+    
     while(!threadShouldExit())
     {
         if(!processingIsEnabled)
@@ -66,7 +68,11 @@ void PathProducer<BlockType>::run()
         {
             std::vector<float> fftData;
             fftDataGenerator.getFFTData(std::move(fftData));
-            updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(LOOP_DELAY) * decayRateInDbPerSec.load() / 1000.f);
+            
+            auto deltaT = juce::Time::currentTimeMillis() - previousTime;
+            previousTime += deltaT;
+            
+            updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(deltaT) * decayRateInDbPerSec.load() / 1000.f);
             pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth());
         }
  

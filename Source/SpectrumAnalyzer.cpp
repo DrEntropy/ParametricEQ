@@ -16,47 +16,92 @@ SpectrumAnalyzer<BlockType>::SpectrumAnalyzer(double sr,
                  SingleChannelSampleFifo<BlockType>& rightScsf,
                                    juce::AudioProcessorValueTreeState& apv) : sampleRate{sr}, leftPathProducer {sr, leftScsf}, rightPathProducer {sr, rightScsf}
 {
-    // PLACEHOLDER FOR TESTING,
-    leftPathProducer.setDecayRate(120.f);
-    leftPathProducer.changeOrder(AnalyzerProperties::FFTOrder::FFT4096);
+    using namespace AnalyzerProperties;
+    
+    
+    auto getParam = [&apv](ParamNames param)
+    {
+        return apv.getParameter(getAnalyzerParamName(param));
+    };
+    
+    
+    auto safePtr = juce::Component::SafePointer<SpectrumAnalyzer<BlockType>>(this);
+    
+    analyzerEnabledParamListener.reset(new ParamListener(getParam(ParamNames::EnableAnalyzer),
+                                                         [safePtr](float v)
+                                                         {
+                                                             if(auto* comp = safePtr.getComponent() )
+                                                                comp->setActive(v > 0.5);
+                                                         }));
+    
+  
+    analyzerDecayRateParamListener.reset(new ParamListener(getParam(ParamNames::AnalyzerDecayRate),
+                                                           [safePtr](float v)
+                                                           {
+                                                               if(auto* comp = safePtr.getComponent() )
+                                                                  comp->updateDecayRate(v);
+                                                           }));
+   
+    analyzerOrderParamListener.reset(new ParamListener(getParam(ParamNames::AnalyzerPoints),
+                                                       [safePtr](float v)
+                                                       {
+                                                           if(auto* comp = safePtr.getComponent() )
+                                                              comp->updateOrder(v);
+                                                       }));
+    
+    updateDecayRate(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerDecayRate))->load());
+    
+    updateOrder(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerPoints))->load());
+    setActive(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.5);
+    
+    // TODO, add scales
+    
     animate();
 }
 
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::timerCallback()
 {
-    if(leftPathProducer.getNumAvailableForReading()>0)
-        repaint();
+    if(!active)
+    {
+        leftAnalyzerPath.clear();
+        rightAnalyzerPath.clear();
+        stopTimer();
+    }
+    else
+    {
+    while(leftPathProducer.getNumAvailableForReading() > 0)
+        leftPathProducer.pull(leftAnalyzerPath);
+    
+    while(rightPathProducer.getNumAvailableForReading() > 0)
+        rightPathProducer.pull(rightAnalyzerPath);
+    }
+    repaint();
 }
 
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::resized()
 {
-    leftPathProducer.setFFTRectBounds(getBoundsForFFT().toFloat());
+    AnalyzerBase::resized();
+    leftPathProducer.setFFTRectBounds(fftBoundingBox.toFloat());
+    rightPathProducer.setFFTRectBounds(fftBoundingBox.toFloat());
+    
+    //todo, set bounds for analyzer and eq scale
+    // call customizeScales
 }
 
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::paint(juce::Graphics& g)
 {
+    paintBackground(g);
+    g.reduceClipRegion(fftBoundingBox);
     g.setColour(juce::Colours::red);
     juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
-    juce::Path fftPath;
     
-    auto centerBounds = getBoundsForFFT();
+    g.strokePath(leftAnalyzerPath, pst);
     
-    //g.reduceClipRegion(centerBounds.toNearestInt());
-    
-    if(leftPathProducer.getNumAvailableForReading() > 0)
-    {
-        while(leftPathProducer.getNumAvailableForReading() > 0)
-            leftPathProducer.pull(fftPath);
-        
-        g.strokePath(fftPath, pst);
-    }
-    
-    g.setColour(juce::Colours::lightblue);
-    g.drawRect(centerBounds);
-    
+    g.setColour(juce::Colours::salmon);
+    g.strokePath(rightAnalyzerPath, pst);
     
 }
 
@@ -69,32 +114,45 @@ void SpectrumAnalyzer<BlockType>::customizeScales(int leftScaleMin, int leftScal
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::changeSampleRate(double sr)
 {
+    sampleRate = sr;
     leftPathProducer.updateSampleRate(sr);
     rightPathProducer.updateSampleRate(sr);
 }
  
 template <typename BlockType>
-void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics&)
+void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
 {
+    g.setColour(juce::Colours::lightblue);
+    g.drawRect(getLocalBounds().toFloat());
     
+    // TODO: draw scale lines
 }
 
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::setActive(bool a)
 {
+    active = a;
     
+    if(active && !isTimerRunning())
+        animate();
+        
 }
 
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::updateDecayRate(float dr)
 {
-    
+    leftPathProducer.setDecayRate(dr);
+    rightPathProducer.setDecayRate(dr);
 }
 
 template <typename BlockType>
-void SpectrumAnalyzer<BlockType>::updateOrder(float value)
+void SpectrumAnalyzer<BlockType>::updateOrder(float v)
 {
-    
+    using namespace AnalyzerProperties;
+    int lowest = static_cast<int>(FFTOrder::FFT2048);
+    FFTOrder o = static_cast<FFTOrder>(v + lowest);
+    leftPathProducer.changeOrder(o);
+    rightPathProducer.changeOrder(o);
 }
 
 template <typename BlockType>

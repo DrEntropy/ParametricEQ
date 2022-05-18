@@ -67,4 +67,6 @@ private:
      and causes processing to be skipped when it's false.
      */
     std::atomic<bool> processingIsEnabled { true };
+    
+    juce::int64 previousTime;
 };

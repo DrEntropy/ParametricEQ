@@ -121,7 +121,7 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Right, sampleRate);
  
     leftSCSFifo.prepare(SCSF_SIZE);
-    //rightSCSFifo.prepare(SCSF_SIZE);
+    rightSCSFifo.prepare(SCSF_SIZE);
     
     sampleRateListeners.call([sampleRate](SampleRateListener& srl){srl.sampleRateChanged(sampleRate);});
  
@@ -240,10 +240,20 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.setSample(1, j, sample);
     }
 #endif
+    using namespace AnalyzerProperties;
     
-    if(getActiveEditor())
+    auto analyzerEnabled = apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.;
+    
+    auto analyzerMode = static_cast<ProcessingModes> (apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerProcessingMode))->load()) ;
+    
+    if(getActiveEditor() )
     {
-        leftSCSFifo.update(buffer);
+        if(analyzerEnabled && analyzerMode == ProcessingModes::Pre)
+        {
+            leftSCSFifo.update(buffer);
+            rightSCSFifo.update(buffer);
+        }
+        
         updateMeterFifos(inMeterValuesFifo, buffer);
     }
  
@@ -285,6 +295,11 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(getActiveEditor())
     {
+        if(analyzerEnabled && analyzerMode == ProcessingModes::Post)
+        {
+            leftSCSFifo.update(buffer);
+            rightSCSFifo.update(buffer);
+        }
         updateMeterFifos(outMeterValuesFifo, buffer);
     }
 }
@@ -396,7 +411,7 @@ void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
     
     layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerPoints),
                                                             params.at(ParamNames::AnalyzerPoints),
-                                                            orders, 0));
+                                                            orders, 1));
       
     juce::StringArray modes;
     
