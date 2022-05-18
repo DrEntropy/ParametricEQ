@@ -11,6 +11,7 @@
 #include "FFTDataGenerator.h"
 #include "EQConstants.h"
 
+using namespace AnalyzerProperties;
 
 void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData)
 {

@@ -75,7 +75,7 @@ void PathProducer<BlockType>::run()
 }
 
 template<typename BlockType>
-void PathProducer<BlockType>::changeOrder(FFTOrder o)
+void PathProducer<BlockType>::changeOrder(AnalyzerProperties::FFTOrder o)
 {
     pauseThread();
     fftDataGenerator.changeOrder(o);

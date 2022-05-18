@@ -22,6 +22,7 @@
 #include "MeterValues.h"
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
+#include "AnalyzerProperties.h"
 
 #define SCSF_SIZE 2048
 
@@ -118,7 +119,7 @@ public:
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
     
     //placeholder until controls are set up
-    FFTOrder fftOrder {FFTOrder::FFT4096};
+    AnalyzerProperties::FFTOrder fftOrder {AnalyzerProperties::FFTOrder::FFT4096};
 
 private:
     //==============================================================================
@@ -255,8 +256,11 @@ private:
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
     
+    
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
+    
+    void addAnalyzerParams(ParamLayout& layout);
     
     void performMidSideTransform(juce::AudioBuffer<float>&);
  

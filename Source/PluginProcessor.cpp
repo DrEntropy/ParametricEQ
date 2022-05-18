@@ -375,6 +375,42 @@ void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channe
     addFilterParamToLayout(layout, channel, 7, true);
 }
 
+void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
+{
+    using namespace AnalyzerProperties;
+    const auto& params = AnalyzerProperties::GetAnalyzerParams();
+    layout.add(std::make_unique<juce::AudioParameterBool>(params.at(ParamNames::EnableAnalyzer),
+                                                          params.at(ParamNames::EnableAnalyzer),
+                                                          true));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(ParamNames::AnalyzerDecayRate),
+                                                          params.at(ParamNames::AnalyzerDecayRate),
+                                                          0.0, 30.0, 30.0));
+    
+    juce::StringArray orders;
+    
+    for (const auto& [order, stringRep] : GetAnalyzerPoints())
+    {
+        orders.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerPoints),
+                                                            params.at(ParamNames::AnalyzerPoints),
+                                                            orders, 0));
+      
+    juce::StringArray modes;
+    
+    for (const auto& [mode, stringRep] : GetProcessingModes())
+    {
+        modes.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerProcessingMode),
+                                                            params.at(ParamNames::AnalyzerProcessingMode),
+                                                            modes, 0));
+    
+    
+}
+
 // for some reason compiler will not let me use the alias for return type here.
 ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
@@ -396,7 +432,9 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     createFilterLayouts(layout, Channel::Left);
     createFilterLayouts(layout, Channel::Right);
- 
+    
+    addAnalyzerParams(layout);
+    
     return layout;
 }
 
@@ -474,7 +512,7 @@ bool ParametricEQAudioProcessor::isAnyActiveOn()
         isAnyOn |= isOn;
         if(mode != ChannelMode::Stereo)
         {
-            bool isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Right, filterNum))->load() < 0.5f;
+            isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Right, filterNum))->load() < 0.5f;
             isAnyOn |= isOn;
         }
     }

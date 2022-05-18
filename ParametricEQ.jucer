@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="HlrOZr" name="ParametricEQ" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rational Pursuit"
+              cppLanguageStandard="17">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
       <GROUP id="{A5D7B329-6861-5696-8BE5-87A9ABC9229F}" name="Utilities">
@@ -46,6 +47,8 @@
         <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
       </GROUP>
       <GROUP id="{26A645A9-FD90-D699-F5BC-B2F6D94C0309}" name="SpectrumAnalyzer">
+        <FILE id="PwFuCi" name="AnalyzerProperties.h" compile="0" resource="0"
+              file="Source/AnalyzerProperties.h"/>
         <FILE id="eIpZYN" name="AnalyzerBase.h" compile="0" resource="0" file="Source/AnalyzerBase.h"/>
         <FILE id="YLJxiI" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
               file="Source/AnalyzerPathGenerator.cpp"/>
