@@ -120,7 +120,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
  
-    sCSFifo.prepare(SCSF_SIZE);
+    leftSCSFifo.prepare(SCSF_SIZE);
+    //rightSCSFifo.prepare(SCSF_SIZE);
     
     sampleRateListeners.call([sampleRate](SampleRateListener& srl){srl.sampleRateChanged(sampleRate);});
  
@@ -242,7 +243,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     if(getActiveEditor())
     {
-        sCSFifo.update(buffer);
+        leftSCSFifo.update(buffer);
         updateMeterFifos(inMeterValuesFifo, buffer);
     }
  

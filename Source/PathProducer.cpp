@@ -186,7 +186,9 @@ void PathProducer<BlockType>::updateSampleRate(double sr)
 {
     pauseThread();
     sampleRate.store(sr);
-    startThread();
+    if(!fftBounds.isEmpty())
+        startThread();
+ 
 }
 
 

@@ -17,6 +17,7 @@
 #include "SingleChannelSampleFifo.h"
 #include "DbScale.h"
 #include "ParamListener.h"
+#include "EQConstants.h"
 
 #define RESPONSE_CURVE_MIN_DB -96.f
 #define RESPONSE_CURVE_MAX_DB 12.f

@@ -116,10 +116,8 @@ public:
     //Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
     
-    SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>  leftSCSFifo{Channel::Left}, rightSCSFifo{Channel::Right};
     
-    //placeholder until controls are set up
-    AnalyzerProperties::FFTOrder fftOrder {AnalyzerProperties::FFTOrder::FFT4096};
 
 private:
     //==============================================================================

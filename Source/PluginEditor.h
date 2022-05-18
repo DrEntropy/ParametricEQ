@@ -18,7 +18,7 @@
 #include "BypassButtonContainer.h"
 #include "GlobalBypass.h"
 #include "FFTDataGenerator.h"
-#include "PathProducer.h"
+#include "SpectrumAnalyzer.h"
 
 
 //layout defines
@@ -64,9 +64,8 @@ private:
     
     GlobalBypass globalBypass {audioProcessor};
     
-    std::unique_ptr<PathProducer<juce::AudioBuffer<float>>> pathProducer;
-    
-    juce::Rectangle<float> centerBounds;
+    std::unique_ptr<SpectrumAnalyzer<juce::AudioBuffer<float>>> spectrumAnalyzer;
+     
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
