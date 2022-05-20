@@ -67,7 +67,7 @@ void PathProducer<BlockType>::run()
         while(!threadShouldExit() && fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
         {
             std::vector<float> fftData;
-            fftDataGenerator.getFFTData(std::move(fftData));
+            fftDataGenerator.getFFTData(fftData);
             
             auto deltaT = juce::Time::currentTimeMillis() - previousTime;
             previousTime += deltaT;

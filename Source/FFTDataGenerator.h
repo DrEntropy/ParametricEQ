@@ -30,7 +30,7 @@ struct FFTDataGenerator
     size_t getFFTSize() const { return 1 << static_cast<int>(order); }
     
     size_t getNumAvailableFFTDataBlocks() const;
-    bool getFFTData(std::vector<float>&& fftData);
+    bool getFFTData(std::vector<float>& fftData);
     
 private:
     AnalyzerProperties::FFTOrder order;
