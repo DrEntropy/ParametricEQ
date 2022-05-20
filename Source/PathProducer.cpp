@@ -176,7 +176,8 @@ void PathProducer<BlockType>::updateRenderData(std::vector<float>& renderData,
         auto previousValue = renderData[i];
         auto candidate = fftData[i];
         auto finalValue = juce::jmax(candidate, previousValue - decayRate);
-        renderData[i] = juce::jlimit(negativeInfinity.load(), maxDecibels.load(), finalValue);
+        renderData[i] = juce::jlimit(NEGATIVE_INFINITY, MAX_DECIBELS, finalValue);
+        
     }
 }
 

@@ -102,7 +102,7 @@ template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::paint(juce::Graphics& g)
 {
     paintBackground(g);
-    g.reduceClipRegion(fftBoundingBox);
+    //g.reduceClipRegion(fftBoundingBox);
     g.setColour(juce::Colours::red);
     juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
     
