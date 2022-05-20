@@ -76,7 +76,7 @@ void ParametricEQAudioProcessorEditor::resized()
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
     
     auto centerBounds = bounds;
-    spectrumAnalyzer->setBounds(centerBounds);
+    spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
 }
 
 

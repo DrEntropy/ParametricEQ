@@ -54,7 +54,8 @@ SpectrumAnalyzer<BlockType>::SpectrumAnalyzer(double sr,
     updateOrder(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerPoints))->load());
     setActive(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.5);
     
-    // TODO, add scales
+    addAndMakeVisible(eqScale);
+    addAndMakeVisible(analyzerScale);
     
     animate();
 }
@@ -86,8 +87,15 @@ void SpectrumAnalyzer<BlockType>::resized()
     leftPathProducer.setFFTRectBounds(fftBoundingBox.toFloat());
     rightPathProducer.setFFTRectBounds(fftBoundingBox.toFloat());
     
-    //todo, set bounds for analyzer and eq scale
-    // call customizeScales
+    auto bounds =  getLocalBounds();
+    auto eqScaleBounds = bounds.removeFromRight(getTextWidthScaled());
+    auto analyzerScaleBounds = bounds.removeFromLeft(getTextWidthScaled());
+    
+    eqScale.setBounds(eqScaleBounds);
+   
+    analyzerScale.setBounds(analyzerScaleBounds);
+    
+    customizeScales(leftScaleMin, leftScaleMax, rightScaleMin, rightScaleMax, scaleDivision);
 }
 
 template <typename BlockType>
@@ -106,9 +114,21 @@ void SpectrumAnalyzer<BlockType>::paint(juce::Graphics& g)
 }
 
 template <typename BlockType>
-void SpectrumAnalyzer<BlockType>::customizeScales(int leftScaleMin, int leftScaleMax, int rightScaleMin, int rightScaleMax, int division)
+void SpectrumAnalyzer<BlockType>::customizeScales(int leftMin, int leftMax, int rightMin, int rightMax, int division)
 {
+    leftScaleMin = leftMin;
+    rightScaleMin = rightMin;
+    leftScaleMax = leftMax;
+    rightScaleMax = rightMax;
+    scaleDivision = division;
     
+    leftPathProducer.changePathRange(leftMin, leftMax);
+    rightPathProducer.changePathRange(leftMin, leftMax);
+    eqScale.buildBackgroundImage(scaleDivision, fftBoundingBox, rightScaleMin, rightScaleMax);
+    analyzerScale.buildBackgroundImage(scaleDivision, fftBoundingBox, leftScaleMin, leftScaleMax);
+    
+    if(! getLocalBounds().isEmpty())
+       repaint();  // verify that this doesnt cause a double call to repaint when this is called from resized.
 }
 
 template <typename BlockType>
@@ -124,7 +144,6 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightblue);
     g.drawRect(getLocalBounds().toFloat());
-    
     // TODO: draw scale lines
 }
 
@@ -148,7 +167,7 @@ void SpectrumAnalyzer<BlockType>::updateDecayRate(float dr)
 template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::updateOrder(float v)
 {
-    using namespace AnalyzerProperties;
+    using AnalyzerProperties::FFTOrder;
     int lowest = static_cast<int>(FFTOrder::FFT2048);
     FFTOrder o = static_cast<FFTOrder>(v + lowest);
     leftPathProducer.changeOrder(o);

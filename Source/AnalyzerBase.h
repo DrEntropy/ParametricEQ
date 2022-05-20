@@ -19,13 +19,13 @@ struct AnalyzerBase : juce::Component
 {
     juce::Rectangle<int> getBoundsForRendering() const
     {
-        return getLocalBounds().reduced(0, .75 * getTextHeight());
+        return getLocalBounds().reduced(0, 3 * getTextHeight()/4);
     }
     
     juce::Rectangle<int> getBoundsForFFT()
     {
         auto bounds = getBoundsForRendering();
-        auto w = getTextWidth() * 1.5;
+        auto w = getTextWidthScaled();
         return bounds.withTrimmedLeft(w).withTrimmedRight(w);
     }
     
@@ -37,4 +37,5 @@ struct AnalyzerBase : juce::Component
     }
 protected:
     juce::Rectangle<int> fftBoundingBox;
+    inline float getTextWidthScaled() const {return getTextWidth() * 3 / 2;}
 };

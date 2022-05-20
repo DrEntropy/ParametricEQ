@@ -73,7 +73,7 @@ void PathProducer<BlockType>::run()
             previousTime += deltaT;
             
             updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(deltaT) * decayRateInDbPerSec.load() / 1000.f);
-            pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth());
+            pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth(), negativeInfinity, maxDecibels);
         }
  
         wait(LOOP_DELAY);
