@@ -25,7 +25,7 @@ struct AnalyzerBase : juce::Component
     juce::Rectangle<int> getBoundsForFFT()
     {
         auto bounds = getBoundsForRendering();
-        auto w = getTextWidthScaled();
+        auto w = getScaleWidth();
         return bounds.withTrimmedLeft(w).withTrimmedRight(w);
     }
     
@@ -37,5 +37,5 @@ struct AnalyzerBase : juce::Component
     }
 protected:
     juce::Rectangle<int> fftBoundingBox;
-    inline float getTextWidthScaled() const {return getTextWidth() * 3 / 2;}
+    inline float getScaleWidth() const {return getTextWidth() * 3 / 2;}
 };

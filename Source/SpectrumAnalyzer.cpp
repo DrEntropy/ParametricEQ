@@ -88,8 +88,8 @@ void SpectrumAnalyzer<BlockType>::resized()
     rightPathProducer.setFFTRectBounds(fftBoundingBox.toFloat());
     
     auto bounds =  getLocalBounds();
-    auto eqScaleBounds = bounds.removeFromRight(getTextWidthScaled());
-    auto analyzerScaleBounds = bounds.removeFromLeft(getTextWidthScaled());
+    auto eqScaleBounds = bounds.removeFromRight(getScaleWidth());
+    auto analyzerScaleBounds = bounds.removeFromLeft(getScaleWidth());
     
     eqScale.setBounds(eqScaleBounds);
    
