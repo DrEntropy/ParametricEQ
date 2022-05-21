@@ -47,6 +47,10 @@
         <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
       </GROUP>
       <GROUP id="{26A645A9-FD90-D699-F5BC-B2F6D94C0309}" name="SpectrumAnalyzer">
+        <FILE id="uTP8Xv" name="AnalyzerControls.cpp" compile="1" resource="0"
+              file="Source/AnalyzerControls.cpp"/>
+        <FILE id="wyWbK6" name="AnalyzerControls.h" compile="0" resource="0"
+              file="Source/AnalyzerControls.h"/>
         <FILE id="dxqYJw" name="SpectrumAnalyzer.cpp" compile="1" resource="0"
               file="Source/SpectrumAnalyzer.cpp"/>
         <FILE id="D1wSnl" name="SpectrumAnalyzer.h" compile="0" resource="0"

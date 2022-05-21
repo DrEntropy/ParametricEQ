@@ -19,10 +19,11 @@
 #include "GlobalBypass.h"
 #include "FFTDataGenerator.h"
 #include "SpectrumAnalyzer.h"
+#include "AnalyzerControls.h"
 
 
 //layout defines
-#define OVERALL_MARGIN 10
+#define OVERALL_MARGIN 5
 #define BYPASS_SWITCH_HEIGHT 50
 #define BYPASS_SWITCH_V_MARGIN 5
 #define GLOBAL_SWITCH_RIGHT_MARGIN 15
@@ -66,9 +67,7 @@ private:
     
     std::unique_ptr<SpectrumAnalyzer<juce::AudioBuffer<float>>> spectrumAnalyzer;
      
-    juce::Slider testSlider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxAbove};
-    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    std::unique_ptr<SliderAttachment> testAttachment;
+    AnalyzerControls analyzerControls;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

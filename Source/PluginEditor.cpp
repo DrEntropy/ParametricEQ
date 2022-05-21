@@ -12,7 +12,7 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts)
 
 {
     // Make sure that before the constructor has finished, you've set the
@@ -25,10 +25,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
     
-    testAttachment.reset(new SliderAttachment(audioProcessor.apvts,
-                                              AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode),
-                                              testSlider));
-    addAndMakeVisible(testSlider);
+    addAndMakeVisible(analyzerControls);
     
     addAndMakeVisible(bypassButtonContainer);
     
@@ -83,7 +80,14 @@ void ParametricEQAudioProcessorEditor::resized()
     auto centerBounds = bounds;
     spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     
-    testSlider.setBounds(bottomBounds.removeFromLeft(100));
+    // for future use
+    auto inTrimBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight());
+    auto outTrimBounds = bottomBounds.removeFromRight(bottomBounds.getHeight());
+    auto procModeBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 3 / 2);
+    auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 4);
+    
+    // bottomBounds now contains extra room, to be used by "reset all bands"
+    analyzerControls.setBounds(analyzerControlBounds);
 }
 
 
