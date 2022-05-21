@@ -66,7 +66,9 @@ private:
     
     std::unique_ptr<SpectrumAnalyzer<juce::AudioBuffer<float>>> spectrumAnalyzer;
      
-    
+    juce::Slider testSlider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxAbove};
+    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    std::unique_ptr<SliderAttachment> testAttachment;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

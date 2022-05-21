@@ -146,7 +146,7 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
     g.drawRect(getLocalBounds().toFloat());
     
     
-    g.setColour(juce::Colours::lightgrey);
+    
     g.setOpacity(0.5f);
     
     // Draw scale lines
@@ -154,12 +154,15 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
     
     while(currentDb <= leftScaleMax)
     {
-        auto y = juce::jmap(currentDb, leftScaleMin, leftScaleMax, fftBoundingBox.toFloat().getY(), fftBoundingBox.toFloat().getBottom());
+        auto y = juce::jmap(currentDb, leftScaleMin, leftScaleMax, fftBoundingBox.toFloat().getBottom(), fftBoundingBox.toFloat().getY());
+        g.setColour(currentDb == 0 ? juce::Colours::blue : juce::Colours::lightgrey);
         g.drawLine(fftBoundingBox.getX(), y, fftBoundingBox.getRight(), y, 1.f);
         currentDb += scaleDivision;
     }
     
+    
     // Draw frequency marks
+    g.setColour(juce::Colours::lightgrey);
     
     std::vector<float> freqs
        {

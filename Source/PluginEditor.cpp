@@ -25,6 +25,11 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
     
+    testAttachment.reset(new SliderAttachment(audioProcessor.apvts,
+                                              AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode),
+                                              testSlider));
+    addAndMakeVisible(testSlider);
+    
     addAndMakeVisible(bypassButtonContainer);
     
     addAndMakeVisible(globalBypass);
@@ -77,6 +82,8 @@ void ParametricEQAudioProcessorEditor::resized()
     
     auto centerBounds = bounds;
     spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
+    
+    testSlider.setBounds(bottomBounds.removeFromLeft(100));
 }
 
 

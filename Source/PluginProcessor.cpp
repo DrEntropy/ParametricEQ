@@ -133,7 +133,7 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
                             .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
     auto fftSize = 1 << static_cast<int>(fftOrder);
     testOsc.prepare(spec);
-    auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
+    auto centerIndex = std::round(1000.0f / sampleRate * fftSize);
     auto centerFreq =  centerIndex * sampleRate / fftSize;
     testOsc.setFrequency(centerFreq);
     testOscGain.prepare(spec);

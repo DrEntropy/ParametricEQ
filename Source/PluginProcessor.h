@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define USE_TEST_OSC
+//#define USE_TEST_OSC
 
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
