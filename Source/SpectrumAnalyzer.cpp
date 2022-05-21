@@ -145,7 +145,19 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
     g.setColour(juce::Colours::lightblue);
     g.drawRect(getLocalBounds().toFloat());
     
+    
+    g.setColour(juce::Colours::lightgrey);
+    g.setOpacity(0.5f);
+    
     // Draw scale lines
+    auto currentDb = leftScaleMin;
+    
+    while(currentDb <= leftScaleMax)
+    {
+        auto y = juce::jmap(currentDb, leftScaleMin, leftScaleMax, fftBoundingBox.toFloat().getY(), fftBoundingBox.toFloat().getBottom());
+        g.drawLine(fftBoundingBox.getX(), y, fftBoundingBox.getRight(), y, 1.f);
+        currentDb += scaleDivision;
+    }
     
     // Draw frequency marks
     
@@ -169,8 +181,7 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
         g.drawSingleLineText(text, x, fftBoundingBox.getY() + getTextHeight());
     };
     
-    g.setColour(juce::Colours::lightgrey);
-    g.setOpacity(0.5f);
+ 
     
     drawLabel(generateLabel(freqs[0]) + "Hz", fftBoundingBox.getX());
     drawLabel(generateLabel(freqs.back()), fftBoundingBox.getX()+fftBoundingBox.getWidth() - getTextWidth());
