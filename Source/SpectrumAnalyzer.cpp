@@ -102,7 +102,7 @@ template <typename BlockType>
 void SpectrumAnalyzer<BlockType>::paint(juce::Graphics& g)
 {
     paintBackground(g);
-    //g.reduceClipRegion(fftBoundingBox);
+    g.reduceClipRegion(fftBoundingBox);
     g.setColour(juce::Colours::red);
     juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
     
@@ -144,7 +144,45 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightblue);
     g.drawRect(getLocalBounds().toFloat());
-    // TODO: draw scale lines
+    
+    // Draw scale lines
+    
+    // Draw frequency marks
+    
+    std::vector<float> freqs
+       {
+           20, 50, 100,
+           200, 500, 1000,
+           2000, 5000, 10000,
+           20000
+       };
+    
+    auto generateLabel = [](float frequency)
+    {
+        bool addK = frequency >= 1000.f;
+        auto label = juce::String(addK ? frequency/1000.f : frequency, 0);
+        return label + (addK ? "k" : "");
+    };
+    
+    auto drawLabel = [this, &g](juce::String text, float x)
+    {
+        g.drawSingleLineText(text, x, fftBoundingBox.getY() + getTextHeight());
+    };
+    
+    g.setColour(juce::Colours::lightgrey);
+    g.setOpacity(0.5f);
+    
+    drawLabel(generateLabel(freqs[0]) + "Hz", fftBoundingBox.getX());
+    drawLabel(generateLabel(freqs.back()), fftBoundingBox.getX()+fftBoundingBox.getWidth() - getTextWidth());
+    
+    for(size_t i = 1; i < freqs.size() - 1; ++i)
+    {
+        auto scalePos = juce::mapFromLog10(freqs[i], freqs[0], freqs.back());
+        auto x = fftBoundingBox.getWidth() * scalePos + fftBoundingBox.getX();
+        g.drawLine(x, fftBoundingBox.getY(), x, fftBoundingBox.getBottom(), 1.f);
+        drawLabel(generateLabel(freqs[i]), x + getTextWidth() / 4.0f);  //added a bit of space
+    }
+    
 }
 
 template <typename BlockType>
