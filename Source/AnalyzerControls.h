@@ -11,6 +11,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "BottomLookAndFeel.h"
+#include "SwitchControl.h"
  
 
 //==============================================================================
@@ -20,7 +22,7 @@ class AnalyzerControls  : public juce::Component
 {
 public:
     AnalyzerControls(juce::AudioProcessorValueTreeState&);
-    ~AnalyzerControls() override = default;
+    ~AnalyzerControls() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -30,8 +32,14 @@ private:
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     
-    juce::ToggleButton analyzerEnable;
-    juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
+    
+    BottomLookAndFeel lookAndFeel;
+    
+    juce::TextButton analyzerEnable{"On"};
+    juce::Label buttonLabel{"AnalyzerLabel", "Analyzer"};
+    
+   // juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
+    SwitchControl prePostSlider;
     juce::Slider pointsSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
     juce::Slider decaySlider{juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxAbove};
     
@@ -39,6 +47,10 @@ private:
     std::unique_ptr<SliderAttachment> pointsAttachment;
     std::unique_ptr<SliderAttachment> decayAttachment;
     std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
+    
+    
+    
+    void toggleEnablement();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalyzerControls)
 };

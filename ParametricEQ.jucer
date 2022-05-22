@@ -6,6 +6,8 @@
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
       <GROUP id="{A5D7B329-6861-5696-8BE5-87A9ABC9229F}" name="Utilities">
+        <FILE id="tTweo7" name="BottomLookAndFeel.h" compile="0" resource="0"
+              file="Source/BottomLookAndFeel.h"/>
         <FILE id="OgseIV" name="Decibel.h" compile="0" resource="0" file="Source/Decibel.h"/>
         <FILE id="MawBAi" name="Fifo.h" compile="0" resource="0" file="Source/Fifo.h"/>
         <FILE id="xB6BvK" name="ReleasePool.h" compile="0" resource="0" file="Source/ReleasePool.h"/>
@@ -47,6 +49,9 @@
         <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
       </GROUP>
       <GROUP id="{26A645A9-FD90-D699-F5BC-B2F6D94C0309}" name="SpectrumAnalyzer">
+        <FILE id="IrNY2o" name="SwitchControl.cpp" compile="1" resource="0"
+              file="Source/SwitchControl.cpp"/>
+        <FILE id="pnA2h7" name="SwitchControl.h" compile="0" resource="0" file="Source/SwitchControl.h"/>
         <FILE id="uTP8Xv" name="AnalyzerControls.cpp" compile="1" resource="0"
               file="Source/AnalyzerControls.cpp"/>
         <FILE id="wyWbK6" name="AnalyzerControls.h" compile="0" resource="0"
