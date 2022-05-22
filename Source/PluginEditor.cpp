@@ -80,14 +80,21 @@ void ParametricEQAudioProcessorEditor::resized()
     auto centerBounds = bounds;
     spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     
-    // for future use
-    auto inTrimBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight());
-    auto outTrimBounds = bottomBounds.removeFromRight(bottomBounds.getHeight());
-    auto procModeBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 3 / 2);
-    auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 4);
+    // for future use, make room for square bounded controls
+    auto controlWidth = bottomBounds.getHeight();
     
-    // bottomBounds now contains extra room, to be used by "reset all bands"
+    //controls are square:
+    auto inTrimBounds = bottomBounds.removeFromLeft(controlWidth);
+    auto outTrimBounds = bottomBounds.removeFromRight(controlWidth);
+    bottomBounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
+    auto procModeBounds = bottomBounds.removeFromLeft(controlWidth);
+    
+    // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
+    auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 9  / 2);
+    
     analyzerControls.setBounds(analyzerControlBounds);
+    
+    auto resetAllBounds = bottomBounds; //Placeholder
 }
 
 

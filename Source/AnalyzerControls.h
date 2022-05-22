@@ -28,9 +28,17 @@ public:
 private:
     
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
- 
-    juce::Slider testSlider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxAbove};
-    std::unique_ptr<SliderAttachment> testAttachment;
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    
+    juce::ToggleButton analyzerEnable;
+    juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
+    juce::Slider pointsSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
+    juce::Slider decaySlider{juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxAbove};
+    
+    std::unique_ptr<SliderAttachment> prePostAttachment;
+    std::unique_ptr<SliderAttachment> pointsAttachment;
+    std::unique_ptr<SliderAttachment> decayAttachment;
+    std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalyzerControls)
 };

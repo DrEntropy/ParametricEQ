@@ -15,11 +15,25 @@
 //==============================================================================
 AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts)
 {
-    testAttachment.reset(new SliderAttachment(apvts,
+    prePostAttachment.reset(new SliderAttachment(apvts,
                              AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode),
-                             testSlider));
+                             prePostSlider));
     
-    addAndMakeVisible(testSlider);
+     
+    pointsAttachment.reset(new SliderAttachment(apvts,
+                                                AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints),
+                                                pointsSlider));;
+    decayAttachment.reset(new SliderAttachment(apvts,
+                                               AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerDecayRate),
+                                               decaySlider));;
+    analyzerEnableAttachment.reset(new ButtonAttachment(apvts,
+                                                        AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::EnableAnalyzer),
+                                                        analyzerEnable));;
+    
+    addAndMakeVisible(analyzerEnable);
+    addAndMakeVisible(prePostSlider);
+    addAndMakeVisible(pointsSlider);
+    addAndMakeVisible(decaySlider);
 }
 
 
@@ -44,5 +58,10 @@ void AnalyzerControls::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    testSlider.setBounds(getLocalBounds().removeFromLeft(100));
+    auto bounds = getLocalBounds();
+    auto width = bounds.getHeight();
+    analyzerEnable.setBounds(bounds.removeFromLeft(width));
+    prePostSlider.setBounds(bounds.removeFromLeft(width));
+    pointsSlider.setBounds(bounds.removeFromLeft(width));
+    decaySlider.setBounds(bounds);
 }
