@@ -14,8 +14,7 @@
 //==============================================================================
 SwitchControl::SwitchControl(juce::AudioProcessorValueTreeState& apvts, juce::String parameterName)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+  
     attachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, parameterName, slider));
     auto myParameter = dynamic_cast<juce::AudioParameterChoice*>( apvts.getParameter(parameterName) );
     
@@ -24,7 +23,7 @@ SwitchControl::SwitchControl(juce::AudioProcessorValueTreeState& apvts, juce::St
     slider.choices =  myParameter->choices;
     
     addAndMakeVisible(slider);
-    label.setText(myParameter->name, juce::NotificationType::dontSendNotification);
+    label.setText(apvts.getParameter(parameterName)->name, juce::NotificationType::dontSendNotification);
     addAndMakeVisible(label);
 }
 

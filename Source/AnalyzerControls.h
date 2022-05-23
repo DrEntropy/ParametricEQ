@@ -43,8 +43,7 @@ private:
     SwitchControl pointsSlider;
     juce::Slider decaySlider{juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow};
     
-    std::unique_ptr<SliderAttachment> prePostAttachment;
-    std::unique_ptr<SliderAttachment> pointsAttachment;
+  
     std::unique_ptr<SliderAttachment> decayAttachment;
     std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
     

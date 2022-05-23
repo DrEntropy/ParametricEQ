@@ -59,5 +59,46 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
     }
     
     
+    void drawRotarySlider(juce::Graphics & g, int x,int y, int width, int height, float sliderPosProportional,
+                                       float rotaryStartAngle, float rotaryEndAngle, juce::Slider &slider) override
+    {
+        
+        using namespace juce;
+        auto bounds = Rectangle<float> {static_cast<float>(x),static_cast<float>(y),
+                                      static_cast<float>(width),static_cast<float>(height)};
+        
+        auto enabled = slider.isEnabled();
+        
+        
+        g.setColour( enabled ? Colours::lightblue : Colours::darkgrey);
+        g.fillEllipse(bounds);
+        
+        g.setColour(enabled ? Colours::white : Colours::lightgrey);
+        g.drawEllipse(bounds, 1.0f);
+        
+ 
+            
+        auto center = bounds.getCentre();
+        Path p;
+        
+        Rectangle<float> r;
+        // the pointer
+        r.setLeft(center.getX() - 2.0f);
+        r.setRight(center.getX() + 2.0f);
+        r.setTop(bounds.getY());
+        r.setBottom(center.getY());
+        p.addRoundedRectangle(r, 2.0f);
+            
+            
+        jassert(rotaryStartAngle<rotaryEndAngle);
+            
+        auto sliderAngle = jmap(sliderPosProportional,0.0f,1.0f,rotaryStartAngle,rotaryEndAngle);
+            
+        p.applyTransform(AffineTransform().rotation(sliderAngle, center.getX(), center.getY()));
+            
+        g.fillPath(p); // draw the dial indicator
+    }
+    
+    
 };
 
