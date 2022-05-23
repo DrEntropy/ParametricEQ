@@ -27,8 +27,7 @@ class AnalyzerControls  : public juce::Component
 public:
     AnalyzerControls(juce::AudioProcessorValueTreeState&);
     ~AnalyzerControls() override;
-
-    void paint (juce::Graphics&) override;
+ 
     void resized() override;
 
 private:
