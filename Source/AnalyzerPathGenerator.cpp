@@ -59,6 +59,7 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     {
         x = mapX(i);
         y = mapY(renderData[i]);
+        
         // only draw one bin per x in the GUI.
         if(x - prevX > 1.f)
         {
