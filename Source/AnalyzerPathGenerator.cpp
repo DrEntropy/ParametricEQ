@@ -54,8 +54,8 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
     fftPath.startNewSubPath(x, y);
     
     auto prevX = x;
-    auto maxY = y;
-    bool findMax = false;
+    auto minY = y;
+    bool findMin = false;
      
     for(size_t i = 2; i <= numBins; ++i)
     {
@@ -65,18 +65,21 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
         // only draw one bin per x in the GUI, and draw the largest  
         if(x - prevX > 1.f)
         {
-            fftPath.lineTo(x, findMax ? maxY : y);
+            if(findMin && y < minY)
+                minY = y;
+            
+            fftPath.lineTo(x, findMin ? minY : y);
             prevX = x;
-            findMax = false;
+            findMin = false;
         }
-        else if(findMax && y > maxY)
+        else if(findMin && y < minY)
         {
-            maxY = y;
+            minY = y;
         }
-        else
+        else if(! findMin)
         {
-            findMax = true;
-            maxY = y;
+            findMin = true;
+            minY = y;
         }
         
         
