@@ -67,6 +67,13 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
         auto bounds = Rectangle<float> {static_cast<float>(x),static_cast<float>(y),
                                       static_cast<float>(width),static_cast<float>(height)};
         
+        auto extraWidth = bounds.getWidth()  - bounds.getHeight();
+        
+        if(extraWidth > 0)
+        {
+            bounds.reduce(extraWidth / 2.f, 0);
+        }
+        
         auto enabled = slider.isEnabled();
         
         

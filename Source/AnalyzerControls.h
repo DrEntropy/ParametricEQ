@@ -12,9 +12,13 @@
 
 #include <JuceHeader.h>
 #include "BottomLookAndFeel.h"
-#include "SwitchControl.h"
+#include "BottomControl.h"
  
+struct RotarySlider : juce::Slider
+{
+    RotarySlider() : juce::Slider(juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow){}
 
+};
 //==============================================================================
 /*
 */
@@ -39,12 +43,10 @@ private:
     juce::Label buttonLabel{"AnalyzerLabel", "Analyzer"};
     
    // juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
-    SwitchControl prePostSlider;
-    SwitchControl pointsSlider;
-    juce::Slider decaySlider{juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow};
-    
-  
-    std::unique_ptr<SliderAttachment> decayAttachment;
+    BottomControl<SwitchSlider> prePostSlider;
+    BottomControl<SwitchSlider> pointsSlider;
+    BottomControl<RotarySlider> decaySlider;
+ 
     std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
     
     

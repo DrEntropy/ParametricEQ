@@ -17,11 +17,7 @@
         <FILE id="oE9RgW" name="DecayingValueHolder.h" compile="0" resource="0"
               file="Source/DecayingValueHolder.h"/>
         <FILE id="cl8APg" name="SwitchSlider.h" compile="0" resource="0" file="Source/SwitchSlider.h"/>
-        <FILE id="IrNY2o" name="SwitchControl.cpp" compile="1" resource="0"
-              file="Source/SwitchControl.cpp"/>
-        <FILE id="pnA2h7" name="SwitchControl.h" compile="0" resource="0" file="Source/SwitchControl.h"/>
-        <FILE id="P4FO2k" name="KnobControl.cpp" compile="1" resource="0" file="Source/KnobControl.cpp"/>
-        <FILE id="zdVmNo" name="KnobControl.h" compile="0" resource="0" file="Source/KnobControl.h"/>
+        <FILE id="pnA2h7" name="BottomControl.h" compile="0" resource="0" file="Source/BottomControl.h"/>
         <FILE id="dqoskZ" name="HelperFunctions.h" compile="0" resource="0"
               file="Source/HelperFunctions.h"/>
       </GROUP>

@@ -15,13 +15,12 @@
 //==============================================================================
 AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
     prePostSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode)),
-    pointsSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))
+    pointsSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints)),
+    decaySlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerDecayRate))
 {
  
      
-    decayAttachment.reset(new SliderAttachment(apvts,
-                                               AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerDecayRate),
-                                               decaySlider));;
+ 
     analyzerEnableAttachment.reset(new ButtonAttachment(apvts,
                                                         AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::EnableAnalyzer),
                                                         analyzerEnable));;
@@ -85,7 +84,7 @@ void AnalyzerControls::resized()
     
     prePostSlider.setBounds(bounds.removeFromLeft(width));
     pointsSlider.setBounds(bounds.removeFromLeft(width));
-    decaySlider.setBounds(bounds);
+    decaySlider.setBounds(bounds.removeFromRight(width));
 }
 
 void AnalyzerControls::toggleEnablement()
