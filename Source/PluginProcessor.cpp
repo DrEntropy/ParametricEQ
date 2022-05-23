@@ -399,10 +399,10 @@ void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
     using namespace AnalyzerProperties;
     const auto& params = AnalyzerProperties::GetAnalyzerParams();
     layout.add(std::make_unique<juce::AudioParameterBool>(params.at(ParamNames::EnableAnalyzer),
-                                                          params.at(ParamNames::EnableAnalyzer),
+                                                          "Enable",
                                                           true));
     layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(ParamNames::AnalyzerDecayRate),
-                                                          params.at(ParamNames::AnalyzerDecayRate),
+                                                          "Decay Rate",
                                                           0.0, 30.0, 30.0));
     
     juce::StringArray orders;
@@ -413,7 +413,7 @@ void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
     }
     
     layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerPoints),
-                                                            params.at(ParamNames::AnalyzerPoints),
+                                                            "FFT Points",
                                                             orders, 1));
       
     juce::StringArray modes;
@@ -424,7 +424,7 @@ void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
     }
     
     layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerProcessingMode),
-                                                            params.at(ParamNames::AnalyzerProcessingMode),
+                                                            "Mode",
                                                             modes, 0));
     
     
