@@ -13,6 +13,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
+#include "TestFunctions.h"
 
 
  
@@ -147,10 +148,7 @@ bool ParametricEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
     juce::ignoreUnused (layouts);
     return true;
   #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
+    
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
@@ -222,14 +220,18 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     inputTrim.process(stereoContext);
     
 #ifdef USE_TEST_OSC
-    auto sampleRate = getSampleRate();
     auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(apvts
-                            .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+                             .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
     auto fftSize = 1 << static_cast<int>(fftOrder);
-    DBG(fftSize);
-    auto centerIndex = std::round(TEST_OSC_FREQ / sampleRate * static_cast<float>(fftSize));
-    auto centerFreq =  centerIndex * sampleRate / static_cast<float>(fftSize);
+     // DBG(fftSize);
+
+    
+    auto centerFreq = GetTestSignalFrequency(JUCE_LIVE_CONSTANT(64),
+                                            static_cast<size_t>(fftOrder),
+                                             getSampleRate());
+    
     DBG(centerFreq);
+    
     testOsc.setFrequency(centerFreq);
     
     for( auto i = 0; i < totalNumOutputChannels; ++i)

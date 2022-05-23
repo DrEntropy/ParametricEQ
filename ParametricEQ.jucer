@@ -6,6 +6,9 @@
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
       <GROUP id="{A5D7B329-6861-5696-8BE5-87A9ABC9229F}" name="Utilities">
+        <FILE id="MKXa6N" name="TestFunctions.cpp" compile="1" resource="0"
+              file="Source/TestFunctions.cpp"/>
+        <FILE id="SpkLLc" name="TestFunctions.h" compile="0" resource="0" file="Source/TestFunctions.h"/>
         <FILE id="tTweo7" name="BottomLookAndFeel.h" compile="0" resource="0"
               file="Source/BottomLookAndFeel.h"/>
         <FILE id="OgseIV" name="Decibel.h" compile="0" resource="0" file="Source/Decibel.h"/>
