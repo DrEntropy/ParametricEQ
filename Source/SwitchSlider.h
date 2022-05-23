@@ -31,7 +31,7 @@ public:
         auto enabled = isEnabled();
         auto bounds = getLocalBounds();
         
-        auto sliderRect = bounds.removeFromLeft(bounds.getWidth() / 8);
+        auto sliderRect = bounds.removeFromLeft(bounds.getWidth() / sliderWidthDiv);
         
         auto startX = sliderRect.getRight() + textHeight;
         auto startY = sliderRect.getBottom() - sliderRect.getWidth() / 2;
@@ -46,7 +46,7 @@ public:
         
         auto value = getValue();
         
-        for(size_t i = 0; i < choices.size(); ++i)
+        for(int i = 0; i < choices.size(); ++i)
         {
            if(enabled && static_cast<int>(value) == i)
                g.setColour(juce::Colours::green);
@@ -84,7 +84,7 @@ public:
 private:
     
     static constexpr int textHeight = 14;
-    
+    static constexpr int sliderWidthDiv = 8;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SwitchSlider)
 };

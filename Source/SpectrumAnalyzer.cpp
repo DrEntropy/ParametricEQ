@@ -11,22 +11,19 @@
 #include "SpectrumAnalyzer.h"
 
 template <typename BlockType>
-SpectrumAnalyzer<BlockType>::SpectrumAnalyzer(double sr,
-                 SingleChannelSampleFifo<BlockType>& leftScsf,
-                 SingleChannelSampleFifo<BlockType>& rightScsf,
-                                   juce::AudioProcessorValueTreeState& apv) : sampleRate{sr}, leftPathProducer {sr, leftScsf}, rightPathProducer {sr, rightScsf}
+SpectrumAnalyzer<BlockType>::SpectrumAnalyzer(double sr, SingleChannelSampleFifo<BlockType>& leftScsf, SingleChannelSampleFifo<BlockType>& rightScsf,
+                                              juce::AudioProcessorValueTreeState& apv) : sampleRate{sr}, leftPathProducer {sr, leftScsf},
+                                              rightPathProducer {sr, rightScsf}
 {
     using namespace AnalyzerProperties;
-    
     
     auto getParam = [&apv](ParamNames param)
     {
         return apv.getParameter(getAnalyzerParamName(param));
     };
     
-    
     auto safePtr = juce::Component::SafePointer<SpectrumAnalyzer<BlockType>>(this);
-    
+
     analyzerEnabledParamListener.reset(new ParamListener(getParam(ParamNames::EnableAnalyzer),
                                                          [safePtr](float v)
                                                          {
@@ -50,7 +47,6 @@ SpectrumAnalyzer<BlockType>::SpectrumAnalyzer(double sr,
                                                        }));
     
     updateDecayRate(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerDecayRate))->load());
-    
     updateOrder(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerPoints))->load());
     setActive(apv.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.5);
     
@@ -92,7 +88,6 @@ void SpectrumAnalyzer<BlockType>::resized()
     auto analyzerScaleBounds = bounds.removeFromLeft(getScaleWidth());
     
     eqScale.setBounds(eqScaleBounds);
-   
     analyzerScale.setBounds(analyzerScaleBounds);
     
     customizeScales(leftScaleMin, leftScaleMax, rightScaleMin, rightScaleMax, scaleDivision);
@@ -103,14 +98,14 @@ void SpectrumAnalyzer<BlockType>::paint(juce::Graphics& g)
 {
     paintBackground(g);
     g.reduceClipRegion(fftBoundingBox);
-    g.setColour(juce::Colours::red);
+
     juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
     
+    g.setColour(juce::Colours::red);
     g.strokePath(leftAnalyzerPath, pst);
     
     g.setColour(juce::Colours::salmon);
     g.strokePath(rightAnalyzerPath, pst);
-    
 }
 
 template <typename BlockType>
@@ -144,7 +139,6 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightblue);
     g.drawRect(getLocalBounds().toFloat());
-    
     
     
     g.setOpacity(0.5f);
@@ -187,7 +181,7 @@ void SpectrumAnalyzer<BlockType>::paintBackground(juce::Graphics& g)
  
     
     drawLabel(generateLabel(freqs[0]) + "Hz", fftBoundingBox.getX());
-    drawLabel(generateLabel(freqs.back()), fftBoundingBox.getX()+fftBoundingBox.getWidth() - getTextWidth());
+    drawLabel(generateLabel(freqs.back()), fftBoundingBox.getX() + fftBoundingBox.getWidth() - getTextWidth());
     
     for(size_t i = 1; i < freqs.size() - 1; ++i)
     {
@@ -206,7 +200,6 @@ void SpectrumAnalyzer<BlockType>::setActive(bool a)
     
     if(active && !isTimerRunning())
         animate();
-        
 }
 
 template <typename BlockType>

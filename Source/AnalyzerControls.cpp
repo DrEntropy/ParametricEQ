@@ -18,9 +18,6 @@ AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
     pointsSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints)),
     decaySlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerDecayRate))
 {
- 
-     
- 
     analyzerEnableAttachment.reset(new ButtonAttachment(apvts,
                                                         AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::EnableAnalyzer),
                                                         analyzerEnable));;
@@ -62,14 +59,12 @@ void AnalyzerControls::paint(juce::Graphics& g)
 
 void AnalyzerControls::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
     auto bounds = getLocalBounds();
-    auto width = bounds.getHeight();
+    auto width = bounds.getHeight(); // use square sections
     
     auto enableSection = bounds.removeFromLeft(width);
     
-    analyzerEnable.setBounds(enableSection.removeFromBottom(width / 2).reduced(width / 10));
+    analyzerEnable.setBounds(enableSection.removeFromBottom(width / 2).reduced(width / marginDiv));
     buttonLabel.setBounds(enableSection);
     
     prePostSlider.setBounds(bounds.removeFromLeft(width));

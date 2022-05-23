@@ -21,7 +21,6 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
         
         if(style == juce::Slider::SliderStyle::LinearVertical)
         {
-            auto bounds = slider.getLocalBounds().toFloat();
             bool enabled = slider.isEnabled();
             
             g.setColour(enabled ? juce::Colours::white : juce::Colours::grey);
@@ -35,7 +34,6 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
             
             g.setColour(enabled ? juce::Colours::lightblue : juce::Colours::grey);
             g.fillRect(static_cast<float>(x), sliderY, knobHeight, knobHeight);
-      
         }
         else
         {
@@ -62,12 +60,12 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
     void drawRotarySlider(juce::Graphics & g, int x,int y, int width, int height, float sliderPosProportional,
                                        float rotaryStartAngle, float rotaryEndAngle, juce::Slider &slider) override
     {
-        
-        using namespace juce;
-        auto bounds = Rectangle<float> {static_cast<float>(x),static_cast<float>(y),
+        auto bounds = juce::Rectangle<float> {static_cast<float>(x),static_cast<float>(y),
                                       static_cast<float>(width),static_cast<float>(height)};
         
         auto extraWidth = bounds.getWidth()  - bounds.getHeight();
+        
+        constexpr float dialWidth{2.f};
         
         if(extraWidth > 0)
         {
@@ -77,31 +75,31 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
         auto enabled = slider.isEnabled();
         
         
-        g.setColour( enabled ? Colours::lightblue : Colours::darkgrey);
+        g.setColour( enabled ? juce::Colours::lightblue : juce::Colours::darkgrey);
         g.fillEllipse(bounds);
         
-        g.setColour(enabled ? Colours::white : Colours::lightgrey);
+        g.setColour(enabled ? juce::Colours::white : juce::Colours::lightgrey);
         g.drawEllipse(bounds, 1.0f);
         
  
             
         auto center = bounds.getCentre();
-        Path p;
+        juce::Path p;
         
-        Rectangle<float> r;
+        juce::Rectangle<float> r;
         // the pointer
-        r.setLeft(center.getX() - 2.0f);
-        r.setRight(center.getX() + 2.0f);
+        r.setLeft(center.getX() - dialWidth);
+        r.setRight(center.getX() + dialWidth);
         r.setTop(bounds.getY());
         r.setBottom(center.getY());
-        p.addRoundedRectangle(r, 2.0f);
+        p.addRoundedRectangle(r, dialWidth);
             
             
         jassert(rotaryStartAngle<rotaryEndAngle);
             
-        auto sliderAngle = jmap(sliderPosProportional,0.0f,1.0f,rotaryStartAngle,rotaryEndAngle);
+        auto sliderAngle = juce::jmap(sliderPosProportional, 0.0f, 1.0f, rotaryStartAngle, rotaryEndAngle);
             
-        p.applyTransform(AffineTransform().rotation(sliderAngle, center.getX(), center.getY()));
+        p.applyTransform(juce::AffineTransform().rotation(sliderAngle, center.getX(), center.getY()));
             
         g.fillPath(p); // draw the dial indicator
     }

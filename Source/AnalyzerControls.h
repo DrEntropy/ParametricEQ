@@ -16,8 +16,7 @@
  
 struct RotarySlider : juce::Slider
 {
-    RotarySlider() : juce::Slider(juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow){}
-
+    RotarySlider() : juce::Slider(juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow) {}
 };
 //==============================================================================
 /*
@@ -43,16 +42,15 @@ private:
     juce::TextButton analyzerEnable{"On"};
     juce::Label buttonLabel{"AnalyzerLabel", "Analyzer"};
     
-   // juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
     BottomControl<SwitchSlider> prePostSlider;
     BottomControl<SwitchSlider> pointsSlider;
     BottomControl<RotarySlider> decaySlider;
  
     std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
     
-    
-    
     void toggleEnablement();
+    
+    static constexpr int marginDiv {10};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalyzerControls)
 };

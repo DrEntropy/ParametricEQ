@@ -49,9 +49,9 @@ public:
     {
         auto bounds = getLocalBounds();
         auto w = bounds.getWidth();
-        bounds.removeFromLeft(w / 10);
-        label.setBounds(bounds.removeFromTop(w / 4));
-        bounds.removeFromBottom(w / 10);
+        bounds.removeFromLeft(w / marginDiv);
+        label.setBounds(bounds.removeFromTop(w / labelHeightDiv));
+        bounds.removeFromBottom(w / marginDiv);
         
         slider.setBounds(bounds);
     }
@@ -64,6 +64,8 @@ private:
     
     juce::Label label;
     
+    static constexpr int marginDiv {10};
+    static constexpr int labelHeightDiv {4};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BottomControl)
 };
