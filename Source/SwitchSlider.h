@@ -62,11 +62,9 @@ public:
         auto range = getRange();
         
         
-        auto getPos{
-            [&range, &sliderRect](double v)
-            {
-                return juce::jmap(v, range.getStart(), range.getEnd(), sliderRect.toDouble().getBottom(), sliderRect.toDouble().getY());
-            }
+        auto getPos = [&range, &sliderRect](double v)
+        {
+            return juce::jmap(v, range.getStart(), range.getEnd(), sliderRect.toDouble().getBottom(), sliderRect.toDouble().getY());
         };
         
         getLookAndFeel().drawLinearSlider (g,

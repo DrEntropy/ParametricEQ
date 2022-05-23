@@ -33,8 +33,8 @@ AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
    
     analyzerEnable.onClick = [safePtr]()
     {
-     if(auto* comp = safePtr.getComponent() )
-         comp->toggleEnablement();
+        if(auto* comp = safePtr.getComponent() )
+            comp->toggleEnablement();
     };
     
     buttonLabel.setJustificationType(juce::Justification::centred);
@@ -78,8 +78,5 @@ void AnalyzerControls::toggleEnablement()
     prePostSlider.setEnabled(state);
     pointsSlider.setEnabled(state);
     decaySlider.setEnabled(state);
-    if(state)
-        analyzerEnable.setButtonText("On");
-    else
-        analyzerEnable.setButtonText("Off");
+    analyzerEnable.setButtonText(state ? "On" : "Off");
 }

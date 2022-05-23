@@ -40,11 +40,14 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     
     startTimerHz(FRAME_RATE);
     
+    audioProcessor.editorActive = true;
+    
 }
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 {
     audioProcessor.removeSampleRateListener(this);
+    audioProcessor.editorActive = false;
 }
 
 //==============================================================================

@@ -80,4 +80,43 @@ inline const juce::String getAnalyzerParamName(ParamNames name)
     return params.at(name);
 }
 
+
+inline void  addAnalyzerParams(juce::AudioProcessorValueTreeState::ParameterLayout& layout)
+{
+    const auto& params = GetAnalyzerParams();
+    
+   
+    layout.add(std::make_unique<juce::AudioParameterBool>(params.at(ParamNames::EnableAnalyzer),
+                                                          "Enable",
+                                                          true));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(ParamNames::AnalyzerDecayRate),
+                                                          "Decay Rate",
+                                                           juce::NormalisableRange<float>(0.0f, 30.0f, 1.0f, 1.0f), 30.0f));
+    
+    juce::StringArray orders;
+    
+    for (const auto& [order, stringRep] : GetAnalyzerPoints())
+    {
+        orders.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerPoints),
+                                                            "FFT Points",
+                                                            orders, 1));
+      
+    juce::StringArray modes;
+    
+    for (const auto& [mode, stringRep] : GetProcessingModes())
+    {
+        modes.add(stringRep);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerProcessingMode),
+                                                            "Mode",
+                                                            modes, 0));
+    
+    
+}
+
+
 }

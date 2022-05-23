@@ -252,7 +252,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     auto analyzerMode = static_cast<ProcessingModes> (apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerProcessingMode))->load()) ;
     
-    if(getActiveEditor() )
+    if(editorActive)
     {
         if(analyzerEnabled && analyzerMode == ProcessingModes::Pre)
         {
@@ -300,7 +300,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     outputTrim.process(stereoContext);
     
-    if(getActiveEditor())
+    if(editorActive)
     {
         if(analyzerEnabled && analyzerMode == ProcessingModes::Post)
         {
@@ -398,41 +398,6 @@ void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channe
     addFilterParamToLayout(layout, channel, 7, true);
 }
 
-void ParametricEQAudioProcessor::addAnalyzerParams(ParamLayout& layout)
-{
-    using namespace AnalyzerProperties;
-    const auto& params = AnalyzerProperties::GetAnalyzerParams();
-    layout.add(std::make_unique<juce::AudioParameterBool>(params.at(ParamNames::EnableAnalyzer),
-                                                          "Enable",
-                                                          true));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(ParamNames::AnalyzerDecayRate),
-                                                          "Decay Rate",
-                                                          0.0, 30.0, 30.0));
-    
-    juce::StringArray orders;
-    
-    for (const auto& [order, stringRep] : GetAnalyzerPoints())
-    {
-        orders.add(stringRep);
-    }
-    
-    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerPoints),
-                                                            "FFT Points",
-                                                            orders, 1));
-      
-    juce::StringArray modes;
-    
-    for (const auto& [mode, stringRep] : GetProcessingModes())
-    {
-        modes.add(stringRep);
-    }
-    
-    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerProcessingMode),
-                                                            "Mode",
-                                                            modes, 0));
-    
-    
-}
 
 // for some reason compiler will not let me use the alias for return type here.
 ParamLayout ParametricEQAudioProcessor::createParameterLayout()
@@ -456,7 +421,7 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
     createFilterLayouts(layout, Channel::Left);
     createFilterLayouts(layout, Channel::Right);
     
-    addAnalyzerParams(layout);
+    AnalyzerProperties::addAnalyzerParams(layout);
     
     return layout;
 }

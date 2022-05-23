@@ -37,18 +37,16 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
         }
         else
         {
-        // draw a normal slider in other cases.
-        juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
+            // draw a normal slider in other cases.
+            juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
         }
     }
     
     void drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
         auto bounds = button.getLocalBounds();
-        if(button.getToggleState())
-            g.setColour(juce::Colours::green);
-        else
-            g.setColour(juce::Colours::black);
+        
+        g.setColour(button.getToggleState() ? juce::Colours::green : juce::Colours::black);
         
         g.fillRect(bounds);
         g.setColour(juce::Colours::white);

@@ -119,6 +119,7 @@ public:
     
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  leftSCSFifo{Channel::Left}, rightSCSFifo{Channel::Right};
     
+    bool editorActive {false};
 
 private:
     //==============================================================================
@@ -258,8 +259,6 @@ private:
     
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
-    
-    void addAnalyzerParams(ParamLayout& layout);
     
     void performMidSideTransform(juce::AudioBuffer<float>&);
  

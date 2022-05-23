@@ -40,10 +40,8 @@ public:
         addAndMakeVisible(label);
     }
     
-    ~BottomControl() override
-    {
-        attachment.reset();
-    }
+    ~BottomControl() override = default;
+ 
 
     void resized() override
     {
