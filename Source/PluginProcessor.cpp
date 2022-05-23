@@ -226,6 +226,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(apvts
                             .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
     auto fftSize = 1 << static_cast<int>(fftOrder);
+    DBG(fftSize);
     auto centerIndex = std::round(TEST_OSC_FREQ / sampleRate * static_cast<float>(fftSize));
     auto centerFreq =  centerIndex * sampleRate / static_cast<float>(fftSize);
     DBG(centerFreq);

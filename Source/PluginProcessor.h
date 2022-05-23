@@ -9,7 +9,7 @@
 #pragma once
 
 //#define USE_TEST_OSC
-#define TEST_OSC_FREQ 5000.f
+#define TEST_OSC_FREQ 1000.f
 
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
@@ -270,7 +270,7 @@ private:
     juce::ListenerList<SampleRateListener> sampleRateListeners;
     
 #ifdef USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 1024};
     juce::dsp::Gain<float> testOscGain;
 #endif
     
