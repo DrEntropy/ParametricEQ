@@ -53,7 +53,12 @@ AnalyzerControls::~AnalyzerControls()
     setLookAndFeel(nullptr);
 }
 
- 
+void AnalyzerControls::paint(juce::Graphics& g)
+{
+    auto bounds = getLocalBounds();
+    g.setColour(juce::Colours::lightgrey);
+    g.drawRect(bounds.toFloat());
+}
 
 void AnalyzerControls::resized()
 {
