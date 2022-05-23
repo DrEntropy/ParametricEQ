@@ -62,19 +62,15 @@ void AnalyzerPathGenerator::generatePath(const std::vector<float>& renderData,
         x = mapX(i);
         y = mapY(renderData[i]);
         
+        if(findMin && y < minY)
+            minY = y;
+        
         // only draw one bin per x in the GUI, and draw the largest  
         if(x - prevX > 1.f)
         {
-            if(findMin && y < minY)
-                minY = y;
-            
             fftPath.lineTo(x, findMin ? minY : y);
             prevX = x;
             findMin = false;
-        }
-        else if(findMin && y < minY)
-        {
-            minY = y;
         }
         else if(! findMin)
         {
