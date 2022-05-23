@@ -16,6 +16,12 @@
               file="Source/DecayingValueHolder.cpp"/>
         <FILE id="oE9RgW" name="DecayingValueHolder.h" compile="0" resource="0"
               file="Source/DecayingValueHolder.h"/>
+        <FILE id="cl8APg" name="SwitchSlider.h" compile="0" resource="0" file="Source/SwitchSlider.h"/>
+        <FILE id="IrNY2o" name="SwitchControl.cpp" compile="1" resource="0"
+              file="Source/SwitchControl.cpp"/>
+        <FILE id="pnA2h7" name="SwitchControl.h" compile="0" resource="0" file="Source/SwitchControl.h"/>
+        <FILE id="P4FO2k" name="KnobControl.cpp" compile="1" resource="0" file="Source/KnobControl.cpp"/>
+        <FILE id="zdVmNo" name="KnobControl.h" compile="0" resource="0" file="Source/KnobControl.h"/>
         <FILE id="dqoskZ" name="HelperFunctions.h" compile="0" resource="0"
               file="Source/HelperFunctions.h"/>
       </GROUP>
@@ -49,9 +55,6 @@
         <FILE id="gd69MT" name="StereoMeter.h" compile="0" resource="0" file="Source/StereoMeter.h"/>
       </GROUP>
       <GROUP id="{26A645A9-FD90-D699-F5BC-B2F6D94C0309}" name="SpectrumAnalyzer">
-        <FILE id="IrNY2o" name="SwitchControl.cpp" compile="1" resource="0"
-              file="Source/SwitchControl.cpp"/>
-        <FILE id="pnA2h7" name="SwitchControl.h" compile="0" resource="0" file="Source/SwitchControl.h"/>
         <FILE id="uTP8Xv" name="AnalyzerControls.cpp" compile="1" resource="0"
               file="Source/AnalyzerControls.cpp"/>
         <FILE id="wyWbK6" name="AnalyzerControls.h" compile="0" resource="0"

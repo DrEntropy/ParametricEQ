@@ -11,7 +11,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "BottomLookAndFeel.h"
+ 
+#include "SwitchSlider.h"
 
 //==============================================================================
 /*
@@ -22,22 +23,15 @@ public:
     SwitchControl(juce::AudioProcessorValueTreeState&, juce::String);
     ~SwitchControl() override;
 
-    void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
     
-    juce::AudioProcessorValueTreeState& apvts;
-    juce::String parameterName;
-    juce::Slider slider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::NoTextBox};
+    SwitchSlider slider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attachment;
     
     juce::Label label;
     
-    juce::Rectangle<int> sliderBounds;
-    juce::StringArray choices;
-    
-    static constexpr int textHeight = 14;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SwitchControl)
 };

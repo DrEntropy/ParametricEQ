@@ -27,6 +27,7 @@ AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
                                                         analyzerEnable));;
     
     setLookAndFeel(&lookAndFeel);
+    
     analyzerEnable.setClickingTogglesState(true);
     analyzerEnable.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);
     
