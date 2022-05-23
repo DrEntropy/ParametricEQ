@@ -14,12 +14,11 @@
 
 //==============================================================================
 AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
-    prePostSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode))
+    prePostSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerProcessingMode)),
+    pointsSlider(apvts, AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))
 {
  
-    pointsAttachment.reset(new SliderAttachment(apvts,
-                                                AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints),
-                                                pointsSlider));;
+     
     decayAttachment.reset(new SliderAttachment(apvts,
                                                AnalyzerProperties::getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerDecayRate),
                                                decaySlider));;

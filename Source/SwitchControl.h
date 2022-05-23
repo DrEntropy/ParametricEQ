@@ -32,5 +32,12 @@ private:
     juce::Slider slider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::NoTextBox};
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attachment;
     
+    juce::Label label;
+    
+    juce::Rectangle<int> sliderBounds;
+    juce::StringArray choices;
+    
+    static constexpr int textHeight = 14;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SwitchControl)
 };

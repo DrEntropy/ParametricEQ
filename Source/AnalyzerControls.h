@@ -40,7 +40,7 @@ private:
     
    // juce::Slider prePostSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
     SwitchControl prePostSlider;
-    juce::Slider pointsSlider{juce::Slider::SliderStyle::LinearVertical, juce::Slider::TextBoxRight};
+    SwitchControl pointsSlider;
     juce::Slider decaySlider{juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxAbove};
     
     std::unique_ptr<SliderAttachment> prePostAttachment;
