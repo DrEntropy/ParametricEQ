@@ -132,10 +132,6 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     }
     
 #if USE_TEST_OSC
-    static int counter = 0;
-    
-
-    
     if(counter == 10)
     {
         auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(audioProcessor.apvts
