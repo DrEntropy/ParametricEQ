@@ -69,5 +69,9 @@ private:
      
     AnalyzerControls analyzerControls;
     
+#if USE_TEST_OSC
+    int counter {0};
+#endif
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametricEQAudioProcessorEditor)
 };

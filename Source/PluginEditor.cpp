@@ -106,6 +106,8 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     auto& inputFifo = audioProcessor.inMeterValuesFifo;
     auto& outputFifo = audioProcessor.outMeterValuesFifo;
     
+   
+    
     MeterValues values;
     
     
@@ -129,6 +131,32 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         outputMeter.update(values);
     }
     
+#if USE_TEST_OSC
+    int step_time = JUCE_LIVE_CONSTANT(120);
+    if(counter >= step_time)
+    {
+        auto sampleRate = audioProcessor.getSampleRate();
+        
+        using namespace AnalyzerProperties;
+        auto fftOrder = getFFTOrder(audioProcessor.apvts.getParameter(getAnalyzerParamName(ParamNames::AnalyzerPoints))->getValue());
+        auto fftSize = 1 << static_cast<int>(fftOrder);
+        auto numBins = fftSize / 2 + 1;
+        decltype(numBins) maxBin = std::ceil(20000.f * fftSize / sampleRate); //largest bin we care about.
+        
+        auto bin = audioProcessor.binNum.load();
+        if(++bin >= std::min(numBins, maxBin))
+            bin = 0;
+        
+        DBG(bin * sampleRate / fftSize);
+        
+        audioProcessor.binNum.store(bin);
+        counter = 1;
+    }
+    else if (JUCE_LIVE_CONSTANT(false))
+    {
+        ++counter;
+    }
+#endif
 
 }
 

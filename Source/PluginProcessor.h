@@ -8,7 +8,7 @@
 
 #pragma once
 
-//#define USE_TEST_OSC
+#define USE_TEST_OSC true
 
 
 #include <JuceHeader.h>
@@ -120,6 +120,10 @@ public:
     SingleChannelSampleFifo<juce::AudioBuffer<float>>  leftSCSFifo{Channel::Left}, rightSCSFifo{Channel::Right};
     
     bool editorActive {false};
+    
+#if USE_TEST_OSC
+    std::atomic<size_t> binNum {1};
+#endif
 
 private:
     //==============================================================================
@@ -268,8 +272,8 @@ private:
     
     juce::ListenerList<SampleRateListener> sampleRateListeners;
     
-#ifdef USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 1024};
+#if USE_TEST_OSC
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }};
     juce::dsp::Gain<float> testOscGain;
 #endif
     
