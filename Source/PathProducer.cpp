@@ -42,8 +42,6 @@ void PathProducer<BlockType>::run()
         auto BFGSize = bufferForGenerator.getNumSamples();
         jassert(fftSize == BFGSize);
         
-        BlockType tempBuffer(1, BFGSize);
-        
         while(!threadShouldExit() && singleChannelSampleFifo->getNumCompleteBuffersAvailable() > 0)
         {
             auto success = singleChannelSampleFifo->getAudioBuffer(buffer);
@@ -51,15 +49,17 @@ void PathProducer<BlockType>::run()
             juce::ignoreUnused(success);
             
             auto SCSFSize = buffer.getNumSamples();
-            jassert(SCSFSize <= BFGSize);
+            jassert(SCSFSize <= BFGSize && BFGSize % SCSFSize == 0); //Spec requirement
             
-            // copy shifted. Note if BFGSize == SCSFSize nothing happens.
-            tempBuffer.copyFrom(0, 0, bufferForGenerator, 0, SCSFSize, BFGSize - SCSFSize);
+            if(BFGSize > SCSFSize)
+            {
+                auto writePointer = bufferForGenerator.getWritePointer(0);
+                auto readPointer = bufferForGenerator.getReadPointer(0);
+                std::copy(readPointer + SCSFSize, readPointer + BFGSize, writePointer);
+            }
             
-            // copy SCSF into tempBuffer's end
-            tempBuffer.copyFrom(0, BFGSize - SCSFSize, buffer, 0, 0, SCSFSize);
-            
-            std::swap(tempBuffer, bufferForGenerator);
+            // copy SCSF into bufferForGenerator end.
+            bufferForGenerator.copyFrom(0, BFGSize - SCSFSize, buffer, 0, 0, SCSFSize);
             
             fftDataGenerator.produceFFTDataForRendering(bufferForGenerator);
         }
