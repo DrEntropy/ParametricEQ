@@ -151,7 +151,7 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         audioProcessor.binNum.store(bin);
         counter = 1;
     }
-    else
+    else if (JUCE_LIVE_CONSTANT(false))
     {
         ++counter;
     }
