@@ -12,39 +12,42 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts)
 
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     
     //TODO, deal with case where sample rate changes. Editor is not going to get reconstructed! but this is just a placeholder
-    pathProducer.reset(new PathProducer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.sCSFifo));
+    spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));
     
     addAndMakeVisible(inputMeter);
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
     
+    addAndMakeVisible(analyzerControls);
+    
     addAndMakeVisible(bypassButtonContainer);
     
     addAndMakeVisible(globalBypass);
+    addAndMakeVisible(*spectrumAnalyzer);
  
     setSize (1200, 800);
     
-    // PLACEHOLDER FOR TESTING, will be replaced with audio paramter in PFM11-35
-    pathProducer->setDecayRate(120.f);
-    
-    pathProducer->changeOrder(audioProcessor.fftOrder);
+
     audioProcessor.addSampleRateListener(this);
     
     
     startTimerHz(FRAME_RATE);
+    
+    audioProcessor.editorActive = true;
     
 }
 
 ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 {
     audioProcessor.removeSampleRateListener(this);
+    audioProcessor.editorActive = false;
 }
 
 //==============================================================================
@@ -52,22 +55,7 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll(juce::Colour::fromFloatRGBA (0.1f, 0.1f, 0.2f, 1.0f));
     
-    g.setColour(juce::Colours::red);
-    juce::PathStrokeType pst(2, juce::PathStrokeType::curved);
-    juce::Path fftPath;
-    g.reduceClipRegion(centerBounds.toNearestInt());
-    
-    if(pathProducer->getNumAvailableForReading() > 0)
-    {
-        while(pathProducer->getNumAvailableForReading() > 0)
-            pathProducer->pull(fftPath);
-        
-        g.strokePath(fftPath, pst);
-    }
-    
-    g.setColour(juce::Colours::lightblue);
-    g.drawRect(centerBounds);
-    
+
 }
 
 void ParametricEQAudioProcessorEditor::resized()
@@ -92,8 +80,24 @@ void ParametricEQAudioProcessorEditor::resized()
     globalBypass.setBounds(topBounds.withTrimmedBottom(2 * BYPASS_SWITCH_V_MARGIN)
                                     .withTrimmedRight(GLOBAL_SWITCH_RIGHT_MARGIN).removeFromRight(2 * BYPASS_SWITCH_HEIGHT));
     
-    centerBounds = bounds.toFloat();
-    pathProducer->setFFTRectBounds(centerBounds);
+    auto centerBounds = bounds;
+    spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
+    
+    // for future use, make room for square bounded controls
+    auto controlWidth = bottomBounds.getHeight();
+    
+    //controls are square:
+    auto inTrimBounds = bottomBounds.removeFromLeft(controlWidth);
+    auto outTrimBounds = bottomBounds.removeFromRight(controlWidth);
+    bottomBounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
+    auto procModeBounds = bottomBounds.removeFromLeft(controlWidth);
+    
+    // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
+    auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 9  / 2);
+    
+    analyzerControls.setBounds(analyzerControlBounds);
+    
+    auto resetAllBounds = bottomBounds; //Placeholder
 }
 
 
@@ -125,13 +129,12 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         outputMeter.update(values);
     }
     
-    if(pathProducer->getNumAvailableForReading()>0)
-        repaint();
+
 }
 
 // functionality to be moved into SpectrumAnalyzer class
 void ParametricEQAudioProcessorEditor::sampleRateChanged(double sr)
 {
-    if(pathProducer)
-        pathProducer->updateSampleRate(sr);
+    if(spectrumAnalyzer)
+        spectrumAnalyzer->changeSampleRate(sr);
 }

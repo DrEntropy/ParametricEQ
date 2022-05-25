@@ -15,6 +15,7 @@
 #include "FFTDataGenerator.h"
 #include "AnalyzerPathGenerator.h"
 #include "EQConstants.h"
+#include "AnalyzerProperties.h"
 
 
 template<typename BlockType>
@@ -24,7 +25,7 @@ struct PathProducer : juce::Thread
     ~PathProducer() override;
     
     void run() override;
-    void changeOrder(FFTOrder o);
+    void changeOrder(AnalyzerProperties::FFTOrder o);
     size_t getFFTSize() const;
     double getBinWidth() const;
     void pauseThread();
@@ -66,4 +67,6 @@ private:
      and causes processing to be skipped when it's false.
      */
     std::atomic<bool> processingIsEnabled { true };
+    
+    juce::int64 previousTime;
 };

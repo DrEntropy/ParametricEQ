@@ -11,6 +11,7 @@
 #include "FFTDataGenerator.h"
 #include "EQConstants.h"
 
+using namespace AnalyzerProperties;
 
 void FFTDataGenerator::produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData)
 {
@@ -69,7 +70,7 @@ size_t FFTDataGenerator::getNumAvailableFFTDataBlocks() const
    return fftDataFifo.getNumAvailableForReading();
 }
 
-bool FFTDataGenerator::getFFTData(std::vector<float>&& fftData)
+bool FFTDataGenerator::getFFTData(std::vector<float>& fftData)
 {
-   return fftDataFifo.exchange(std::move(fftData));
+   return fftDataFifo.exchange(fftData);
 }

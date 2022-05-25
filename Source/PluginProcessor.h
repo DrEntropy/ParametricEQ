@@ -8,7 +8,8 @@
 
 #pragma once
 
-//#define USE_TEST_OSC
+#define USE_TEST_OSC
+
 
 #include <JuceHeader.h>
 #include "HighCutLowCutParameters.h"
@@ -22,6 +23,7 @@
 #include "MeterValues.h"
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
+#include "AnalyzerProperties.h"
 
 #define SCSF_SIZE 2048
 
@@ -115,10 +117,9 @@ public:
     //Fifo<juce::AudioBuffer<float>, 30> inputBuffers;
     Fifo<MeterValues, 30> inMeterValuesFifo, outMeterValuesFifo;
     
-    SingleChannelSampleFifo<juce::AudioBuffer<float>>  sCSFifo{Channel::Left};
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>  leftSCSFifo{Channel::Left}, rightSCSFifo{Channel::Right};
     
-    //placeholder until controls are set up
-    FFTOrder fftOrder {FFTOrder::FFT4096};
+    bool editorActive {false};
 
 private:
     //==============================================================================
@@ -255,6 +256,7 @@ private:
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
     
+    
     void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
     
@@ -267,7 +269,7 @@ private:
     juce::ListenerList<SampleRateListener> sampleRateListeners;
     
 #ifdef USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 512};
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 1024};
     juce::dsp::Gain<float> testOscGain;
 #endif
     

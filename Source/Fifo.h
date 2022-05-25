@@ -85,7 +85,7 @@ struct Fifo
     }
     
     
-    bool exchange(T&& t)
+    bool exchange(T& t)
     {
 
             auto readHandle = fifo.read(1);

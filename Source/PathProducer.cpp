@@ -28,6 +28,8 @@ void PathProducer<BlockType>::run()
 {
     BlockType buffer;
     
+    previousTime = juce::Time::currentTimeMillis();
+    
     while(!threadShouldExit())
     {
         if(!processingIsEnabled)
@@ -65,9 +67,13 @@ void PathProducer<BlockType>::run()
         while(!threadShouldExit() && fftDataGenerator.getNumAvailableFFTDataBlocks() > 0)
         {
             std::vector<float> fftData;
-            fftDataGenerator.getFFTData(std::move(fftData));
-            updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(LOOP_DELAY) * decayRateInDbPerSec.load() / 1000.f);
-            pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth());
+            fftDataGenerator.getFFTData(fftData);
+            
+            auto deltaT = juce::Time::currentTimeMillis() - previousTime;
+            previousTime += deltaT;
+            
+            updateRenderData(renderData, fftData, getNumBins(),  static_cast<float>(deltaT) * decayRateInDbPerSec.load() / 1000.f);
+            pathGenerator.generatePath(renderData, fftBounds, fftSize, getBinWidth(), negativeInfinity, maxDecibels);
         }
  
         wait(LOOP_DELAY);
@@ -75,7 +81,7 @@ void PathProducer<BlockType>::run()
 }
 
 template<typename BlockType>
-void PathProducer<BlockType>::changeOrder(FFTOrder o)
+void PathProducer<BlockType>::changeOrder(AnalyzerProperties::FFTOrder o)
 {
     pauseThread();
     fftDataGenerator.changeOrder(o);
@@ -170,7 +176,8 @@ void PathProducer<BlockType>::updateRenderData(std::vector<float>& renderData,
         auto previousValue = renderData[i];
         auto candidate = fftData[i];
         auto finalValue = juce::jmax(candidate, previousValue - decayRate);
-        renderData[i] = juce::jlimit(negativeInfinity.load(), maxDecibels.load(), finalValue);
+        renderData[i] = juce::jlimit(NEGATIVE_INFINITY, MAX_DECIBELS, finalValue);
+        
     }
 }
 
@@ -186,7 +193,9 @@ void PathProducer<BlockType>::updateSampleRate(double sr)
 {
     pauseThread();
     sampleRate.store(sr);
-    startThread();
+    if(!fftBounds.isEmpty())
+        startThread();
+ 
 }
 
 

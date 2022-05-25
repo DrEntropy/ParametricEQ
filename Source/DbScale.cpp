@@ -33,15 +33,15 @@ void DbScale::buildBackgroundImage(int dbDivision, juce::Rectangle<int> meterBou
     juce::Graphics g(bkgd);
     
     g.addTransform(juce::AffineTransform().scale(scaleFactor));
-    g.setColour(juce::Colours::lightgrey);
     
     auto ticks =  getTicks(dbDivision, meterBounds, minDb, maxDb);
     
     for(auto tick:ticks)
     {
         juce::Rectangle<int> tickarea {bounds.getX(), tick.y-textHeight/2,  bounds.getWidth(), textHeight};
-        g.drawFittedText(std::to_string(static_cast<int>(tick.db)),
-                         tickarea, juce::Justification::centred, 1);
+        auto label = (tick.db > 0 ? "+" : "") + juce::String(tick.db,0);
+        g.setColour(tick.db == 0 ? juce::Colours::lightgreen : juce::Colours::lightgrey);
+        g.drawFittedText(label, tickarea, juce::Justification::centred, 1);
     }
 }
 

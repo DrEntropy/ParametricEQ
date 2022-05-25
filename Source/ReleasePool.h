@@ -49,7 +49,7 @@ struct ReleasePool : juce::Timer {
            Ptr object;
            while (holdFifo.getNumAvailableForReading() >0)
            {
-               bool exchangeSucceeded = holdFifo.exchange(std::move(object));
+               bool exchangeSucceeded = holdFifo.exchange(object);
                jassert(exchangeSucceeded); // should not fail.
                if(object.get())
                    addIfNotAlreadyThere(object);

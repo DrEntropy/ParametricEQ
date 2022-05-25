@@ -13,6 +13,7 @@
 #include "FilterInfo.h"
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
+#include "TestFunctions.h"
 
 
  
@@ -120,18 +121,15 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     initializeFilters(Channel::Left, sampleRate);
     initializeFilters(Channel::Right, sampleRate);
  
-    sCSFifo.prepare(SCSF_SIZE);
+    leftSCSFifo.prepare(SCSF_SIZE);
+    rightSCSFifo.prepare(SCSF_SIZE);
     
     sampleRateListeners.call([sampleRate](SampleRateListener& srl){srl.sampleRateChanged(sampleRate);});
  
     
     
 #ifdef USE_TEST_OSC
-    auto fftSize = 1 << static_cast<int>(fftOrder);
     testOsc.prepare(spec);
-    auto centerIndex = std::round(1000.0f / sampleRate * fftSize); 
-    auto centerFreq =  centerIndex * sampleRate / fftSize;
-    testOsc.setFrequency(centerFreq);
     testOscGain.prepare(spec);
 #endif
 
@@ -150,10 +148,7 @@ bool ParametricEQAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
     juce::ignoreUnused (layouts);
     return true;
   #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
+    
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
@@ -225,6 +220,20 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     inputTrim.process(stereoContext);
     
 #ifdef USE_TEST_OSC
+    auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(apvts
+                             .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+    auto fftSize = 1 << static_cast<int>(fftOrder);
+     // DBG(fftSize);
+
+    
+    auto centerFreq = GetTestSignalFrequency(JUCE_LIVE_CONSTANT(64),
+                                            static_cast<size_t>(fftOrder),
+                                             getSampleRate());
+    
+    DBG(centerFreq);
+    
+    testOsc.setFrequency(centerFreq);
+    
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, numSamples);
     
@@ -239,10 +248,20 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.setSample(1, j, sample);
     }
 #endif
+    using namespace AnalyzerProperties;
     
-    if(getActiveEditor())
+    auto analyzerEnabled = apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.;
+    
+    auto analyzerMode = static_cast<ProcessingModes> (apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::AnalyzerProcessingMode))->load()) ;
+    
+    if(editorActive)
     {
-        sCSFifo.update(buffer);
+        if(analyzerEnabled && analyzerMode == ProcessingModes::Pre)
+        {
+            leftSCSFifo.update(buffer);
+            rightSCSFifo.update(buffer);
+        }
+        
         updateMeterFifos(inMeterValuesFifo, buffer);
     }
  
@@ -276,14 +295,20 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
     
 #ifdef USE_TEST_OSC
+    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 #endif
     
     outputTrim.process(stereoContext);
     
-    if(getActiveEditor())
+    if(editorActive)
     {
+        if(analyzerEnabled && analyzerMode == ProcessingModes::Post)
+        {
+            leftSCSFifo.update(buffer);
+            rightSCSFifo.update(buffer);
+        }
         updateMeterFifos(outMeterValuesFifo, buffer);
     }
 }
@@ -375,6 +400,7 @@ void ParametricEQAudioProcessor::createFilterLayouts(ParamLayout& layout, Channe
     addFilterParamToLayout(layout, channel, 7, true);
 }
 
+
 // for some reason compiler will not let me use the alias for return type here.
 ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 {
@@ -396,7 +422,9 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     createFilterLayouts(layout, Channel::Left);
     createFilterLayouts(layout, Channel::Right);
- 
+    
+    AnalyzerProperties::addAnalyzerParams(layout);
+    
     return layout;
 }
 
@@ -474,7 +502,7 @@ bool ParametricEQAudioProcessor::isAnyActiveOn()
         isAnyOn |= isOn;
         if(mode != ChannelMode::Stereo)
         {
-            bool isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Right, filterNum))->load() < 0.5f;
+            isOn = apvts.getRawParameterValue(createBypassParamString(Channel::Right, filterNum))->load() < 0.5f;
             isAnyOn |= isOn;
         }
     }
