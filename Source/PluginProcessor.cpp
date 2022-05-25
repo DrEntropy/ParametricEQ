@@ -226,12 +226,10 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     size_t numBins = fftSize / 2 + 1;
 
     
-    auto centerFreq = GetTestSignalFrequency(std::min(binNum.load(), numBins),
-                                            static_cast<size_t>(fftOrder),
+    auto centerFreq = GetTestSignalFrequency(std::min(binNum.load(), numBins), static_cast<size_t>(fftOrder),
                                              getSampleRate());
     
-    //DBG(centerFreq);
-    
+
     testOsc.setFrequency(centerFreq);
     
     for( auto i = 0; i < totalNumOutputChannels; ++i)

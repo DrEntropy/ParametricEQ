@@ -132,22 +132,29 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     }
     
 #if USE_TEST_OSC
-    if(counter == 10)
+    int step_time = JUCE_LIVE_CONSTANT(120);
+    if(counter >= step_time)
     {
+        auto sampleRate = audioProcessor.getSampleRate();
         auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(audioProcessor.apvts
-                                 .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+                                   .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
         auto fftSize = 1 << static_cast<int>(fftOrder);
         auto numBins = fftSize / 2 + 1;
+        decltype(numBins) maxBin = std::ceil(20000.f * fftSize / sampleRate); //largest bin we care about.
+        
         auto bin = audioProcessor.binNum.load();
-        ++bin;
-        if(bin > numBins)
-            bin = 1;
+        if(++bin >= std::min(numBins, maxBin))
+            bin = 0;
+        
+        DBG(bin * sampleRate / fftSize);
         
         audioProcessor.binNum.store(bin);
-        counter = 0;
+        counter = 1;
     }
     else
+    {
         ++counter;
+    }
 #endif
 
 }

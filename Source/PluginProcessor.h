@@ -273,7 +273,7 @@ private:
     juce::ListenerList<SampleRateListener> sampleRateListeners;
     
 #if USE_TEST_OSC
-    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }, 1024};
+    juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }};
     juce::dsp::Gain<float> testOscGain;
 #endif
     
