@@ -21,7 +21,5 @@ float GetTestSignalFrequency(size_t binNum, size_t fftOrder, double sampleRate)
     
     auto centerFreq =  binNum * binWidthHz;
 
-    DBG(centerFreq);
-
     return centerFreq;
 }

@@ -128,7 +128,7 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
  
     
     
-#ifdef USE_TEST_OSC
+#if USE_TEST_OSC
     testOsc.prepare(spec);
     testOscGain.prepare(spec);
 #endif
@@ -219,18 +219,18 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     inputTrim.process(stereoContext);
     
-#ifdef USE_TEST_OSC
+#if USE_TEST_OSC
     auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(apvts
                              .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
     auto fftSize = 1 << static_cast<int>(fftOrder);
-     // DBG(fftSize);
+    size_t numBins = fftSize / 2 + 1;
 
     
-    auto centerFreq = GetTestSignalFrequency(JUCE_LIVE_CONSTANT(64),
+    auto centerFreq = GetTestSignalFrequency(std::min(binNum.load(), numBins),
                                             static_cast<size_t>(fftOrder),
                                              getSampleRate());
     
-    DBG(centerFreq);
+    //DBG(centerFreq);
     
     testOsc.setFrequency(centerFreq);
     
@@ -294,7 +294,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         performMidSideTransform(buffer);
     }
     
-#ifdef USE_TEST_OSC
+#if USE_TEST_OSC
     //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
     for( auto i = 0; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());

@@ -106,6 +106,8 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     auto& inputFifo = audioProcessor.inMeterValuesFifo;
     auto& outputFifo = audioProcessor.outMeterValuesFifo;
     
+   
+    
     MeterValues values;
     
     
@@ -129,6 +131,28 @@ void ParametricEQAudioProcessorEditor::timerCallback()
         outputMeter.update(values);
     }
     
+#if USE_TEST_OSC
+    static int counter = 0;
+    
+
+    
+    if(counter == 10)
+    {
+        auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(audioProcessor.apvts
+                                 .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+        auto fftSize = 1 << static_cast<int>(fftOrder);
+        auto numBins = fftSize / 2 + 1;
+        auto bin = audioProcessor.binNum.load();
+        ++bin;
+        if(bin > numBins)
+            bin = 1;
+        
+        audioProcessor.binNum.store(bin);
+        counter = 0;
+    }
+    else
+        ++counter;
+#endif
 
 }
 
