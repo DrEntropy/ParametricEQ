@@ -220,8 +220,8 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     inputTrim.process(stereoContext);
     
 #if USE_TEST_OSC
-    auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(apvts
-                             .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+    using namespace AnalyzerProperties;
+    auto fftOrder = getFFTOrder(apvts.getParameter(getAnalyzerParamName(ParamNames::AnalyzerPoints))->getValue());
     auto fftSize = 1 << static_cast<int>(fftOrder);
     size_t numBins = fftSize / 2 + 1;
 

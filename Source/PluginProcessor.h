@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define USE_TEST_OSC 1
+#define USE_TEST_OSC true
 
 
 #include <JuceHeader.h>

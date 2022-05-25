@@ -80,6 +80,14 @@ inline const juce::String getAnalyzerParamName(ParamNames name)
     return params.at(name);
 }
 
+inline FFTOrder getFFTOrder(float paramValue)
+{
+    return  paramValue > 0.5f ?
+            FFTOrder::FFT8192 :
+            paramValue < 0.5f ?
+                FFTOrder::FFT2048 :
+                FFTOrder::FFT4096;
+}
 
 inline void  addAnalyzerParams(juce::AudioProcessorValueTreeState::ParameterLayout& layout)
 {
@@ -114,7 +122,6 @@ inline void  addAnalyzerParams(juce::AudioProcessorValueTreeState::ParameterLayo
     layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(ParamNames::AnalyzerProcessingMode),
                                                             "Mode",
                                                             modes, 0));
-    
     
 }
 

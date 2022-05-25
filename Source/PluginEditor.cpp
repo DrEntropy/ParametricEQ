@@ -136,8 +136,9 @@ void ParametricEQAudioProcessorEditor::timerCallback()
     if(counter >= step_time)
     {
         auto sampleRate = audioProcessor.getSampleRate();
-        auto fftOrder = static_cast<AnalyzerProperties::FFTOrder>(audioProcessor.apvts
-                                   .getRawParameterValue(getAnalyzerParamName(AnalyzerProperties::ParamNames::AnalyzerPoints))->load()+11);
+        
+        using namespace AnalyzerProperties;
+        auto fftOrder = getFFTOrder(audioProcessor.apvts.getParameter(getAnalyzerParamName(ParamNames::AnalyzerPoints))->getValue());
         auto fftSize = 1 << static_cast<int>(fftOrder);
         auto numBins = fftSize / 2 + 1;
         decltype(numBins) maxBin = std::ceil(20000.f * fftSize / sampleRate); //largest bin we care about.
