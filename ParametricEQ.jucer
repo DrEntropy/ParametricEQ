@@ -35,6 +35,7 @@
               file="Source/ResponseCurveComponent.h"/>
       </GROUP>
       <GROUP id="{683C66F1-38C1-D26C-2C8B-869DE4047265}" name="Filters">
+        <FILE id="QDTtXc" name="ChainHelpers.h" compile="0" resource="0" file="Source/ChainHelpers.h"/>
         <FILE id="tXb9LF" name="FilterInfo.h" compile="0" resource="0" file="Source/FilterInfo.h"/>
         <FILE id="tifnVR" name="CoefficientsMaker.h" compile="0" resource="0"
               file="Source/CoefficientsMaker.h"/>

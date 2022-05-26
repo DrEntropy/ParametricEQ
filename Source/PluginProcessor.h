@@ -249,13 +249,12 @@ private:
     
     
     template <const int filterNum, typename ParamType>
-    void initializeChain(ParamType params, bool onRealTimeThread, double sampleRate)
+    void initializeChain(MonoFilterChain& chain, ParamType params, bool onRealTimeThread, double sampleRate)
     {
-        leftChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
-        rightChain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
+        chain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
     }
     
-    void initializeFilters(Channel channel, double sampleRate);
+    void initializeFilters(MonoFilterChain& chain, Channel channel, double sampleRate);
     void performInnerLoopUpdate(int samplesToSkip);
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
