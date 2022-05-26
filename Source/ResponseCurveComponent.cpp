@@ -12,6 +12,7 @@
 #include "ResponseCurveComponent.h"
 #include "EQConstants.h"
 
+using namespace ChainHelpers;
 
 ResponseCurveComponent::ResponseCurveComponent(double sr, juce::AudioProcessorValueTreeState& apvtsIn) : apvts{apvtsIn}, sampleRate{sr}
 {
@@ -81,11 +82,26 @@ void ResponseCurveComponent::buildNewResponseCurves()
 
 void ResponseCurveComponent::updateChainParameters()
 {
-    // TODO: need to pull the initialization code out of PluginProcessor
-    //update both Chain instances with fresh parameter values from the APVTS.
-
-//    I wrote a ChainHelpers:: namespace that had an initializeChain(chain, sampleRate, rampTime, apvts, isLeftMid) function.  This function pulled the appropriate parameter values from the APVTS and configured the chain links correctly by calling each link’s initialize() function.  Remember, each chain has 8 separate filters and the only way to access each link is via ProcessorChain::get<Index>()
+    auto singleChainUpdate = [this](MonoFilterChain& chain, Channel channel)
+    {
+        initializeChain<1>(chain, getParametericFilterParams<1>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        initializeChain<2>(chain, getParametericFilterParams<2>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        initializeChain<3>(chain, getParametericFilterParams<3>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        initializeChain<4>(chain, getParametericFilterParams<4>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        initializeChain<5>(chain, getParametericFilterParams<5>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        initializeChain<6>(chain, getParametericFilterParams<6>(channel, sampleRate, apvts), 0.0, false, sampleRate);
+        
+        HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true, apvts);
+        initializeChain<0>(chain, lowCutParams, 0.0, false,sampleRate);
+        HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false, apvts);
+        initializeChain<7>(chain, highCutParams, 0.0, false,sampleRate);
+    };
+    
+    singleChainUpdate(leftChain, Channel::Left);
+    singleChainUpdate(rightChain, Channel::Right);
 }
+
+ 
 
 std::vector<float> ResponseCurveComponent::buildNewResponseCurve(MonoFilterChain& chain)
 {

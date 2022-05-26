@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define USE_TEST_OSC true
+#define USE_TEST_OSC false
 
 
 #include <JuceHeader.h>
@@ -24,29 +24,18 @@
 #include "SingleChannelSampleFifo.h"
 #include "FFTDataGenerator.h"
 #include "AnalyzerProperties.h"
+#include "ChainHelpers.h"
 
 #define SCSF_SIZE 2048
 
-using Filter = juce::dsp::IIR::Filter<float>;
+ 
 using Trim = juce::dsp::Gain<float>;
-using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
-using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
-using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
-
+ 
 using ParamLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
 
 const float rampTime = 0.05f;  //50 mseconds
 const int innerLoopSize = 32;
  
-using MonoFilterChain = juce::dsp::ProcessorChain<CutFilter,
-                                            ParametricFilter,
-                                            ParametricFilter,
-                                            ParametricFilter,
-                                            ParametricFilter,
-                                            ParametricFilter,
-                                            ParametricFilter,
-                                            CutFilter>;
-
 
 
 //==============================================================================
@@ -144,74 +133,18 @@ private:
         fifo.push(values);
     }
     
-    template <const int filterNum>
-    FilterParameters getParametericFilterParams(Channel channel, double sampleRate)
-    {
-        using namespace FilterInfo;
-        
-        float frequency = apvts.getRawParameterValue(createFreqParamString(channel, filterNum))->load();
-        float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
-        bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
-        
-        FilterParameters parametricParams;
-        
-        
-        switch(filterNum)
-        {
-            case 1:
-                parametricParams.filterType =  FilterType::LowShelf;
-                break;
-            case 6:
-                parametricParams.filterType = FilterType::HighShelf;
-                break;
-            default:
-                parametricParams.filterType = FilterType::PeakFilter;
-        }
-            
-        
-        parametricParams.frequency = frequency;
-        parametricParams.sampleRate = sampleRate;
-        parametricParams.quality = quality;
-        parametricParams.bypassed = bypassed;
-        parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(channel, filterNum))-> load());
-        
-        return parametricParams;
-
-    }
-    
-    template <const int filterNum>
-    HighCutLowCutParameters getCutFilterParams(Channel channel, double sampleRate,bool isLowCut)
-    {
-        using namespace FilterInfo;
-        
-        float frequency = apvts.getRawParameterValue(createFreqParamString(channel, filterNum))->load();
-        float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
-        bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
-        
-        Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(channel, filterNum))->load());
-        
-        HighCutLowCutParameters cutParams;
-            
-        cutParams.isLowcut = isLowCut;
-        cutParams.frequency = frequency;
-        cutParams.bypassed = bypassed;
-        cutParams.order = static_cast<int>(slope) + 1;
-        cutParams.sampleRate = sampleRate;
-        cutParams.quality  = quality;
-        
-        return cutParams;
-    }
     
     template <const int filterNum>
     void preUpdateParametricFilter(ChannelMode mode, double sampleRate)
     {
-        FilterParameters parametricParamsLeft = getParametericFilterParams<filterNum>(Channel::Left, sampleRate);
+        using namespace ChainHelpers;
+        FilterParameters parametricParamsLeft = getParametericFilterParams<filterNum>(Channel::Left, sampleRate, apvts);
         FilterParameters parametricParamsRight;
         
         if(mode == ChannelMode::Stereo)
             parametricParamsRight = parametricParamsLeft;
         else
-            parametricParamsRight = getParametericFilterParams<filterNum>(Channel::Right, sampleRate);
+            parametricParamsRight = getParametericFilterParams<filterNum>(Channel::Right, sampleRate, apvts);
         
         leftChain.get<filterNum>().performPreloopUpdate(parametricParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(parametricParamsRight);
@@ -228,13 +161,14 @@ private:
     template <const int filterNum>
     void preUpdateCutFilter(ChannelMode mode, double sampleRate, bool isLowCut)
     {
-        HighCutLowCutParameters cutParamsLeft = getCutFilterParams<filterNum>(Channel::Left, sampleRate, isLowCut);
+        using namespace ChainHelpers;
+        HighCutLowCutParameters cutParamsLeft = getCutFilterParams<filterNum>(Channel::Left, sampleRate, isLowCut, apvts);
         HighCutLowCutParameters cutParamsRight;
         
         if(mode == ChannelMode::Stereo)
             cutParamsRight = cutParamsLeft;
         else
-            cutParamsRight = getCutFilterParams<filterNum>(Channel::Right, sampleRate, isLowCut);
+            cutParamsRight = getCutFilterParams<filterNum>(Channel::Right, sampleRate, isLowCut, apvts);
             
         leftChain.get<filterNum>().performPreloopUpdate(cutParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(cutParamsRight);
@@ -248,13 +182,9 @@ private:
     }
     
     
-    template <const int filterNum, typename ParamType>
-    void initializeChain(MonoFilterChain& chain, ParamType params, bool onRealTimeThread, double sampleRate)
-    {
-        chain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
-    }
+   
     
-    void initializeFilters(MonoFilterChain& chain, Channel channel, double sampleRate);
+    void initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel channel, double sampleRate);
     void performInnerLoopUpdate(int samplesToSkip);
     void performPreLoopUpdate(ChannelMode mode, double sampleRate);
     void updateTrims();
@@ -266,7 +196,7 @@ private:
     void performMidSideTransform(juce::AudioBuffer<float>&);
  
     ParamLayout createParameterLayout();
-    MonoFilterChain leftChain, rightChain;
+    ChainHelpers::MonoFilterChain leftChain, rightChain;
     Trim inputTrim, outputTrim;
     
     juce::ListenerList<SampleRateListener> sampleRateListeners;

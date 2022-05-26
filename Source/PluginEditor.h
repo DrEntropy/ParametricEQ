@@ -20,6 +20,7 @@
 #include "FFTDataGenerator.h"
 #include "SpectrumAnalyzer.h"
 #include "AnalyzerControls.h"
+#include "ResponseCurveComponent.h"
 
 
 //layout defines
@@ -68,6 +69,8 @@ private:
     std::unique_ptr<SpectrumAnalyzer<juce::AudioBuffer<float>>> spectrumAnalyzer;
      
     AnalyzerControls analyzerControls;
+    
+    std::unique_ptr<ResponseCurveComponent> responseCurve;
     
 #if USE_TEST_OSC
     int counter {0};

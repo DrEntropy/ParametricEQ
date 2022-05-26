@@ -14,6 +14,7 @@
 #include "AnalyzerBase.h"
 #include "AllParamsListener.h"
 #include "PluginProcessor.h"
+#include "ChainHelpers.h"
 
  
 struct ResponseCurveComponent : AnalyzerBase
@@ -28,12 +29,12 @@ private:
     double sampleRate;
     std::unique_ptr<AllParamsListener> allParamsListener;
     
-    MonoFilterChain leftChain, rightChain;
+    ChainHelpers::MonoFilterChain leftChain, rightChain;
     juce::Path leftResponseCurve, rightResponseCurve;
     
     void refreshParams();
     void buildNewResponseCurves();
     void updateChainParameters();
-    std::vector<float> buildNewResponseCurve(MonoFilterChain& chain);
+    std::vector<float> buildNewResponseCurve(ChainHelpers::MonoFilterChain& chain);
     juce::Path createResponseCurve(const std::vector<float>& data);
 };

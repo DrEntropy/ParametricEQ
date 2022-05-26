@@ -14,8 +14,6 @@
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
 #include "TestFunctions.h"
-
-
  
 #include <string>
 
@@ -427,27 +425,28 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 }
 
 
-void ParametricEQAudioProcessor::initializeFilters(MonoFilterChain& chain, Channel channel,  double sampleRate)
+void ParametricEQAudioProcessor::initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel channel,  double sampleRate)
 {
     // check if on realtime thread
     auto messMan = juce::MessageManager::getInstanceWithoutCreating();
     bool onRealTimeThread=  ! ((messMan != nullptr) && messMan->isThisTheMessageThread());
     
+    using namespace ChainHelpers;
     // initialize filters
    
-    initializeChain<1>(chain, getParametericFilterParams<1>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<2>(chain, getParametericFilterParams<2>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<3>(chain, getParametericFilterParams<3>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<4>(chain, getParametericFilterParams<4>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<5>(chain, getParametericFilterParams<5>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<6>(chain, getParametericFilterParams<6>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<1>(chain, getParametericFilterParams<1>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<2>(chain, getParametericFilterParams<2>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<3>(chain, getParametericFilterParams<3>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<4>(chain, getParametericFilterParams<4>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<5>(chain, getParametericFilterParams<5>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<6>(chain, getParametericFilterParams<6>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
-    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true);
-    initializeChain<0>(chain, lowCutParams,onRealTimeThread,sampleRate);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false);
-    initializeChain<7>(chain, highCutParams,onRealTimeThread,sampleRate);
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true, apvts);
+    initializeChain<0>(chain, lowCutParams, rampTime, onRealTimeThread,sampleRate);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false, apvts);
+    initializeChain<7>(chain, highCutParams, rampTime, onRealTimeThread,sampleRate);
  
 }
 
