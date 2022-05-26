@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 #include "ResponseCurveComponent.h"
-#include "Para"
+
 
 ResponseCurveComponent::ResponseCurveComponent(double sr, juce::AudioProcessorValueTreeState& apvtsIn) : apvts{apvtsIn}, sampleRate{sr}
 {
@@ -80,6 +80,9 @@ void ResponseCurveComponent::buildNewResponseCurves()
 
 void updateChainParameters()
 {
+    //update both Chain instances with fresh parameter values from the APVTS.
+
+//    I wrote a ChainHelpers:: namespace that had an initializeChain(chain, sampleRate, rampTime, apvts, isLeftMid) function.  This function pulled the appropriate parameter values from the APVTS and configured the chain links correctly by calling each link’s initialize() function.  Remember, each chain has 8 separate filters and the only way to access each link is via ProcessorChain::get<Index>()
 }
 
 std::vector<float> buildNewResponseCurve(MonoFilterChain& chain)
