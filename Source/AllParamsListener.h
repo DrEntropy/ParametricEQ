@@ -19,8 +19,9 @@ struct AllParamsListener : juce::Timer, juce::AudioProcessorParameter::Listener
     void timerCallback() override;
     void parameterValueChanged (int /*parameterIndex*/, float /*newValue*/) override;
     void parameterGestureChanged (int /*parameterIndex*/, bool /*gestureIsStarting*/) override;
+    
 private:
-    juce::AudioProcessorValueTreeState* apvts;
+    juce::AudioProcessorValueTreeState& apvts;
     std::function<void()> func;
     juce::Atomic<bool> changed { false };
 };
