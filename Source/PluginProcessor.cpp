@@ -14,8 +14,6 @@
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
 #include "TestFunctions.h"
-
-
  
 #include <string>
 
@@ -118,8 +116,8 @@ void ParametricEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     outputTrim.prepare(spec);
     
     
-    initializeFilters(Channel::Left, sampleRate);
-    initializeFilters(Channel::Right, sampleRate);
+    initializeFilters(leftChain, Channel::Left, sampleRate);
+    initializeFilters(rightChain, Channel::Right, sampleRate);
  
     leftSCSFifo.prepare(SCSF_SIZE);
     rightSCSFifo.prepare(SCSF_SIZE);
@@ -246,6 +244,19 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.setSample(1, j, sample);
     }
 #endif
+    
+    
+    
+#if USE_WHITE_NOISE
+    
+    for( auto j = 0; j < numSamples; ++j)
+    {
+        auto sample = random.nextFloat() * 2.0f - 1.0f;
+        buffer.setSample(0, j, sample);
+        buffer.setSample(1, j, sample);
+    }
+
+#endif
     using namespace AnalyzerProperties;
     
     auto analyzerEnabled = apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.;
@@ -292,11 +303,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         performMidSideTransform(buffer);
     }
     
-#if USE_TEST_OSC
-    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
-    for( auto i = 0; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-#endif
+
     
     outputTrim.process(stereoContext);
     
@@ -309,6 +316,12 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
         updateMeterFifos(outMeterValuesFifo, buffer);
     }
+    
+#if USE_TEST_OSC || USE_WHITE_NOISE
+    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+#endif
 }
 
 //==============================================================================
@@ -338,8 +351,8 @@ void ParametricEQAudioProcessor::setStateInformation (const void* data, int size
      if (xmlState.get() != nullptr)
                 if (xmlState->hasTagName (apvts.state.getType()))
                     apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
-    initializeFilters(Channel::Left, getSampleRate());
-    initializeFilters(Channel::Right, getSampleRate());
+    initializeFilters(leftChain, Channel::Left, getSampleRate());
+    initializeFilters(rightChain, Channel::Right, getSampleRate());
 }
 
 //==============================================================================
@@ -427,27 +440,28 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
 }
 
 
-void ParametricEQAudioProcessor::initializeFilters(Channel channel, double sampleRate)
+void ParametricEQAudioProcessor::initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel channel,  double sampleRate)
 {
     // check if on realtime thread
     auto messMan = juce::MessageManager::getInstanceWithoutCreating();
     bool onRealTimeThread=  ! ((messMan != nullptr) && messMan->isThisTheMessageThread());
     
+    using namespace ChainHelpers;
     // initialize filters
    
-    initializeChain<1>(getParametericFilterParams<1>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<2>(getParametericFilterParams<2>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<3>(getParametericFilterParams<3>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<4>(getParametericFilterParams<4>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<5>(getParametericFilterParams<5>(channel, sampleRate), onRealTimeThread, sampleRate);
-    initializeChain<6>(getParametericFilterParams<6>(channel, sampleRate), onRealTimeThread, sampleRate);
+    initializeChain<1>(chain, getParametericFilterParams<1>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<2>(chain, getParametericFilterParams<2>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<3>(chain, getParametericFilterParams<3>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<4>(chain, getParametericFilterParams<4>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<5>(chain, getParametericFilterParams<5>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
+    initializeChain<6>(chain, getParametericFilterParams<6>(channel, sampleRate, apvts), rampTime, onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
-    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true);
-    initializeChain<0>(lowCutParams,onRealTimeThread,sampleRate);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false);
-    initializeChain<7>(highCutParams,onRealTimeThread,sampleRate);
+    HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true, apvts);
+    initializeChain<0>(chain, lowCutParams, rampTime, onRealTimeThread,sampleRate);
+    HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false, apvts);
+    initializeChain<7>(chain, highCutParams, rampTime, onRealTimeThread,sampleRate);
  
 }
 

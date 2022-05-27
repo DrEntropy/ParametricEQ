@@ -188,6 +188,27 @@ struct FilterLink
         resetSmoothers(rampTime);
         
     }
+    
+    bool isBypassed()
+    {
+        return currentParams.bypassed;
+    }
+    
+    double getCutFilterMagnitudeForFrequency(double frequency)
+    {
+        double mag {1};
+        mag *=  filter.template isBypassed<0>() ? 1.0 : filter.template get<0>().coefficients->getMagnitudeForFrequency (frequency, sampleRate);
+        mag *=  filter.template isBypassed<1>() ? 1.0 : filter.template get<1>().coefficients->getMagnitudeForFrequency (frequency, sampleRate);
+        mag *=  filter.template isBypassed<2>() ? 1.0 : filter.template get<2>().coefficients->getMagnitudeForFrequency (frequency, sampleRate);
+        mag *=  filter.template isBypassed<3>() ? 1.0 : filter.template get<3>().coefficients->getMagnitudeForFrequency (frequency, sampleRate);
+        return mag;
+    }
+    
+    double getFilterMagnitudeForFrequency(double frequency)
+    {
+        return filter.coefficients->getMagnitudeForFrequency (frequency, sampleRate);
+    }
+    
 private:
     //stuff for setting the coefficients of the FilterType instance.
     template <typename Obj>

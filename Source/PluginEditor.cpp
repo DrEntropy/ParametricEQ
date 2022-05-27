@@ -12,13 +12,9 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts)
 
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    
-    //TODO, deal with case where sample rate changes. Editor is not going to get reconstructed! but this is just a placeholder
     spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));
     
     addAndMakeVisible(inputMeter);
@@ -31,6 +27,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     
     addAndMakeVisible(globalBypass);
     addAndMakeVisible(*spectrumAnalyzer);
+    addAndMakeVisible(responseCurve);
  
     setSize (1200, 800);
     
@@ -82,6 +79,7 @@ void ParametricEQAudioProcessorEditor::resized()
     
     auto centerBounds = bounds;
     spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
+    responseCurve.setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     
     // for future use, make room for square bounded controls
     auto controlWidth = bottomBounds.getHeight();
