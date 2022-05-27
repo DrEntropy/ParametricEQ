@@ -70,7 +70,7 @@ private:
      
     AnalyzerControls analyzerControls;
     
-    std::unique_ptr<ResponseCurveComponent> responseCurve;
+    ResponseCurveComponent responseCurve;
     
 #if USE_TEST_OSC
     int counter {0};
