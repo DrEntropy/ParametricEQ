@@ -16,16 +16,6 @@ using namespace ChainHelpers;
 
 ResponseCurveComponent::ResponseCurveComponent(double sr, juce::AudioProcessorValueTreeState& apvtsIn) : apvts{apvtsIn}, sampleRate{sr}
 {
-  
-//TODO: VERIFY if this is needed.
-//  auto safePtr = juce::Component::SafePointer<ResponseCurveComponent>(this);
-//    allParamsListener.reset( new AllParamsListener(apvts,
-//                                                   [safePtr]()
-//                                                   {
-//                                                       if(auto* comp = safePtr.getComponent() )
-//                                                           comp->refreshParams();
-//                                                   }));
-    
     allParamsListener.reset( new AllParamsListener(apvts, std::bind( &ResponseCurveComponent::refreshParams, this)));
     
     juce::dsp::ProcessSpec spec;
@@ -153,11 +143,4 @@ juce::Path ResponseCurveComponent::createResponseCurve(const std::vector<float>&
     }
 
     return thePath;
-    
-
-   // At this point, the path is done, but it may require some scaling/translation for it to appear correctly.
-
-   // I had to scale it horizontally to be the same width as fftBounds
-
-   // I had to shift it to the right to line up with fftBounds
 }

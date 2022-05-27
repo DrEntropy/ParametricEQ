@@ -251,7 +251,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     for( auto j = 0; j < numSamples; ++j)
     {
-        auto sample = random.nextFloat() * 1.0f - 0.5f;
+        auto sample = random.nextFloat() * 2.0f - 1.0f;
         buffer.setSample(0, j, sample);
         buffer.setSample(1, j, sample);
     }

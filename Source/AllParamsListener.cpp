@@ -33,12 +33,12 @@ void AllParamsListener::timerCallback()
        func();
 }
 
-void AllParamsListener::parameterValueChanged (int paramIndex, float newValue)
+void AllParamsListener::parameterValueChanged (int /*paramIndex*/, float /*newValue*/)
 {
     changed.set(true);
 }
 
-void AllParamsListener::parameterGestureChanged (int paramIndex, bool gestureStarting)
+void AllParamsListener::parameterGestureChanged (int /*paramIndex*/, bool /*gestureStarting*/)
 {
     //nothing
 }
