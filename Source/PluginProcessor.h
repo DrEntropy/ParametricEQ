@@ -9,7 +9,7 @@
 #pragma once
 
 #define USE_TEST_OSC false
-#define USE_WHITE_NOISE true
+#define USE_WHITE_NOISE false
 
 
 #include <JuceHeader.h>

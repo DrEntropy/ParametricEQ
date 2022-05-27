@@ -36,5 +36,5 @@ private:
     void buildNewResponseCurves();
     void updateChainParameters();
     std::vector<float> buildNewResponseCurve(ChainHelpers::MonoFilterChain& chain);
-    juce::Path createResponseCurve(const std::vector<float>& data);
+    void createResponseCurve(juce::Path& path, const std::vector<float>& data);
 };

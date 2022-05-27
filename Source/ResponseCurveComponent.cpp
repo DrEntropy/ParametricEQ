@@ -62,11 +62,11 @@ void ResponseCurveComponent::buildNewResponseCurves()
 {
     updateChainParameters();
  
-    leftResponseCurve = createResponseCurve(buildNewResponseCurve(leftChain));
+    createResponseCurve(leftResponseCurve, buildNewResponseCurve(leftChain));
     
     if(static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo)
     {
-        rightResponseCurve = createResponseCurve(buildNewResponseCurve(rightChain));
+        createResponseCurve(rightResponseCurve, buildNewResponseCurve(rightChain));
     }
 }
 
@@ -118,16 +118,14 @@ std::vector<float> ResponseCurveComponent::buildNewResponseCurve(MonoFilterChain
     return path;
 }
 
-juce::Path ResponseCurveComponent::createResponseCurve(const std::vector<float>& data)
+void ResponseCurveComponent::createResponseCurve(juce::Path& path, const std::vector<float>& data)
 {
-    juce::Path thePath;
-
     if(data.empty())
-        return thePath;
+        return;
+    
+    path.clear();
     
     auto startX = fftBoundingBox.getX();
-    
-   
     
     auto mapGain = [this](float gain)
     {
@@ -135,12 +133,12 @@ juce::Path ResponseCurveComponent::createResponseCurve(const std::vector<float>&
         return juce::jmap(gain, static_cast<float>(RESPONSE_CURVE_MIN_DB), static_cast<float>(RESPONSE_CURVE_MAX_DB), bBox.getBottom(), bBox.getY());
     };
 
-    thePath.startNewSubPath(startX,  mapGain(data[0]));
+    path.startNewSubPath(startX,  mapGain(data[0]));
     
     for(size_t i = 1; i < data.size(); ++i)
     {
-        thePath.lineTo(i + startX, mapGain(data[i]));
+        path.lineTo(i + startX, mapGain(data[i]));
     }
 
-    return thePath;
+    return ;
 }
