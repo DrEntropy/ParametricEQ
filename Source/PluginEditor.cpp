@@ -15,10 +15,6 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts)
 
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    
-    //TODO, deal with case where sample rate changes. Editor is not going to get reconstructed! but this is just a placeholder
     spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));
     
     addAndMakeVisible(inputMeter);
