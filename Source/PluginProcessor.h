@@ -9,6 +9,7 @@
 #pragma once
 
 #define USE_TEST_OSC false
+#define USE_WHITE_NOISE true
 
 
 #include <JuceHeader.h>
@@ -113,6 +114,8 @@ public:
 #if USE_TEST_OSC
     std::atomic<size_t> binNum {1};
 #endif
+    
+
 
 private:
     //==============================================================================
@@ -204,6 +207,10 @@ private:
 #if USE_TEST_OSC
     juce::dsp::Oscillator<float> testOsc {[] (float x) { return std::sin (x); }};
     juce::dsp::Gain<float> testOscGain;
+#endif
+    
+#if USE_WHITE_NOISE
+    juce::Random random;
 #endif
     
 };

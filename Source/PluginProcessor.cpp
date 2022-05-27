@@ -244,6 +244,19 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.setSample(1, j, sample);
     }
 #endif
+    
+    
+    
+#if USE_WHITE_NOISE
+    
+    for( auto j = 0; j < numSamples; ++j)
+    {
+        auto sample = random.nextFloat() * 1.0f - 0.5f;
+        buffer.setSample(0, j, sample);
+        buffer.setSample(1, j, sample);
+    }
+
+#endif
     using namespace AnalyzerProperties;
     
     auto analyzerEnabled = apvts.getRawParameterValue(getAnalyzerParamName(ParamNames::EnableAnalyzer))->load() > 0.;
@@ -290,11 +303,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         performMidSideTransform(buffer);
     }
     
-#if USE_TEST_OSC
-    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
-    for( auto i = 0; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-#endif
+
     
     outputTrim.process(stereoContext);
     
@@ -307,6 +316,12 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
         updateMeterFifos(outMeterValuesFifo, buffer);
     }
+    
+#if USE_TEST_OSC || USE_WHITE_NOISE
+    //testOsc.setFrequency(JUCE_LIVE_CONSTANT(5000));
+    for( auto i = 0; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+#endif
 }
 
 //==============================================================================
