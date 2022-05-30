@@ -1,11 +1,11 @@
 /*
   ==============================================================================
 
-    AnalyzerNode.h
-    Created: 30 May 2022 10:09:33am
+    AnalyzerWidgets.cpp
+    Created: 30 May 2022 10:15:32am
     Author:  Ronald Legere
 
   ==============================================================================
 */
 
-#pragma once
+#include "AnalyzerWidgets.h"

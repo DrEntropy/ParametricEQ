@@ -1,11 +1,11 @@
 /*
   ==============================================================================
 
-    ParameterAttachment.cpp
-    Created: 30 May 2022 10:10:44am
+    AnalyzerWidgets.h
+    Created: 30 May 2022 10:15:32am
     Author:  Ronald Legere
 
   ==============================================================================
 */
 
-#include "ParameterAttachment.h"
+#pragma once

@@ -25,22 +25,16 @@
               file="Source/HelperFunctions.h"/>
       </GROUP>
       <GROUP id="{2E90EA13-AF78-352E-2563-3511802F5243}" name="ResponseCurve">
-        <FILE id="exbOkN" name="ParameterAttachment.cpp" compile="1" resource="0"
-              file="Source/ParameterAttachment.cpp"/>
-        <FILE id="DOSyOh" name="ParameterAttachment.h" compile="0" resource="0"
-              file="Source/ParameterAttachment.h"/>
+        <FILE id="uTToKi" name="AnalyzerWidgets.cpp" compile="1" resource="0"
+              file="Source/AnalyzerWidgets.cpp"/>
+        <FILE id="YVjDUQ" name="AnalyzerWidgets.h" compile="0" resource="0"
+              file="Source/AnalyzerWidgets.h"/>
         <FILE id="r6ZLkq" name="NodeController.cpp" compile="1" resource="0"
               file="Source/NodeController.cpp"/>
         <FILE id="eAL25T" name="NodeController.h" compile="0" resource="0"
               file="Source/NodeController.h"/>
-        <FILE id="mxhlPS" name="AnalyzerBand.h" compile="0" resource="0" file="Source/AnalyzerBand.h"/>
-        <FILE id="jnbheh" name="AnalyzerNode.h" compile="0" resource="0" file="Source/AnalyzerNode.h"/>
         <FILE id="aNLSVq" name="AllParamsListener.cpp" compile="1" resource="0"
               file="Source/AllParamsListener.cpp"/>
-        <FILE id="aA8uUj" name="AnalyzerWidgetBase.cpp" compile="1" resource="0"
-              file="Source/AnalyzerWidgetBase.cpp"/>
-        <FILE id="k9jhXl" name="AnalyzerWidgetBase.h" compile="0" resource="0"
-              file="Source/AnalyzerWidgetBase.h"/>
         <FILE id="n2kulb" name="AllParamsListener.h" compile="0" resource="0"
               file="Source/AllParamsListener.h"/>
         <FILE id="x0SgbL" name="ResponseCurveComponent.cpp" compile="1" resource="0"
