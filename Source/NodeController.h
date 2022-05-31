@@ -17,6 +17,7 @@ struct NodeController : AnalyzerBase
 {
     NodeController();
     
+    
 private:
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes;

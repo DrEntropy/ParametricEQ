@@ -49,8 +49,9 @@ struct AnalyzerNode : AnalyzerWidgetBase
 {
     AnalyzerNode(ChainPosition cp, Channel ch) : AnalyzerWidgetBase(cp, ch)
     {
-        setSize(8, 8);
+        setSize(nodeSize, nodeSize);
     }
+    static constexpr int nodeSize{8};
     juce::Rectangle<int> mouseOverBounds, qualityBounds;
     float getFrequency() const { return frequency; }
     float getGainOrSlope() const { return gainOrSlope; }
