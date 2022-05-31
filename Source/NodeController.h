@@ -9,3 +9,18 @@
 */
 
 #pragma once
+#include "AnalyzerBase.h"
+#include "AnalyzerWidgets.h"
+#include "AllParamsListener.h"
+
+struct NodeController : AnalyzerBase
+{
+    NodeController();
+    
+private:
+    
+    std::array<std::unique_ptr<AnalyzerNode> , 16> nodes;
+    std::unique_ptr<AllParamsListener> allParamsListener;
+    
+};
+

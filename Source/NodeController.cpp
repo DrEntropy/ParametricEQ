@@ -9,3 +9,9 @@
 */
 
 #include "NodeController.h"
+
+
+NodeController::NodeController()
+{
+    // do some stuff.
+}

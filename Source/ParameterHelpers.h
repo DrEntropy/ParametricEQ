@@ -25,17 +25,19 @@ const std::map<ChannelMode,juce::String>  mapModeToString
     {ChannelMode::MidSide, "Mid-Side"},
 };
 
-juce::String createGainParamString(Channel channel, int filterNum);
+using ChainPosition = int;
 
-juce::String createQParamString(Channel channel, int filterNum);
+juce::String createGainParamString(Channel channel, ChainPosition filterNum);
 
-juce::String createFreqParamString(Channel channel, int filterNum);
+juce::String createQParamString(Channel channel, ChainPosition filterNum);
 
-juce::String createBypassParamString(Channel channel, int filterNum);
+juce::String createFreqParamString(Channel channel, ChainPosition filterNum);
 
-juce::String createTypeParamString(Channel channel, int filterNum);
+juce::String createBypassParamString(Channel channel, ChainPosition filterNum);
 
-juce::String createSlopeParamString(Channel channel, int filterNum);
+juce::String createTypeParamString(Channel channel, ChainPosition filterNum);
+
+juce::String createSlopeParamString(Channel channel, ChainPosition filterNum);
 
 juce::String createChannelString(Channel channel);
  

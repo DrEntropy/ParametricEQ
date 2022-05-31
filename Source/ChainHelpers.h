@@ -17,7 +17,7 @@
 
 namespace ChainHelpers
 {
-
+ 
 using Filter = juce::dsp::IIR::Filter<float>;
 using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
