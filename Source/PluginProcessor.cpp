@@ -446,22 +446,8 @@ void ParametricEQAudioProcessor::initializeFilters(ChainHelpers::MonoFilterChain
     // check if on realtime thread
     auto messMan = juce::MessageManager::getInstanceWithoutCreating();
     bool onRealTimeThread=  ! ((messMan != nullptr) && messMan->isThisTheMessageThread());
-    
-    using namespace ChainHelpers;
-    // initialize filters
-   
-    initializeChainLink<ChainPosition::LowShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::PeakFilter1, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::PeakFilter2, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::PeakFilter3, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::PeakFilter4, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::HighShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    
-    
-    //low cut filter, and then high cut
-   
-    initializeChainLink<ChainPosition::LowCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChainLink<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+     
+    ChainHelpers::initializeFilters(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
 }
 
 

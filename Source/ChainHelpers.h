@@ -115,6 +115,19 @@ void initializeChainLink(MonoFilterChain& chain, Channel channel, juce::AudioPro
     chain.get<static_cast<int>(chainPos)>().initialize(params, rampTime, onRealTimeThread, sampleRate);
 }
 
-
+inline void initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel channel, juce::AudioProcessorValueTreeState& apvts, float rampTime, bool onRealTimeThread,   double sampleRate)
+{
+    // initialize filters
+    initializeChainLink<ChainPosition::LowShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter1, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter2, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter3, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter4, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::HighShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    //low cut filter, and then high cut
+   
+    initializeChainLink<ChainPosition::LowCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+}
 
 }
