@@ -74,23 +74,15 @@ void ResponseCurveComponent::updateChainParameters()
 {
     auto singleChainUpdate = [this](MonoFilterChain& chain, Channel channel)
     {
-        initializeChain<ChainPosition::LowShelf>(chain, getParametericFilterParams<ChainPosition::LowShelf>(channel, sampleRate, apvts),
-                                                 0.0, false, sampleRate);
-        initializeChain<ChainPosition::PeakFilter1>(chain, getParametericFilterParams<ChainPosition::PeakFilter1>(channel, sampleRate, apvts),
-                                                    0.0, false, sampleRate);
-        initializeChain<ChainPosition::PeakFilter2>(chain, getParametericFilterParams<ChainPosition::PeakFilter2>(channel, sampleRate, apvts),
-                                                    0.0, false, sampleRate);
-        initializeChain<ChainPosition::PeakFilter3>(chain, getParametericFilterParams<ChainPosition::PeakFilter3>(channel, sampleRate, apvts),
-                                                    0.0, false, sampleRate);
-        initializeChain<ChainPosition::PeakFilter4>(chain, getParametericFilterParams<ChainPosition::PeakFilter4>(channel, sampleRate, apvts),
-                                                    0.0, false, sampleRate);
-        initializeChain<ChainPosition::HighShelf>(chain, getParametericFilterParams<ChainPosition::HighShelf>(channel, sampleRate, apvts),
-                                                  0.0, false, sampleRate);
+        initializeChain<ChainPosition::LowShelf, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::PeakFilter1, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::PeakFilter2, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::PeakFilter3, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::PeakFilter4, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::HighShelf, FilterParameters> (chain, channel, apvts, 0.0, false, sampleRate);
         
-        HighCutLowCutParameters lowCutParams = getCutFilterParams<ChainPosition::LowCut>(channel, sampleRate, true, apvts);
-        initializeChain<ChainPosition::LowCut>(chain, lowCutParams, 0.0, false,sampleRate);
-        HighCutLowCutParameters highCutParams = getCutFilterParams<ChainPosition::HighCut>(channel, sampleRate, false, apvts);
-        initializeChain<ChainPosition::HighCut>(chain, highCutParams, 0.0, false,sampleRate);
+        initializeChain<ChainPosition::LowCut, HighCutLowCutParameters> (chain, channel, apvts, 0.0, false, sampleRate);
+        initializeChain<ChainPosition::HighCut, HighCutLowCutParameters> (chain, channel, apvts, 0.0, false, sampleRate);
     };
     
     singleChainUpdate(leftChain, Channel::Left);

@@ -450,39 +450,31 @@ void ParametricEQAudioProcessor::initializeFilters(ChainHelpers::MonoFilterChain
     using namespace ChainHelpers;
     // initialize filters
    
-    initializeChain<ChainPosition::LowShelf>(chain, getParametericFilterParams<ChainPosition::LowShelf>(channel, sampleRate, apvts),
-                                             rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter1>(chain, getParametericFilterParams<ChainPosition::PeakFilter1>(channel, sampleRate, apvts),
-                                                rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter2>(chain, getParametericFilterParams<ChainPosition::PeakFilter2>(channel, sampleRate, apvts),
-                                                rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter3>(chain, getParametericFilterParams<ChainPosition::PeakFilter3>(channel, sampleRate, apvts),
-                                                rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter4>(chain, getParametericFilterParams<ChainPosition::PeakFilter4>(channel, sampleRate, apvts),
-                                                rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::HighShelf>(chain, getParametericFilterParams<ChainPosition::HighShelf>(channel, sampleRate, apvts),
-                                              rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::LowShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::PeakFilter1, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::PeakFilter2, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::PeakFilter3, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::PeakFilter4, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::HighShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
-    HighCutLowCutParameters lowCutParams = getCutFilterParams<ChainPosition::LowCut>(channel, sampleRate, true, apvts);
-    initializeChain<ChainPosition::LowCut>(chain, lowCutParams, rampTime, onRealTimeThread,sampleRate);
-    HighCutLowCutParameters highCutParams = getCutFilterParams<ChainPosition::HighCut>(channel, sampleRate, false, apvts);
-    initializeChain<ChainPosition::HighCut>(chain, highCutParams, rampTime, onRealTimeThread,sampleRate);
- 
+   
+    initializeChain<ChainPosition::LowCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChain<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
 }
 
 
 void ParametricEQAudioProcessor::performPreLoopUpdate(ChannelMode mode, double sampleRate)
 {
-    preUpdateCutFilter<ChainPosition::LowCut>(mode, sampleRate, true);
+    preUpdateCutFilter<ChainPosition::LowCut>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::LowShelf>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::PeakFilter1>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::PeakFilter2>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::PeakFilter3>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::PeakFilter4>(mode, sampleRate);
     preUpdateParametricFilter<ChainPosition::HighShelf>(mode, sampleRate);
-    preUpdateCutFilter<ChainPosition::HighCut>(mode, sampleRate, false);
+    preUpdateCutFilter<ChainPosition::HighCut>(mode, sampleRate);
 }
 
 void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
