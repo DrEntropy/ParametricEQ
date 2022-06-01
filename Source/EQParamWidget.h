@@ -130,7 +130,7 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
 class EQParamWidget  : public juce::Component
 {
 public:
-    EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut);
+    EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition chainPos, bool isCut);
     ~EQParamWidget() override;
     void refreshButtons(ChannelMode mode);
     void setUpButton(juce::Button& button);
@@ -141,7 +141,7 @@ public:
 
 private:
     
-    int filterNumber;
+    ChainPosition chainPos;
     bool isCut;
     
     juce::AudioProcessorValueTreeState& apvts;

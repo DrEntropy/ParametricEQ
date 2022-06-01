@@ -11,7 +11,7 @@
 #include "EQParamWidget.h"
 
 
-EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut) : apvts (apvts), filterNumber (filterNumber), isCut (isCut)
+EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition cp, bool isCut) : apvts (apvts), chainPos(cp), isCut (isCut)
 {
     setLookAndFeel(&eQParamLookAndFeel);
     
@@ -88,17 +88,17 @@ void EQParamWidget::setUpButton(juce::Button& button)
 void EQParamWidget::attachSliders(Channel channel)
 {
     frequencyAttachment.reset(); //must first delete old attachment before creating new one!
-    frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, filterNumber), frequencySlider));
+    frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, chainPos), frequencySlider));
 
     qAttachment.reset();
-    qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, filterNumber), qSlider));
+    qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, chainPos), qSlider));
 
     juce::String gainOrSlopeParamString;
 
     if(isCut)
-        gainOrSlopeParamString = createSlopeParamString(channel, filterNumber);
+        gainOrSlopeParamString = createSlopeParamString(channel, chainPos);
     else
-        gainOrSlopeParamString = createGainParamString(channel, filterNumber);
+        gainOrSlopeParamString = createGainParamString(channel, chainPos);
 
     gainOrSlopeAttachment.reset();
     gainOrSlopeAttachment.reset(new SliderAttachment(apvts, gainOrSlopeParamString, *gainOrSlopeSlider));

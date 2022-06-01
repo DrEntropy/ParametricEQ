@@ -137,49 +137,53 @@ private:
     }
     
     
-    template <const int filterNum>
+    template <const ChainPosition chainPos>
     void preUpdateParametricFilter(ChannelMode mode, double sampleRate)
     {
         using namespace ChainHelpers;
-        FilterParameters parametricParamsLeft = getParametericFilterParams<filterNum>(Channel::Left, sampleRate, apvts);
+        FilterParameters parametricParamsLeft = getParametericFilterParams<chainPos>(Channel::Left, sampleRate, apvts);
         FilterParameters parametricParamsRight;
         
         if(mode == ChannelMode::Stereo)
             parametricParamsRight = parametricParamsLeft;
         else
-            parametricParamsRight = getParametericFilterParams<filterNum>(Channel::Right, sampleRate, apvts);
+            parametricParamsRight = getParametericFilterParams<chainPos>(Channel::Right, sampleRate, apvts);
         
+        constexpr int filterNum = static_cast<int>(chainPos);
         leftChain.get<filterNum>().performPreloopUpdate(parametricParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(parametricParamsRight);
     }
     
     
-    template <const int filterNum>
+    template <const ChainPosition chainPos>
     void loopUpdateParametricFilter(int samplesToSkip)
     {
+        constexpr int filterNum = static_cast<int>(chainPos);
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
     }
     
-    template <const int filterNum>
+    template <const ChainPosition chainPos>
     void preUpdateCutFilter(ChannelMode mode, double sampleRate, bool isLowCut)
     {
         using namespace ChainHelpers;
-        HighCutLowCutParameters cutParamsLeft = getCutFilterParams<filterNum>(Channel::Left, sampleRate, isLowCut, apvts);
+        HighCutLowCutParameters cutParamsLeft = getCutFilterParams<chainPos>(Channel::Left, sampleRate, isLowCut, apvts);
         HighCutLowCutParameters cutParamsRight;
         
         if(mode == ChannelMode::Stereo)
             cutParamsRight = cutParamsLeft;
         else
-            cutParamsRight = getCutFilterParams<filterNum>(Channel::Right, sampleRate, isLowCut, apvts);
-            
+            cutParamsRight = getCutFilterParams<chainPos>(Channel::Right, sampleRate, isLowCut, apvts);
+        
+        constexpr int filterNum = static_cast<int>(chainPos);
         leftChain.get<filterNum>().performPreloopUpdate(cutParamsLeft);
         rightChain.get<filterNum>().performPreloopUpdate(cutParamsRight);
     }
     
-    template <const int filterNum>
+    template <const ChainPosition chainPos>
     void loopUpdateCutFilter(int samplesToSkip)
     {
+        constexpr int filterNum = static_cast<int>(chainPos);
         leftChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
         rightChain.get<filterNum>().performInnerLoopFilterUpdate(true, samplesToSkip);
     }
@@ -193,7 +197,7 @@ private:
     void updateTrims();
     
     
-    void addFilterParamToLayout(ParamLayout&, Channel, int, bool);
+    void addFilterParamToLayout(ParamLayout&, Channel, ChainPosition, bool);
     void createFilterLayouts(ParamLayout& layout, Channel channel);
     
     void performMidSideTransform(juce::AudioBuffer<float>&);

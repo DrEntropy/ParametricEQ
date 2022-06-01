@@ -32,24 +32,24 @@ using MonoFilterChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
                                             CutFilter>;
 
-template <const int filterNum>
+template <const ChainPosition chainPos>
 FilterParameters getParametericFilterParams(Channel channel, double sampleRate, juce::AudioProcessorValueTreeState& apvts)
 {
     using namespace FilterInfo;
     
-    float frequency = apvts.getRawParameterValue(createFreqParamString(channel, filterNum))->load();
-    float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
-    bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
+    float frequency = apvts.getRawParameterValue(createFreqParamString(channel, chainPos))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(channel, chainPos))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, chainPos))->load() > 0.5f;
     
     FilterParameters parametricParams;
     
     
-    switch(filterNum)
+    switch(chainPos)
     {
-        case 1:
+        case ChainPosition::LowShelf:
             parametricParams.filterType =  FilterType::LowShelf;
             break;
-        case 6:
+        case ChainPosition::HighShelf:
             parametricParams.filterType = FilterType::HighShelf;
             break;
         default:
@@ -61,22 +61,22 @@ FilterParameters getParametericFilterParams(Channel channel, double sampleRate, 
     parametricParams.sampleRate = sampleRate;
     parametricParams.quality = quality;
     parametricParams.bypassed = bypassed;
-    parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(channel, filterNum))-> load());
+    parametricParams.gain = Decibel <float> (apvts.getRawParameterValue(createGainParamString(channel, chainPos))-> load());
     
     return parametricParams;
 
 }
 
-template <const int filterNum>
+template <const ChainPosition chainPos>
 HighCutLowCutParameters getCutFilterParams(Channel channel, double sampleRate,bool isLowCut, juce::AudioProcessorValueTreeState& apvts)
 {
     using namespace FilterInfo;
     
-    float frequency = apvts.getRawParameterValue(createFreqParamString(channel, filterNum))->load();
-    float quality  = apvts.getRawParameterValue(createQParamString(channel, filterNum))->load();
-    bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, filterNum))->load() > 0.5f;
+    float frequency = apvts.getRawParameterValue(createFreqParamString(channel, chainPos))->load();
+    float quality  = apvts.getRawParameterValue(createQParamString(channel, chainPos))->load();
+    bool bypassed = apvts.getRawParameterValue(createBypassParamString(channel, chainPos))->load() > 0.5f;
     
-    Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(channel, filterNum))->load());
+    Slope slope = static_cast<Slope> (apvts.getRawParameterValue(createSlopeParamString(channel, chainPos))->load());
     
     HighCutLowCutParameters cutParams;
         
@@ -90,10 +90,10 @@ HighCutLowCutParameters getCutFilterParams(Channel channel, double sampleRate,bo
     return cutParams;
 }
 
-template <const int filterNum, typename ParamType>
+template <const ChainPosition chainPos, typename ParamType>
 void initializeChain(MonoFilterChain& chain, ParamType params,float rampTime, bool onRealTimeThread, double sampleRate)
 {
-    chain.get<filterNum>().initialize(params, rampTime, onRealTimeThread, sampleRate);
+    chain.get<static_cast<int>(chainPos)>().initialize(params, rampTime, onRealTimeThread, sampleRate);
 }
 
 

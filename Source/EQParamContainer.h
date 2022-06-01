@@ -53,14 +53,14 @@ private:
     
     juce::AudioProcessorValueTreeState& apvts;
     
-    EQParamWidget lowCut {apvts, 0, true};
-    EQParamWidget param1 {apvts, 1, false};
-    EQParamWidget param2 {apvts, 2, false};
-    EQParamWidget param3 {apvts, 3, false};
-    EQParamWidget param4 {apvts, 4, false};
-    EQParamWidget param5 {apvts, 5, false};
-    EQParamWidget param6 {apvts, 6, false};
-    EQParamWidget highCut {apvts, 7, true};
+    EQParamWidget lowCut {apvts, ChainPosition::LowCut, true};
+    EQParamWidget param1 {apvts, ChainPosition::LowShelf, false};
+    EQParamWidget param2 {apvts, ChainPosition::PeakFilter1, false};
+    EQParamWidget param3 {apvts, ChainPosition::PeakFilter2, false};
+    EQParamWidget param4 {apvts, ChainPosition::PeakFilter3, false};
+    EQParamWidget param5 {apvts, ChainPosition::PeakFilter4, false};
+    EQParamWidget param6 {apvts, ChainPosition::HighShelf, false};
+    EQParamWidget highCut {apvts, ChainPosition::HighCut, true};
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQParamContainer)

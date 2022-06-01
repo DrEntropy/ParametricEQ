@@ -25,7 +25,19 @@ const std::map<ChannelMode,juce::String>  mapModeToString
     {ChannelMode::MidSide, "Mid-Side"},
 };
 
-using ChainPosition = int;
+enum class ChainPosition
+{
+    LowCut,
+    LowShelf,
+    PeakFilter1,
+    PeakFilter2,
+    PeakFilter3,
+    PeakFilter4,
+    HighShelf,
+    HighCut
+};
+
+juce::String createFilterNumberString(ChainPosition chainpos);
 
 juce::String createGainParamString(Channel channel, ChainPosition filterNum);
 
