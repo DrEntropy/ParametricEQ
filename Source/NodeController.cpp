@@ -15,20 +15,24 @@
 NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvts{apvts}
 {
     
-  
-   for(uint i=0; i< 8; ++i)
-   {
-       auto pos = static_cast<ChainPosition>(i);
-       nodes[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
-       addChildComponent(*nodes[i]);
-       nodes[i+8] = std::make_unique<AnalyzerNode>(pos, Channel::Right);
-       addChildComponent(*nodes[i + 8]);
-   }
-    
-    allParamsListener.reset( new AllParamsListener(apvts, [this]()
+    setComponentID("CONTROLLER");
+    for(uint i=0; i< 8; ++i)
     {
-        refreshNodes();
-    }));
+        auto pos = static_cast<ChainPosition>(i);
+       
+        nodes[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
+        nodes[i]->setComponentID(juce::String("NODE:") + "L:" + std::to_string(i));
+        nodes[i]->addMouseListener(this, false);
+        addChildComponent(*nodes[i]);
+       
+        nodes[i + 8] = std::make_unique<AnalyzerNode>(pos, Channel::Right);
+        nodes[i + 8]->setComponentID(juce::String("NODE:") + "R:" + std::to_string(i));
+        nodes[i + 8]->addMouseListener(this, false);
+        addChildComponent(*nodes[i + 8]);
+    }
+    
+    allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
+  
 }
 
 void NodeController::resized()
@@ -37,6 +41,10 @@ void NodeController::resized()
     refreshNodes();
 }
 
+void NodeController::refreshWidgets()
+{
+    refreshNodes();
+}
 
 void NodeController::refreshNodes()
 {
@@ -94,5 +102,51 @@ void NodeController::updateNode(AnalyzerNode& node,ChainPosition chainPos, Chann
     node.updateGainOrSlope(gainOrSlope);
     node.setVisible(true);
 }
+
+
+
+void debugMouse(juce::String type, const juce::MouseEvent &event)
+{
+    auto component =  event.originalComponent -> getComponentID();
+    DBG(type + "from: " + component);
+}
+
+// Mouse Handling
+void NodeController::mouseMove(const juce::MouseEvent &event)
+{
+    
+}
+
+
+void NodeController::mouseEnter(const juce::MouseEvent &event)
+{
+    debugMouse("Enter", event);
+}
+
+void NodeController::mouseExit(const juce::MouseEvent &event)
+{
+    debugMouse("Exit", event);
+}
+
+void NodeController::mouseDown(const juce::MouseEvent &event)
+{
+    debugMouse("Down", event);
+}
+
+void NodeController::mouseDrag(const juce::MouseEvent &event)
+{
+    debugMouse("Drag", event);
+}
+
+void NodeController::mouseUp(const juce::MouseEvent &event)
+{
+    debugMouse("Mouse Up", event);
+}
+
+void NodeController::mouseDoubleClick(const juce::MouseEvent &event)
+{
+    debugMouse("DoubleClick", event);
+}
+
 
 
