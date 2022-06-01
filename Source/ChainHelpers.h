@@ -86,11 +86,12 @@ inline HighCutLowCutParameters getCutFilterParams(const ChainPosition chainPos, 
     
     return cutParams;
 }
+ 
 
 template <typename ParamType>
 ParamType getFilterParams(ChainPosition chainpos, Channel channel, double sampleRate, juce::AudioProcessorValueTreeState& apvts)
 {
-    jassert(false);
+    jassert(false); // If you end up calling the base template then something went wrong.
     return ParamType();
 }
 
@@ -108,7 +109,7 @@ inline FilterParameters getFilterParams<FilterParameters>(ChainPosition chainpos
 
 
 template <const ChainPosition chainPos, typename ParamType>
-void initializeChain(MonoFilterChain& chain, Channel channel, juce::AudioProcessorValueTreeState& apvts, float rampTime, bool onRealTimeThread, double sampleRate)
+void initializeChainLink(MonoFilterChain& chain, Channel channel, juce::AudioProcessorValueTreeState& apvts, float rampTime, bool onRealTimeThread, double sampleRate)
 {
     ParamType params = getFilterParams<ParamType>(chainPos, channel, sampleRate, apvts);
     chain.get<static_cast<int>(chainPos)>().initialize(params, rampTime, onRealTimeThread, sampleRate);

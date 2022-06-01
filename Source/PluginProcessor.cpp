@@ -450,18 +450,18 @@ void ParametricEQAudioProcessor::initializeFilters(ChainHelpers::MonoFilterChain
     using namespace ChainHelpers;
     // initialize filters
    
-    initializeChain<ChainPosition::LowShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter1, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter2, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter3, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::PeakFilter4, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::HighShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::LowShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter1, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter2, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter3, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::PeakFilter4, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::HighShelf, FilterParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
     
     
     //low cut filter, and then high cut
    
-    initializeChain<ChainPosition::LowCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
-    initializeChain<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::LowCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
+    initializeChainLink<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
 }
 
 
