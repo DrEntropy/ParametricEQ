@@ -23,6 +23,8 @@ struct NodeController : AnalyzerBase
 private:
     
     void refreshNodes();
+    void updateNode(AnalyzerNode& node, ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox);
+    
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::unique_ptr<AllParamsListener> allParamsListener;
     

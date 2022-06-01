@@ -14,13 +14,21 @@
 
 NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvts{apvts}
 {
+    
+  
    for(uint i=0; i< 8; ++i)
    {
        auto pos = static_cast<ChainPosition>(i);
        nodes[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
-       addAndMakeVisible(*nodes[i]);
+       addChildComponent(*nodes[i]);
        nodes[i+8] = std::make_unique<AnalyzerNode>(pos, Channel::Right);
+       addChildComponent(*nodes[i + 8]);
    }
+    
+    allParamsListener.reset( new AllParamsListener(apvts, [this]()
+    {
+        refreshNodes();
+    }));
 }
 
 void NodeController::resized()
@@ -32,21 +40,59 @@ void NodeController::resized()
 
 void NodeController::refreshNodes()
 {
-    auto size = AnalyzerNode::nodeSize;
+   
     auto bBox = fftBoundingBox.toFloat();
+    bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo;
     
-    // inner filters
-    for(uint i=1; i< 7; ++i)
+    for(uint i=0; i< 8; ++i)
     {
         auto pos = static_cast<ChainPosition>(i);
-        auto params = ChainHelpers::getFilterParams<FilterParameters>(pos, Channel::Left, 0.0, apvts);
-        auto y = juce::jmap(params.gain.getDb(), static_cast<float>(RESPONSE_CURVE_MIN_DB), static_cast<float>(RESPONSE_CURVE_MAX_DB), bBox.getBottom(), bBox.getY());
-        auto x = juce::mapFromLog10(params.frequency, 20.f, 20000.f) * bBox.getWidth() + bBox.getX();
-        nodes[i]->setBounds(x, y, size, size);
-        //nodes[i+8]->setBounds(<#int x#>, <#int y#>, size, size)
+        updateNode(*nodes[i], pos, Channel::Left, bBox);
+    
+        if(drawRightMid)
+        {
+            updateNode(*nodes[i + 8], pos, Channel::Right, bBox);
+        }
+    }
+}
+
+
+
+
+void NodeController::updateNode(AnalyzerNode& node,ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox)
+{
+    auto const size = AnalyzerNode::nodeSize;
+    float freq;
+    float gainOrSlope;
+    bool bypassed;
+    
+    if(chainPos == ChainPosition::LowCut || chainPos == ChainPosition::HighCut)
+    {
+        auto cutParams = ChainHelpers::getFilterParams<HighCutLowCutParameters>(chainPos, channel, 0.0, apvts);
+        freq = cutParams.frequency;
+        gainOrSlope = 30 - cutParams.order * 6.f;
+        bypassed = cutParams.bypassed;
+    }
+    else
+    {
+        auto params = ChainHelpers::getFilterParams<FilterParameters>(chainPos, channel, 0.0, apvts);
+        freq = params.frequency;
+        gainOrSlope = params.gain.getDb();
+        bypassed = params.bypassed;
     }
     
-    //cut filters , factor this later.
-   // auto lowCutParamsL = ChainHelpers::getFilterParams<HighCutLowCutParameters>(ChainPosition::LowCut, Channel::Left, 0.0, apvts);
-   // auto lowCutParamsR = ChainHelpers::getFilterParams<HighCutLowCutParameters>(ChainPosition::LowCut, Channel::Right, 0.0, apvts);
+    if(bypassed)
+    {
+        node.setVisible(false);
+        return;
+    }
+    auto y = juce::jmap(gainOrSlope, static_cast<float>(RESPONSE_CURVE_MIN_DB), static_cast<float>(RESPONSE_CURVE_MAX_DB), bBox.getBottom(), bBox.getY());
+    auto x = juce::mapFromLog10(freq, 20.f, 20000.f) * bBox.getWidth() + bBox.getX();
+    
+    node.setBounds(x - size / 2, y - size / 2, size, size);
+    node.updateFrequency(freq);
+    node.updateGainOrSlope(gainOrSlope);
+    node.setVisible(true);
 }
+
+

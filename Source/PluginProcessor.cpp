@@ -370,7 +370,8 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, Ch
     label = createFreqParamString(channel, chainPos);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f),
-                                                                     (chainPos == ChainPosition::HighCut ? 20000.0f : 20.0f)));
+                                                                     (chainPos == ChainPosition::HighCut ||
+                                                                      chainPos == ChainPosition::HighShelf ? 20000.0f : 20.0f)));
     
     
     if(!isCut)
