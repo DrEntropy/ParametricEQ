@@ -21,6 +21,7 @@
 #include "SpectrumAnalyzer.h"
 #include "AnalyzerControls.h"
 #include "ResponseCurveComponent.h"
+#include "NodeController.h"
 
 
 //layout defines
@@ -71,6 +72,8 @@ private:
     AnalyzerControls analyzerControls;
     
     ResponseCurveComponent responseCurve;
+    
+    NodeController nodeController;
     
 #if USE_TEST_OSC
     int counter {0};

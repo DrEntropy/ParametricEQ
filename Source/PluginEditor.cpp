@@ -12,7 +12,7 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts), nodeController(p.apvts)
 
 {
     spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));
@@ -28,6 +28,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(globalBypass);
     addAndMakeVisible(*spectrumAnalyzer);
     addAndMakeVisible(responseCurve);
+    addAndMakeVisible(nodeController);
  
     setSize (1200, 800);
     
@@ -80,6 +81,7 @@ void ParametricEQAudioProcessorEditor::resized()
     auto centerBounds = bounds;
     spectrumAnalyzer->setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     responseCurve.setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
+    nodeController.setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     
     // for future use, make room for square bounded controls
     auto controlWidth = bottomBounds.getHeight();
@@ -94,6 +96,7 @@ void ParametricEQAudioProcessorEditor::resized()
     auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 9  / 2);
     
     analyzerControls.setBounds(analyzerControlBounds);
+   
     
     auto resetAllBounds = bottomBounds; //Placeholder
 }
@@ -103,8 +106,6 @@ void ParametricEQAudioProcessorEditor::timerCallback()
 {
     auto& inputFifo = audioProcessor.inMeterValuesFifo;
     auto& outputFifo = audioProcessor.outMeterValuesFifo;
-    
-   
     
     MeterValues values;
     

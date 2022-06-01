@@ -15,13 +15,17 @@
 
 struct NodeController : AnalyzerBase
 {
-    NodeController();
+    NodeController(juce::AudioProcessorValueTreeState&);
     
+    
+    void resized() override;
     
 private:
     
-    std::array<std::unique_ptr<AnalyzerNode> , 16> nodes;
+    void refreshNodes();
+    std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::unique_ptr<AllParamsListener> allParamsListener;
     
+    juce::AudioProcessorValueTreeState& apvts;
 };
 
