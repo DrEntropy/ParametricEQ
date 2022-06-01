@@ -22,35 +22,35 @@ juce::String createChannelString(Channel channel)
     return "right_";
 }
 
-juce::String createParamString(Channel channel, juce::String label, ChainPosition filterNum)
+juce::String createParamString(Channel channel, juce::String label, ChainPosition chainpos)
 {
-    return "Filter_" + createChannelString(channel) + createFilterNumberString(filterNum)+"_"+ label;
+    return "Filter_" + createChannelString(channel) + createFilterNumberString(chainpos)+"_"+ label;
 }
 
 
-juce::String createGainParamString(Channel channel, ChainPosition filterNum)
+juce::String createGainParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "gain",filterNum);
+    return createParamString(channel, "gain", chainpos);
 }
 
-juce::String createQParamString(Channel channel, ChainPosition filterNum)
+juce::String createQParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "Q",filterNum);
+    return createParamString(channel, "Q", chainpos);
 }
 
-juce::String createFreqParamString(Channel channel, ChainPosition filterNum)
+juce::String createFreqParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "freq",filterNum);
+    return createParamString(channel, "freq", chainpos);
 }
 
-juce::String createBypassParamString(Channel channel, ChainPosition filterNum)
+juce::String createBypassParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "bypass",filterNum);
+    return createParamString(channel, "bypass", chainpos);
 }
 
-juce::String createTypeParamString(Channel channel, ChainPosition filterNum)
+juce::String createTypeParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "type",filterNum);
+    return createParamString(channel, "type", chainpos);
 }
 
 

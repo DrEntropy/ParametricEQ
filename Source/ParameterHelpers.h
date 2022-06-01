@@ -39,17 +39,17 @@ enum class ChainPosition
 
 juce::String createFilterNumberString(ChainPosition chainpos);
 
-juce::String createGainParamString(Channel channel, ChainPosition filterNum);
+juce::String createGainParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createQParamString(Channel channel, ChainPosition filterNum);
+juce::String createQParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createFreqParamString(Channel channel, ChainPosition filterNum);
+juce::String createFreqParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createBypassParamString(Channel channel, ChainPosition filterNum);
+juce::String createBypassParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createTypeParamString(Channel channel, ChainPosition filterNum);
+juce::String createTypeParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createSlopeParamString(Channel channel, ChainPosition filterNum);
+juce::String createSlopeParamString(Channel channel, ChainPosition chainpos);
 
 juce::String createChannelString(Channel channel);
  
