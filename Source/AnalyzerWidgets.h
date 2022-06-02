@@ -37,13 +37,13 @@ struct AnalyzerBand : AnalyzerWidgetBase
     void paint(juce::Graphics& g) override;
 };
 
-// ADD later
-//struct AnalyzerQControl : AnalyzerWidgetBase
-//{
-//    AnalyzerQControl() : AnalyzerWidgetBase(ChainPosition::Peak1, Channel::Left) { setMouseCursor(juce::MouseCursor::LeftRightResizeCursor); }
-//    void setChainPosition(ChainPosition cp) { chainPosition = cp; }
-//    void setChannel(Channel ch) { channel = ch; }
-//};
+ 
+struct AnalyzerQControl : AnalyzerWidgetBase
+{
+    AnalyzerQControl() : AnalyzerWidgetBase(ChainPosition::PeakFilter1, Channel::Left) { setMouseCursor(juce::MouseCursor::LeftRightResizeCursor); }
+    void setChainPosition(ChainPosition cp) { chainPosition = cp; }
+    void setChannel(Channel ch) { channel = ch; }
+};
 
 struct AnalyzerNode : AnalyzerWidgetBase
 {

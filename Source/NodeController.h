@@ -32,6 +32,13 @@ private:
     void refreshWidgets();
     void refreshNodes();
     void updateNode(AnalyzerNode& node, ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox);
+    void debugMouse(juce::String type, const juce::MouseEvent &event);
+    
+    float frequencyFromX(float x);
+    float gainFromY(float y);
+    
+    bool adjustingNode{false};
+    float prevFreq, prevGainOrSlope;
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::unique_ptr<AllParamsListener> allParamsListener;
