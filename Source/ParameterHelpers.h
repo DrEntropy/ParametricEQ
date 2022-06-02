@@ -53,3 +53,8 @@ juce::String createSlopeParamString(Channel channel, ChainPosition chainpos);
 
 juce::String createChannelString(Channel channel);
  
+juce::RangedAudioParameter* getFrequencyParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);
+
+juce::RangedAudioParameter* getQParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);
+
+juce::RangedAudioParameter* getGainOrSlopeParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);

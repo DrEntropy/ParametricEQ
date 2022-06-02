@@ -128,6 +128,15 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
         nodes[i + 8]->setComponentID(juce::String("NODE:") + "R:" + std::to_string(i));
         nodes[i + 8]->addMouseListener(this, false);
         addChildComponent(*nodes[i + 8]);
+        
+        
+        freqAttachements[i] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, Channel::Left, pos), nullptr);
+        qAttachements[i] = std::make_unique<ParameterAttachment>(*getQParam(apvts, Channel::Left, pos), nullptr);
+        gainOrSlopeAttachements[i] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, Channel::Left, pos), nullptr);
+        
+        freqAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, Channel::Right, pos), nullptr);
+        qAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getQParam(apvts, Channel::Right, pos), nullptr);
+        gainOrSlopeAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, Channel::Right, pos), nullptr);
     }
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
@@ -233,6 +242,8 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             dragger.startDraggingComponent(node, event);
+            getAttachmentForNode(freqAttachements, node).beginGesture();
+            getAttachmentForNode(gainOrSlopeAttachements, node).beginGesture();
             break;
         }
         default:
@@ -250,10 +261,27 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
     {
         case WidgetVariant::Node:
         {
+            // TODO, avoid repeating self!
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             dragger.dragComponent(node, event, nullptr);
             node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
-            node->updateGainOrSlope(gainFromY(node->getY() + node->getHeight() / 2.0));
+            
+            auto& gainOrSlopeAttach = getAttachmentForNode(gainOrSlopeAttachements, node);
+            if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
+            {
+                auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
+                node->updateGainOrSlope(slope);
+                // this is awkward... need to refactor.
+                gainOrSlopeAttach.setValueAsPartOfGesture((slope-6.f)/6.f);
+            }
+            else
+            {
+                node->updateGainOrSlope(gainFromY(node->getY() + node->getHeight() / 2.0));
+                gainOrSlopeAttach.setValueAsPartOfGesture(node->getGainOrSlope());
+            }
+            
+            getAttachmentForNode(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
+            
             break;
         }
         default:
@@ -265,6 +293,20 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
 
 void NodeController::mouseUp(const juce::MouseEvent &event)
 {
+    auto widgetVar = getEventsComponent(event);
+    switch (widgetVar.component.index())
+    {
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            getAttachmentForNode(freqAttachements, node).endGesture();
+            getAttachmentForNode(gainOrSlopeAttachements, node).endGesture();
+            break;
+        }
+        default:
+            ;
+            
+    }
     debugMouse("Mouse Up", event);
 }
 
@@ -283,4 +325,23 @@ float NodeController::gainFromY(float y)
 {
     auto bBox = fftBoundingBox.toFloat();
     return juce::jmap(y, bBox.getBottom(), bBox.getY(), static_cast<float>(RESPONSE_CURVE_MIN_DB), static_cast<float>(RESPONSE_CURVE_MAX_DB ));
+}
+
+float NodeController::slopeFromY(float y)
+{
+    auto bBox = fftBoundingBox.toFloat();
+    return juce::jmap(y, bBox.getBottom(), bBox.getY(), 30.f - static_cast<float>(RESPONSE_CURVE_MIN_DB), 30.f - static_cast<float>(RESPONSE_CURVE_MAX_DB));
+}
+
+
+ParameterAttachment& NodeController::getAttachmentForNode(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerNode* node)
+{
+    Channel ch = node->getChannel();
+    ChainPosition cp = node->getChainPosition();
+    size_t filterNum = static_cast<size_t>(cp);
+    
+    if(ch == Channel::Left)
+        return *attachments[filterNum];
+ 
+    return *attachments[filterNum + 8];
 }

@@ -12,6 +12,7 @@
 #include "AnalyzerBase.h"
 #include "AnalyzerWidgets.h"
 #include "AllParamsListener.h"
+#include "ParameterAttachment.h"
 
 struct NodeController : AnalyzerBase 
 {
@@ -36,12 +37,20 @@ private:
     
     float frequencyFromX(float x);
     float gainFromY(float y);
+    float slopeFromY(float y);
     
     bool adjustingNode{false};
     float prevFreq, prevGainOrSlope;
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
+    std::array<std::unique_ptr<ParameterAttachment>, 16> freqAttachements;
+    std::array<std::unique_ptr<ParameterAttachment>, 16> qAttachements;
+    std::array<std::unique_ptr<ParameterAttachment>, 16> gainOrSlopeAttachements;
+    
     std::unique_ptr<AllParamsListener> allParamsListener;
+    
+    ParameterAttachment& getAttachmentForNode(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerNode* node);
+ 
     
     juce::ComponentDragger dragger;
     

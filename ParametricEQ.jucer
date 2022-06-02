@@ -25,6 +25,10 @@
               file="Source/HelperFunctions.h"/>
       </GROUP>
       <GROUP id="{2E90EA13-AF78-352E-2563-3511802F5243}" name="ResponseCurve">
+        <FILE id="rwjo49" name="ParameterAttachment.cpp" compile="1" resource="0"
+              file="Source/ParameterAttachment.cpp"/>
+        <FILE id="R2N5ea" name="ParameterAttachment.h" compile="0" resource="0"
+              file="Source/ParameterAttachment.h"/>
         <FILE id="uTToKi" name="AnalyzerWidgets.cpp" compile="1" resource="0"
               file="Source/AnalyzerWidgets.cpp"/>
         <FILE id="YVjDUQ" name="AnalyzerWidgets.h" compile="0" resource="0"

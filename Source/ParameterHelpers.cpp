@@ -58,3 +58,22 @@ juce::String createSlopeParamString(Channel channel, ChainPosition filterNum)
 {
     return createParamString(channel, "slope",filterNum);
 }
+
+
+juce::RangedAudioParameter* getFrequencyParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+  return  apvts.getParameter(createFreqParamString(channel, chainpos));
+}
+
+juce::RangedAudioParameter* getQParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+    return  apvts.getParameter(createQParamString(channel, chainpos));
+}
+
+juce::RangedAudioParameter* getGainOrSlopeParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+    if(chainpos == ChainPosition::LowCut || chainpos == ChainPosition::HighCut)
+        return apvts.getParameter(createSlopeParamString(channel, chainpos));
+    
+    return  apvts.getParameter(createGainParamString(channel, chainpos));
+}
