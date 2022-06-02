@@ -43,6 +43,8 @@ private:
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::unique_ptr<AllParamsListener> allParamsListener;
     
+    juce::ComponentDragger dragger;
+    
     juce::AudioProcessorValueTreeState& apvts;
 };
 

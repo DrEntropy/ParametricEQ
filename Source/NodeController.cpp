@@ -15,19 +15,17 @@
 
 
 
-enum class ComponentType
-{
-    Node,
-    QControl,
-    Band,
-    Controller,
-    Invalid
-};
-
 struct WidgetVariant
 {
-    ComponentType type;
-    std::variant<AnalyzerNode*, AnalyzerQControl*, AnalyzerBand*>  component;
+    std::variant<std::monostate, NodeController*, AnalyzerNode*, AnalyzerQControl*, AnalyzerBand*>  component;
+    enum Indices
+    {
+        Invalid,
+        Controller,
+        Node,
+        QControl,
+        Band
+    };
 };
  
 
@@ -37,26 +35,23 @@ WidgetVariant getEventsComponent(const juce::MouseEvent &event)
     auto componentPtr =  event.originalComponent;
     if(auto nodeController = dynamic_cast<NodeController*>(componentPtr))
     {
-        widgetVar.type = ComponentType::Controller;
+        widgetVar.component = nodeController;
     }
     else if(auto analyzerNode = dynamic_cast<AnalyzerNode *>(componentPtr))
     {
-        widgetVar.type = ComponentType::Node;
         widgetVar.component = analyzerNode;
     }
     else if(auto analyzerQ = dynamic_cast<AnalyzerQControl *>(componentPtr))
     {
-        widgetVar.type = ComponentType::QControl;
         widgetVar.component = analyzerQ;
     }
     else if(auto band = dynamic_cast<AnalyzerBand *>(componentPtr))
     {
-        widgetVar.type = ComponentType::Band;
         widgetVar.component = band;
     }
     else
     {
-        widgetVar.type = ComponentType::Invalid;
+        widgetVar.component = std::monostate();
         jassertfalse;  // Should not happen
     }
     return widgetVar;
@@ -76,6 +71,15 @@ struct ChannelVisitor
     {
         return qc->getChannel();
     }
+    Channel operator()(NodeController*) const
+    {
+        return Channel::Left;
+    }
+    Channel operator()(std::monostate) const
+    {
+        jassertfalse;
+        return Channel::Left;
+    }
 };
 
 void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event)
@@ -84,7 +88,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
     auto widgetVar = getEventsComponent(event);
     juce::String channelLabel{"None"};
     
-    if(widgetVar.type != ComponentType::Invalid  && widgetVar.type != ComponentType::Controller)
+    if(widgetVar.component.index() != WidgetVariant::Invalid  && widgetVar.component.index() != WidgetVariant::Invalid)
     {
         auto channel = std::visit(ChannelVisitor{}, widgetVar.component);
         channelLabel = (channel == Channel::Left ? "Left" : "Right");
@@ -92,7 +96,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
     
     int x = 0;
     int y = 0;
-    if(widgetVar.type != ComponentType::Controller)
+    if(widgetVar.component.index() != WidgetVariant::Controller)
     {
         x = event.originalComponent->getX();
         y = event.originalComponent->getY();
@@ -103,7 +107,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
     DBG(type + "from: " + componentID + " ch:" + channelLabel + " freq:" +
         std::to_string(frequencyFromX(x + event.x))  + " gain:" + std::to_string(gainFromY(y + event.y)) );
     
-    if(widgetVar.type == ComponentType::Node)
+    if(widgetVar.component.index() == WidgetVariant::Node)
         DBG("Node frequency:" + std::to_string(std::get<AnalyzerNode *>(widgetVar.component)->getFrequency()));
 }
 
@@ -220,21 +224,42 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
 
 void NodeController::mouseDown(const juce::MouseEvent &event)
 {
-    debugMouse("Down", event);
+    
     auto widgetVar = getEventsComponent(event);
-    switch (widgetVar.type)
+    // use a visitor here?
+    switch (widgetVar.component.index())
     {
-        case ComponentType::Node:
-            // start the gesture, store the starting freq.
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            dragger.startDraggingComponent(node, event);
             break;
+        }
         default:
-            //
+            ;
             
     }
+    debugMouse("Down", event);
 }
 
 void NodeController::mouseDrag(const juce::MouseEvent &event)
 {
+    
+    auto widgetVar = getEventsComponent(event);
+    switch (widgetVar.component.index())
+    {
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            dragger.dragComponent(node, event, nullptr);
+            node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
+            node->updateGainOrSlope(gainFromY(node->getY() + node->getHeight() / 2.0));
+            break;
+        }
+        default:
+            ;
+            
+    }
     debugMouse("Drag", event);
 }
 
