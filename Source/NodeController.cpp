@@ -261,27 +261,33 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
     {
         case WidgetVariant::Node:
         {
-            // TODO, avoid repeating self!
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             dragger.dragComponent(node, event, nullptr);
             node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
             
+            float gainOrSlopeUnnorm;
             auto& gainOrSlopeAttach = getAttachmentForNode(gainOrSlopeAttachements, node);
+            
             if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
             {
                 auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
                 node->updateGainOrSlope(slope);
-                // this is awkward... need to refactor.
-                gainOrSlopeAttach.setValueAsPartOfGesture((slope-6.f)/6.f);
+                gainOrSlopeUnnorm = (slope-6.f)/6.f;
             }
             else
             {
-                node->updateGainOrSlope(gainFromY(node->getY() + node->getHeight() / 2.0));
-                gainOrSlopeAttach.setValueAsPartOfGesture(node->getGainOrSlope());
+                gainOrSlopeUnnorm = gainFromY(node->getY() + node->getHeight() / 2.0);
+                node->updateGainOrSlope(gainOrSlopeUnnorm);
             }
+            gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
             
             getAttachmentForNode(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
             
+            break;
+        }
+        
+        case WidgetVariant::Band:
+        {
             break;
         }
         default:
