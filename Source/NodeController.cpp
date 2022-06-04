@@ -140,6 +140,8 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     }
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
+
+     
   
 }
 
@@ -147,6 +149,12 @@ void NodeController::resized()
 {
     AnalyzerBase::resized();
     refreshNodes();
+    auto bounds = getLocalBounds();
+    auto top =  fftBoundingBox.getY() - bounds.getY();
+    auto left = fftBoundingBox.getX() - bounds.getX();
+    auto bottom = bounds.getBottom() - fftBoundingBox.getBottom();
+    auto right  = bounds.getRight() - fftBoundingBox.getRight();
+    constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
 }
 
 void NodeController::refreshWidgets()
@@ -262,7 +270,8 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            dragger.dragComponent(node, event, nullptr);
+            dragger.dragComponent(node, event, &constrainer);
+            
             node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
             
             float gainOrSlopeUnnorm;

@@ -53,6 +53,7 @@ private:
  
     
     juce::ComponentDragger dragger;
+    juce::ComponentBoundsConstrainer constrainer{};
     
     juce::AudioProcessorValueTreeState& apvts;
 };
