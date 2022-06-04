@@ -23,7 +23,7 @@ struct BoundsContrainer : juce::ComponentBoundsConstrainer
     {
         auto centre = bounds.getCentre();
         
-        if(centre.getX() < boundsLimit.getY())
+        if(centre.getY() < boundsLimit.getY())
             centre.setY( boundsLimit.getY());
         if(centre.getY() > boundsLimit.getBottom())
             centre.setY(boundsLimit.getBottom());
