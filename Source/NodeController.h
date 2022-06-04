@@ -14,6 +14,33 @@
 #include "AllParamsListener.h"
 #include "ParameterAttachment.h"
 
+
+struct BoundsContrainer : juce::ComponentBoundsConstrainer
+{
+    void  checkBounds (juce::Rectangle<int>& bounds, const juce::Rectangle<int>& /* old */, const juce::Rectangle<int>& /* limits */,
+                       bool /* isStretchingTop */, bool /* isStretchingLeft */,
+                       bool /* isStretchingBottom */, bool /* isStretchingRight */) override
+    {
+        auto centre = bounds.getCentre();
+        
+        if(centre.getX() < boundsLimit.getY())
+            centre.setY( boundsLimit.getY());
+        if(centre.getY() > boundsLimit.getBottom())
+            centre.setY(boundsLimit.getBottom());
+        if(centre.getX() >  boundsLimit.getRight())
+            centre.setX(boundsLimit.getRight());
+        if(centre.getX() < boundsLimit.getX())
+            centre.setX(boundsLimit.getX());
+        
+        bounds.setCentre(centre);
+    }
+    
+    juce::Rectangle<int> boundsLimit;
+    
+};
+
+
+
 struct NodeController : AnalyzerBase 
 {
     NodeController(juce::AudioProcessorValueTreeState&);
@@ -50,10 +77,9 @@ private:
     std::unique_ptr<AllParamsListener> allParamsListener;
     
     ParameterAttachment& getAttachmentForNode(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerNode* node);
- 
-    
+  
     juce::ComponentDragger dragger;
-    juce::ComponentBoundsConstrainer constrainer{};
+    BoundsContrainer constrainer{};
     
     juce::AudioProcessorValueTreeState& apvts;
 };

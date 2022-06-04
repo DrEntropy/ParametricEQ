@@ -13,8 +13,6 @@
 #include <variant>
 
 
-
-
 struct WidgetVariant
 {
     std::variant<std::monostate, NodeController*, AnalyzerNode*, AnalyzerQControl*, AnalyzerBand*>  component;
@@ -141,8 +139,6 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
 
-    
-    constrainer.setMinimumOnscreenAmounts(0xffff, 0xffff, 0xffff, 0xffff);
      
   
 }
@@ -151,6 +147,7 @@ void NodeController::resized()
 {
     AnalyzerBase::resized();
     refreshNodes();
+    constrainer.boundsLimit = fftBoundingBox;
 }
 
 void NodeController::refreshWidgets()
