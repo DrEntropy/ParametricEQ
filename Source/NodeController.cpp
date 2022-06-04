@@ -141,6 +141,8 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
 
+    
+    constrainer.setMinimumOnscreenAmounts(0xffff, 0xffff, 0xffff, 0xffff);
      
   
 }
@@ -149,12 +151,6 @@ void NodeController::resized()
 {
     AnalyzerBase::resized();
     refreshNodes();
-    auto bounds = getLocalBounds();
-    auto top =  fftBoundingBox.getY() - bounds.getY();
-    auto left = fftBoundingBox.getX() - bounds.getX();
-    auto bottom = bounds.getBottom() - fftBoundingBox.getBottom();
-    auto right  = bounds.getRight() - fftBoundingBox.getRight();
-    constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
 }
 
 void NodeController::refreshWidgets()
