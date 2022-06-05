@@ -234,11 +234,21 @@ void NodeController::mouseMove(const juce::MouseEvent &event)
 
 void NodeController::mouseEnter(const juce::MouseEvent &event)
 {
+    if(auto widget = dynamic_cast<AnalyzerWidgetBase*>(event.originalComponent))
+    {
+        widget->displayAsSelected(true);
+     }
     debugMouse("Enter", event);
 }
 
+
 void NodeController::mouseExit(const juce::MouseEvent &event)
 {
+    if(auto widget = dynamic_cast<AnalyzerWidgetBase*>(event.originalComponent))
+    {
+        widget->displayAsSelected(false);
+    }
+   
     debugMouse("Exit", event);
 }
 
@@ -306,7 +316,7 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
             ;
             
     }
-    debugMouse("Drag", event);
+   // debugMouse("Drag", event);
 }
 
 void NodeController::mouseUp(const juce::MouseEvent &event)
