@@ -39,6 +39,28 @@ struct BoundsContrainer : juce::ComponentBoundsConstrainer
     
 };
 
+struct HorizontalContrainer : juce::ComponentBoundsConstrainer
+{
+    // does not allow vertical movement.
+    void  checkBounds (juce::Rectangle<int>& bounds, const juce::Rectangle<int>& old, const juce::Rectangle<int>& /* limits */,
+                       bool /* isStretchingTop */, bool /* isStretchingLeft */,
+                       bool /* isStretchingBottom */, bool /* isStretchingRight */) override
+    {
+        auto centre = bounds.getCentre();
+    
+        if(centre.getX() >  boundsLimit.getRight())
+            centre.setX(boundsLimit.getRight());
+        if(centre.getX() < boundsLimit.getX())
+            centre.setX(boundsLimit.getX());
+        
+        centre.setY(old.getCentre().getY());
+        
+        bounds.setCentre(centre);
+    }
+    
+    juce::Rectangle<int> boundsLimit;
+    
+};
 
 
 struct NodeController : AnalyzerBase 
@@ -80,6 +102,7 @@ private:
   
     juce::ComponentDragger dragger;
     BoundsContrainer constrainer{};
+    HorizontalConstrainer hConstrainer{};
     
     juce::AudioProcessorValueTreeState& apvts;
 };

@@ -158,6 +158,8 @@ void NodeController::resized()
         nodeLimit.setBottom(fftBoundingBox.getBottom() - pixelsPerDB * (controlRange.getStart() - RESPONSE_CURVE_MIN_DB));
         return nodeLimit;
     }();
+    
+    hConstrainer.boundsLimit = constrainer.boundsLimit;
 }
 
 void NodeController::refreshWidgets()
@@ -232,6 +234,8 @@ void NodeController::mouseMove(const juce::MouseEvent &event)
 }
 
 
+
+// TODO: these could be handled in the components themselves
 void NodeController::mouseEnter(const juce::MouseEvent &event)
 {
     if(auto widget = dynamic_cast<AnalyzerWidgetBase*>(event.originalComponent))
@@ -267,6 +271,17 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             getAttachmentForNode(gainOrSlopeAttachements, node).beginGesture();
             break;
         }
+            
+        case WidgetVariant::Band:
+        {
+            break;
+        }
+        
+        case WidgetVariant::QControl:
+        {
+            break;
+        }
+            
         default:
             ;
             
@@ -312,6 +327,12 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
         {
             break;
         }
+        
+        case WidgetVariant::QControl:
+        {
+            break;
+        }
+            
         default:
             ;
             
