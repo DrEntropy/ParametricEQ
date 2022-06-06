@@ -300,6 +300,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             
             auto index = static_cast<size_t>(node->getChainPosition()) + (node->getChannel() == Channel::Left ? 0 : 8);
             bands[index]->displayAsSelected(true);
+            bands[index]->toFront(false);
             
             break;
         }
@@ -329,10 +330,9 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            node->displayAsSelected(false);
+            if(!qControlsVisitble)
+                node->displayAsSelected(false);
             
-            auto index = static_cast<size_t>(node->getChainPosition()) + (node->getChannel() == Channel::Left ? 0 : 8);
-            bands[index]->displayAsSelected(false);
             
             break;
         }
@@ -363,6 +363,12 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             dragger.startDraggingComponent(node, event);
             getAttachmentForWidget(freqAttachements, node).beginGesture();
             getAttachmentForWidget(gainOrSlopeAttachements, node).beginGesture();
+            qControlsVisitble = true;
+            if(currentNode)
+                currentNode->displayAsSelected(false);
+            
+            currentNode = node;
+            //TODO - show q controls
             break;
         }
             
@@ -371,6 +377,11 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
             dragger.startDraggingComponent(band, event);
             getAttachmentForWidget(freqAttachements, band).beginGesture();
+            if(currentNode && (currentNode->getChannel() != band->getChannel() || currentNode->getChainPosition() != band->getChainPosition()))
+            {
+                qControlsVisitble = false;
+                currentNode->displayAsSelected(false);
+            }
             break;
         }
         
@@ -380,7 +391,9 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         }
             
         default:
-            ;
+            qControlsVisitble = false;
+            if(currentNode)
+                currentNode->displayAsSelected(false);
             
     }
     debugMouse("Down", event);
