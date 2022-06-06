@@ -225,10 +225,8 @@ void NodeController::refreshWidgets()
 
 void NodeController::refreshQControls()
 {
-    auto chainPos = qControlLeft.getChainPosition();
-    auto channel = qControlLeft.getChannel();
-    auto [freq, gainOrSlope, Q, bypassed] = getParameterTuple(chainPos, channel, apvts);
     //TO DO finish setting bounds on both controls
+    // use 'current band'
 }
 
 
@@ -319,6 +317,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
             band->displayAsSelected(true);
             band->toFront(false);
+            lastBandEntered = band;
             break;
         }
             
@@ -339,7 +338,7 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            if(!qControlsVisible())
+            if(!qControlsVisible() || currentNode != node)
                 node->displayAsSelected(false);
             
             
@@ -349,7 +348,8 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         case WidgetVariant::Band:
         {
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
-            band->displayAsSelected(false);
+            if(!qControlsVisible() || currentBand != band)
+                band->displayAsSelected(false);
             break;
         }
             
@@ -372,11 +372,14 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             dragger.startDraggingComponent(node, event);
             getAttachmentForWidget(freqAttachements, node).beginGesture();
             getAttachmentForWidget(gainOrSlopeAttachements, node).beginGesture();
-            if(currentNode)
-                currentNode->displayAsSelected(false);
+            
+            //  activate q controls on this band.
+            if(currentNode && currentNode != node)
+                deactivateQControls();
             
             currentNode = node;
-            displayQControls(node->getChainPosition(), node->getChannel());
+            currentBand = lastBandEntered;
+            activateQControls(node->getChainPosition(), node->getChannel());
             break;
         }
             
@@ -387,9 +390,7 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             getAttachmentForWidget(freqAttachements, band).beginGesture();
             if(currentNode && (currentNode->getChannel() != band->getChannel() || currentNode->getChainPosition() != band->getChainPosition()))
             {
-                qControlLeft.setVisible(false);
-                qControlRight.setVisible(false);
-                currentNode->displayAsSelected(false);
+                deactivateQControls();
             }
             break;
         }
@@ -400,10 +401,8 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         }
             
         default:
-            qControlLeft.setVisible(false);
-            qControlRight.setVisible(false);
             if(currentNode)
-                currentNode->displayAsSelected(false);
+                deactivateQControls();
             
     }
     debugMouse("Down", event);
@@ -529,7 +528,7 @@ ParameterAttachment& NodeController::getAttachmentForWidget(std::array<std::uniq
 }
 
 
-void NodeController::displayQControls(ChainPosition pos, Channel ch)
+void NodeController::activateQControls(ChainPosition pos, Channel ch)
 {
     if(currentNode)
     {
@@ -541,4 +540,14 @@ void NodeController::displayQControls(ChainPosition pos, Channel ch)
         qControlRight.setVisible(true);
         refreshQControls();
     }
+}
+
+
+void NodeController::deactivateQControls()
+{
+    qControlLeft.setVisible(false);
+    qControlRight.setVisible(false);
+    currentNode->displayAsSelected(false);
+    if(currentBand)
+        currentBand->displayAsSelected(false);
 }

@@ -83,7 +83,9 @@ private:
 
     void updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox);
     void updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox);
-    void displayQControls(ChainPosition pos, Channel ch);
+    void activateQControls(ChainPosition pos, Channel ch);
+    void deactivateQControls();
+    
     void refreshQControls();
     
     void debugMouse(juce::String type, const juce::MouseEvent &event);
@@ -104,6 +106,8 @@ private:
     }
     
     AnalyzerNode* currentNode{nullptr};
+    AnalyzerBand* currentBand{nullptr};
+    AnalyzerBand* lastBandEntered{nullptr};
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::array<std::unique_ptr<AnalyzerBand> , 16> bands;
