@@ -225,8 +225,17 @@ void NodeController::refreshWidgets()
 
 void NodeController::refreshQControls()
 {
-    //TO DO finish setting bounds on both controls
-    // use 'current band'
+    if(currentBand)
+    {
+        auto bandBounds = currentBand->getBounds();
+        auto leftBounds = bandBounds.withWidth(4);
+        auto rightBounds = bandBounds.withWidth(4);
+        leftBounds.setCentre(bandBounds.getX(), bandBounds.getCentreY());
+        rightBounds.setCentre(bandBounds.getRight(), bandBounds.getCentreY());
+        qControlLeft.setBounds(leftBounds);
+        qControlRight.setBounds(rightBounds);
+        
+    }
 }
 
 
