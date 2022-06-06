@@ -218,9 +218,18 @@ void NodeController::refreshWidgets()
             updateBand(*bands[i + 8], bBox);
         }
     }
+    if(qControlsVisible())
+        refreshQControls();
 }
 
 
+void NodeController::refreshQControls()
+{
+    auto chainPos = qControlLeft.getChainPosition();
+    auto channel = qControlLeft.getChannel();
+    auto [freq, gainOrSlope, Q, bypassed] = getParameterTuple(chainPos, channel, apvts);
+    //TO DO finish setting bounds on both controls
+}
 
 
  
@@ -330,7 +339,7 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            if(!qControlsVisitble)
+            if(!qControlsVisible())
                 node->displayAsSelected(false);
             
             
@@ -363,12 +372,11 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             dragger.startDraggingComponent(node, event);
             getAttachmentForWidget(freqAttachements, node).beginGesture();
             getAttachmentForWidget(gainOrSlopeAttachements, node).beginGesture();
-            qControlsVisitble = true;
             if(currentNode)
                 currentNode->displayAsSelected(false);
             
             currentNode = node;
-            //TODO - show q controls
+            displayQControls(node->getChainPosition(), node->getChannel());
             break;
         }
             
@@ -379,7 +387,8 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             getAttachmentForWidget(freqAttachements, band).beginGesture();
             if(currentNode && (currentNode->getChannel() != band->getChannel() || currentNode->getChainPosition() != band->getChainPosition()))
             {
-                qControlsVisitble = false;
+                qControlLeft.setVisible(false);
+                qControlRight.setVisible(false);
                 currentNode->displayAsSelected(false);
             }
             break;
@@ -391,7 +400,8 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         }
             
         default:
-            qControlsVisitble = false;
+            qControlLeft.setVisible(false);
+            qControlRight.setVisible(false);
             if(currentNode)
                 currentNode->displayAsSelected(false);
             
@@ -516,4 +526,19 @@ ParameterAttachment& NodeController::getAttachmentForWidget(std::array<std::uniq
         return *attachments[filterNum];
  
     return *attachments[filterNum + 8];
+}
+
+
+void NodeController::displayQControls(ChainPosition pos, Channel ch)
+{
+    if(currentNode)
+    {
+        qControlLeft.setChannel(ch);
+        qControlLeft.setChainPosition(pos);
+        qControlLeft.setVisible(true);
+        qControlRight.setChannel(ch);
+        qControlRight.setChainPosition(pos);
+        qControlRight.setVisible(true);
+        refreshQControls();
+    }
 }

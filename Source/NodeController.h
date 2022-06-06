@@ -83,6 +83,8 @@ private:
 
     void updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox);
     void updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox);
+    void displayQControls(ChainPosition pos, Channel ch);
+    void refreshQControls();
     
     void debugMouse(juce::String type, const juce::MouseEvent &event);
     
@@ -101,14 +103,17 @@ private:
         addChildComponent(*widgets[i]);
     }
     
-    bool qControlsVisitble{false};
-    
     AnalyzerNode* currentNode{nullptr};
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::array<std::unique_ptr<AnalyzerBand> , 16> bands;
     
     AnalyzerQControl  qControlLeft{}, qControlRight{};
+    
+    inline bool qControlsVisible()
+    {
+        return qControlLeft.isVisible() || qControlRight.isVisible();
+    }
     
     std::array<std::unique_ptr<ParameterAttachment>, 16> freqAttachements;
     std::array<std::unique_ptr<ParameterAttachment>, 16> qAttachements;

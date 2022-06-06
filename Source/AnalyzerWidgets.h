@@ -59,9 +59,11 @@ struct AnalyzerNode : AnalyzerWidgetBase
     bool updateFrequency(float f) { return update(frequency, f); }
     /** returns true if the gain/slope was updated */
     bool updateGainOrSlope(float g) { return update(gainOrSlope, g); }
+ 
 private:
     float frequency = 0.f;
     float gainOrSlope = NEGATIVE_INFINITY;
+ 
     
     bool update(float& oldVal, float newVal)
     {
