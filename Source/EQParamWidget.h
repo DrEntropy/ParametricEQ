@@ -135,17 +135,21 @@ public:
     EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition chainPos, bool isCut);
     ~EQParamWidget() override;
     void refreshButtons(ChannelMode mode);
-    void refreshSliders(bool bypassed, Channel ch);
+    void refreshSliders(Channel ch);
     void setUpButton(juce::Button& button);
     void attachSliders(Channel channel);
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
  
-
+    void bandSelected(Channel ch);
+    void bandCleared();
+    
 private:
     
     ChainPosition chainPos;
     bool isCut;
+    
+    bool selected{false};
     
     Channel activeChannel;
     
