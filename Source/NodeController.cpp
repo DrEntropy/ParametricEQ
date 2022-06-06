@@ -80,6 +80,19 @@ struct ChannelVisitor
     }
 };
 
+float bandWidthFromQ(float Q)
+{
+    if(Q <= 0)
+    {
+        return 20000;
+    }
+    
+    // bandwidth in octaves, assume sufficiently high sample rate.
+    // https://www.w3.org/TR/audio-eq-cookbook/
+    
+    return std::asinh(1 / (2 * Q)) * 2 / std::log(2.f);
+}
+
 void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event)
 {
     auto componentID =  event.originalComponent -> getComponentID();
@@ -166,6 +179,19 @@ void NodeController::resized()
 void NodeController::refreshWidgets()
 {
     refreshNodes();
+    refreshBands();
+    refreshQControls();
+}
+
+
+void NodeController::refreshBands()
+{
+    
+}
+
+void NodeController::refreshQControls()
+{
+    
 }
 
 void NodeController::refreshNodes()

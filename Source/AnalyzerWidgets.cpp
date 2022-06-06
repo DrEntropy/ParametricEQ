@@ -10,6 +10,14 @@
 
 #include "AnalyzerWidgets.h"
 
+#define BAND_OPACITY_SELECTED 0.5
+#define BAND_OPACITY_NOT_SELECTED 0.25
+
+juce::Colour getColour(ChainPosition cp, Channel ch)
+{
+    //TODO paint different shade for each cp and different colour for each channel
+    return juce::Colours::lime;
+}
 
 AnalyzerWidgetBase::AnalyzerWidgetBase(ChainPosition cp, Channel ch) : chainPosition(cp), channel(ch){}
 
@@ -34,7 +42,10 @@ AnalyzerBand::AnalyzerBand(ChainPosition cp, Channel ch) :  AnalyzerWidgetBase(c
 
 void AnalyzerBand::paint(juce::Graphics& g)
 {
-    // paint rectangle
+    
+    g.setColour(getColour(chainPosition, channel));
+    g.setOpacity(isSelected  ?  BAND_OPACITY_SELECTED : BAND_OPACITY_NOT_SELECTED);
+    g.drawRect(getLocalBounds().toFloat());
 }
 
 

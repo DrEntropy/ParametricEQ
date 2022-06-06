@@ -39,7 +39,7 @@ struct BoundsContrainer : juce::ComponentBoundsConstrainer
     
 };
 
-struct HorizontalContrainer : juce::ComponentBoundsConstrainer
+struct HorizontalConstrainer : juce::ComponentBoundsConstrainer
 {
     // does not allow vertical movement.
     void  checkBounds (juce::Rectangle<int>& bounds, const juce::Rectangle<int>& old, const juce::Rectangle<int>& /* limits */,
@@ -81,6 +81,8 @@ private:
     
     void refreshWidgets();
     void refreshNodes();
+    void refreshBands();
+    void refreshQControls();
     void updateNode(AnalyzerNode& node, ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox);
     void debugMouse(juce::String type, const juce::MouseEvent &event);
     
@@ -92,6 +94,9 @@ private:
     float prevFreq, prevGainOrSlope;
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
+    std::array<std::unique_ptr<AnalyzerBand> , 16> bands;
+    std::array<std::unique_ptr<AnalyzerQControl> , 16> qControls;
+    
     std::array<std::unique_ptr<ParameterAttachment>, 16> freqAttachements;
     std::array<std::unique_ptr<ParameterAttachment>, 16> qAttachements;
     std::array<std::unique_ptr<ParameterAttachment>, 16> gainOrSlopeAttachements;
