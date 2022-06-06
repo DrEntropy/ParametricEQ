@@ -165,8 +165,8 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     {
         auto pos = static_cast<ChainPosition>(i);
         
-        addWidget(i, bands, pos, Channel::Left);
-        addWidget(i + 8, bands, pos, Channel::Right);
+        addWidget(i, bands, pos, Channel::Left, 0);
+        addWidget(i + 8, bands, pos, Channel::Right, 0);
        
         addWidget(i, nodes, pos, Channel::Left);
         addWidget(i + 8, nodes, pos, Channel::Right);
@@ -176,9 +176,6 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     }
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
-
-     
-  
 }
 
 void NodeController::resized()
@@ -316,13 +313,16 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             dragger.startDraggingComponent(node, event);
-            getAttachmentForNode(freqAttachements, node).beginGesture();
-            getAttachmentForNode(gainOrSlopeAttachements, node).beginGesture();
+            getAttachmentForWidget(freqAttachements, node).beginGesture();
+            getAttachmentForWidget(gainOrSlopeAttachements, node).beginGesture();
             break;
         }
             
         case WidgetVariant::Band:
         {
+            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+            dragger.startDraggingComponent(band, event);
+            getAttachmentForWidget(freqAttachements, band).beginGesture();
             break;
         }
         
@@ -352,7 +352,7 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
             node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
             
             float gainOrSlopeUnnorm;
-            auto& gainOrSlopeAttach = getAttachmentForNode(gainOrSlopeAttachements, node);
+            auto& gainOrSlopeAttach = getAttachmentForWidget(gainOrSlopeAttachements, node);
             
             if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
             {
@@ -367,13 +367,19 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
             }
             gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
             
-            getAttachmentForNode(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
+            getAttachmentForWidget(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
             
             break;
         }
         
         case WidgetVariant::Band:
         {
+            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+            dragger.dragComponent(band, event, &hConstrainer);
+            
+            float freq = frequencyFromX(band->getBounds().getCentreX());
+            
+            getAttachmentForWidget(freqAttachements, band).setValueAsPartOfGesture(freq);
             break;
         }
         
@@ -397,8 +403,15 @@ void NodeController::mouseUp(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            getAttachmentForNode(freqAttachements, node).endGesture();
-            getAttachmentForNode(gainOrSlopeAttachements, node).endGesture();
+            getAttachmentForWidget(freqAttachements, node).endGesture();
+            getAttachmentForWidget(gainOrSlopeAttachements, node).endGesture();
+            break;
+        }
+            
+        case WidgetVariant::Band:
+        {
+            auto band = std::get<AnalyzerBand *>(widgetVar.component);
+            getAttachmentForWidget(freqAttachements, band).endGesture();
             break;
         }
         default:
@@ -432,7 +445,7 @@ float NodeController::slopeFromY(float y)
 }
 
 
-ParameterAttachment& NodeController::getAttachmentForNode(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerNode* node)
+ParameterAttachment& NodeController::getAttachmentForWidget(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerWidgetBase* node)
 {
     Channel ch = node->getChannel();
     ChainPosition cp = node->getChainPosition();

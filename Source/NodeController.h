@@ -91,12 +91,12 @@ private:
     float slopeFromY(float y);
     
     template <typename Widget>
-    void addWidget(size_t i, std::array<std::unique_ptr<Widget>, 16>& widgets, ChainPosition pos, Channel ch)
+    void addWidget(size_t i, std::array<std::unique_ptr<Widget>, 16>& widgets, ChainPosition pos, Channel ch, int zOrder = -1)
     {
         widgets[i] = std::make_unique<Widget>(pos, ch);
         widgets[i]->setComponentID(juce::String("NODE:") + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
         widgets[i]->addMouseListener(this, false);
-        addChildComponent(*widgets[i]);
+        addChildComponent(*widgets[i], zOrder);
     }
     
     bool adjustingNode{false};
@@ -112,7 +112,7 @@ private:
     
     std::unique_ptr<AllParamsListener> allParamsListener;
     
-    ParameterAttachment& getAttachmentForNode(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerNode* node);
+    ParameterAttachment& getAttachmentForWidget(std::array<std::unique_ptr<ParameterAttachment>, 16>& attachments, AnalyzerWidgetBase* node);
   
     juce::ComponentDragger dragger;
     BoundsContrainer constrainer{};
