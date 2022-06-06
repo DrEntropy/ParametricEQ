@@ -122,17 +122,18 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
         DBG("Node frequency:" + std::to_string(std::get<AnalyzerNode *>(widgetVar.component)->getFrequency()));
 }
 
+
 NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvts{apvts}
 {
     
-    auto addWidget = [&](size_t i, auto& widgets, ChainPosition pos, Channel ch)
-    {
-        widgets[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
-        widgets[i]->setComponentID(juce::String("NODE:") + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
-        widgets[i]->addMouseListener(this, false);
-        addChildComponent(*widgets[i]);
-    };
+
     
+    auto addAttachments = [&](size_t i, ChainPosition pos, Channel ch)
+    {
+        freqAttachements[i] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, ch, pos), nullptr);
+        qAttachements[i] = std::make_unique<ParameterAttachment>(*getQParam(apvts, ch, pos), nullptr);
+        gainOrSlopeAttachements[i] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, ch, pos), nullptr);
+    };
     
     setComponentID("CONTROLLER");
     for(uint i=0; i< 8; ++i)
@@ -141,14 +142,12 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
        
         addWidget(i, nodes, pos, Channel::Left);
         addWidget(i + 8, nodes, pos, Channel::Right);
-   
-        freqAttachements[i] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, Channel::Left, pos), nullptr);
-        qAttachements[i] = std::make_unique<ParameterAttachment>(*getQParam(apvts, Channel::Left, pos), nullptr);
-        gainOrSlopeAttachements[i] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, Channel::Left, pos), nullptr);
         
-        freqAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, Channel::Right, pos), nullptr);
-        qAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getQParam(apvts, Channel::Right, pos), nullptr);
-        gainOrSlopeAttachements[i + 8] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, Channel::Right, pos), nullptr);
+        addWidget(i, bands, pos, Channel::Left);
+        addWidget(i + 8, bands, pos, Channel::Right);
+        
+        addAttachments(i, pos, Channel::Left);
+        addAttachments(i + 8, pos, Channel::Right);
     }
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));

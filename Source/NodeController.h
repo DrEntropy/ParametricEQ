@@ -90,6 +90,15 @@ private:
     float gainFromY(float y);
     float slopeFromY(float y);
     
+    template <typename Widget>
+    void addWidget(size_t i, std::array<std::unique_ptr<Widget>, 16>& widgets, ChainPosition pos, Channel ch)
+    {
+        widgets[i] = std::make_unique<Widget>(pos, ch);
+        widgets[i]->setComponentID(juce::String("NODE:") + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
+        widgets[i]->addMouseListener(this, false);
+        addChildComponent(*widgets[i]);
+    }
+    
     bool adjustingNode{false};
     float prevFreq, prevGainOrSlope;
     
