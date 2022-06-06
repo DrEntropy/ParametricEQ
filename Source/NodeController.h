@@ -15,6 +15,9 @@
 #include "ParameterAttachment.h"
 
 
+static const double widthOctaves {std::log2(20000.0 / 20.0)};
+
+
 struct BoundsContrainer : juce::ComponentBoundsConstrainer
 {
     void  checkBounds (juce::Rectangle<int>& bounds, const juce::Rectangle<int>& /* old */, const juce::Rectangle<int>& /* limits */,
@@ -78,7 +81,6 @@ struct NodeController : AnalyzerBase
     void mouseDoubleClick(const juce::MouseEvent &event) override;
     
 private:
-    
     void refreshWidgets();
 
     void updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox);

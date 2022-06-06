@@ -70,6 +70,21 @@ float bandWidthFromQ(float Q)
     return std::asinh(1 / (2 * Q)) * 2 / std::log(2.f);
 }
 
+float qFromBandWidth(float BW)
+{
+    
+    
+    // bandwidth in octaves, assume sufficiently high sample rate.
+    // https://www.w3.org/TR/audio-eq-cookbook/
+    
+    double invQ = 2 * std::sinh(std::log(2.0) / 2.0 * BW);
+    if(invQ > 0)
+        return 1.0 / invQ;
+    else
+        return 10.f;
+}
+
+
 
 std::tuple<float, float, float, bool> getParameterTuple(ChainPosition chainPos, Channel channel, juce::AudioProcessorValueTreeState& apvts)
 {
@@ -284,7 +299,7 @@ void NodeController::updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox)
     
     auto BW = bandWidthFromQ(Q);
     
-    double widthOctaves = std::log2(20000.0 / 20.0);
+    
     bounds.setWidth(bBox.getWidth() * BW / widthOctaves);
     
     bounds.setCentre(centerX, bBox.getCentreY());
@@ -406,6 +421,9 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         
         case WidgetVariant::QControl:
         {
+            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+            dragger.startDraggingComponent(qControl, event);
+            getAttachmentForWidget(qAttachements, qControl).beginGesture();
             break;
         }
             
@@ -464,6 +482,16 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
         
         case WidgetVariant::QControl:
         {
+            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+            dragger.dragComponent(qControl, event, &hConstrainer);
+            if(currentBand)
+            {
+                auto bandBounds = currentBand->getBounds();
+                auto newWidth = std::abs(bandBounds.getCentreX() - qControl->getBounds().getCentreX()) * 2.0f;
+                auto BW = newWidth / fftBoundingBox.getWidth() * widthOctaves;
+                getAttachmentForWidget(qAttachements, qControl).setValueAsPartOfGesture(qFromBandWidth(BW));
+                refreshQControls(); // forces current qControl to snap, listener misses it.
+            }
             break;
         }
             
@@ -491,6 +519,13 @@ void NodeController::mouseUp(const juce::MouseEvent &event)
         {
             auto band = std::get<AnalyzerBand *>(widgetVar.component);
             getAttachmentForWidget(freqAttachements, band).endGesture();
+            break;
+        }
+        
+        case WidgetVariant::QControl:
+        {
+            auto qControl = std::get<AnalyzerQControl *>(widgetVar.component);
+            getAttachmentForWidget(qAttachements, qControl).endGesture();
             break;
         }
         default:
@@ -544,9 +579,11 @@ void NodeController::activateQControls(ChainPosition pos, Channel ch)
         qControlLeft.setChannel(ch);
         qControlLeft.setChainPosition(pos);
         qControlLeft.setVisible(true);
+        qControlLeft.toFront(false);
         qControlRight.setChannel(ch);
         qControlRight.setChainPosition(pos);
         qControlRight.setVisible(true);
+        qControlRight.toFront(false);
         refreshQControls();
     }
 }
