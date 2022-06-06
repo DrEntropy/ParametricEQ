@@ -80,10 +80,10 @@ struct NodeController : AnalyzerBase
 private:
     
     void refreshWidgets();
-    void refreshNodes();
-    void refreshBands();
-    void refreshQControls();
-    void updateNode(AnalyzerNode& node, ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox);
+
+    void updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox);
+    void updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox);
+    
     void debugMouse(juce::String type, const juce::MouseEvent &event);
     
     float frequencyFromX(float x);

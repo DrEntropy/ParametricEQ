@@ -93,6 +93,31 @@ float bandWidthFromQ(float Q)
     return std::asinh(1 / (2 * Q)) * 2 / std::log(2.f);
 }
 
+
+std::tuple<float, float, float, bool> getParameterTuple(ChainPosition chainPos, Channel channel, juce::AudioProcessorValueTreeState& apvts)
+{
+    float freq, gainOrSlope, Q;
+    bool bypassed;
+    
+    if(chainPos == ChainPosition::LowCut || chainPos == ChainPosition::HighCut)
+    {
+        auto cutParams = ChainHelpers::getFilterParams<HighCutLowCutParameters>(chainPos, channel, 0.0, apvts);
+        freq = cutParams.frequency;
+        gainOrSlope = 30 - cutParams.order * 6.f;
+        Q = cutParams.quality;
+        bypassed = cutParams.bypassed;
+    }
+    else
+    {
+        auto params = ChainHelpers::getFilterParams<FilterParameters>(chainPos, channel, 0.0, apvts);
+        freq = params.frequency;
+        gainOrSlope = params.gain.getDb();
+        Q = params.quality;
+        bypassed = params.bypassed;
+    }
+    return {freq, gainOrSlope, Q, bypassed};
+}
+
 void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event)
 {
     auto componentID =  event.originalComponent -> getComponentID();
@@ -139,12 +164,12 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     for(uint i=0; i< 8; ++i)
     {
         auto pos = static_cast<ChainPosition>(i);
-       
-        addWidget(i, nodes, pos, Channel::Left);
-        addWidget(i + 8, nodes, pos, Channel::Right);
         
         addWidget(i, bands, pos, Channel::Left);
         addWidget(i + 8, bands, pos, Channel::Right);
+       
+        addWidget(i, nodes, pos, Channel::Left);
+        addWidget(i + 8, nodes, pos, Channel::Right);
         
         addAttachments(i, pos, Channel::Left);
         addAttachments(i + 8, pos, Channel::Right);
@@ -159,7 +184,7 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
 void NodeController::resized()
 {
     AnalyzerBase::resized();
-    refreshNodes();
+    refreshWidgets();
     
     
     constrainer.boundsLimit = [&]()
@@ -177,36 +202,18 @@ void NodeController::resized()
 
 void NodeController::refreshWidgets()
 {
-    refreshNodes();
-    refreshBands();
-    refreshQControls();
-}
-
-
-void NodeController::refreshBands()
-{
-    
-}
-
-void NodeController::refreshQControls()
-{
-    
-}
-
-void NodeController::refreshNodes()
-{
-   
     auto bBox = fftBoundingBox.toFloat();
     bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo;
     
     for(uint i=0; i< 8; ++i)
     {
-        auto pos = static_cast<ChainPosition>(i);
-        updateNode(*nodes[i], pos, Channel::Left, bBox);
-    
+        updateNode(*nodes[i], bBox);
+        updateBand(*bands[i], bBox);
+
         if(drawRightMid)
         {
-            updateNode(*nodes[i + 8], pos, Channel::Right, bBox);
+            updateNode(*nodes[i + 8], bBox);
+            updateBand(*bands[i + 8], bBox);
         }
     }
 }
@@ -214,27 +221,16 @@ void NodeController::refreshNodes()
 
 
 
-void NodeController::updateNode(AnalyzerNode& node,ChainPosition chainPos, Channel channel, juce::Rectangle<float> bBox)
+ 
+
+void NodeController::updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox)
 {
     auto const size = AnalyzerNode::nodeSize;
-    float freq;
-    float gainOrSlope;
-    bool bypassed;
     
-    if(chainPos == ChainPosition::LowCut || chainPos == ChainPosition::HighCut)
-    {
-        auto cutParams = ChainHelpers::getFilterParams<HighCutLowCutParameters>(chainPos, channel, 0.0, apvts);
-        freq = cutParams.frequency;
-        gainOrSlope = 30 - cutParams.order * 6.f;
-        bypassed = cutParams.bypassed;
-    }
-    else
-    {
-        auto params = ChainHelpers::getFilterParams<FilterParameters>(chainPos, channel, 0.0, apvts);
-        freq = params.frequency;
-        gainOrSlope = params.gain.getDb();
-        bypassed = params.bypassed;
-    }
+    auto chainPos = node.getChainPosition();
+    auto channel = node.getChannel();
+    
+    auto [freq, gainOrSlope, Q, bypassed] = getParameterTuple(chainPos, channel, apvts);
     
     if(bypassed)
     {
@@ -250,7 +246,34 @@ void NodeController::updateNode(AnalyzerNode& node,ChainPosition chainPos, Chann
     node.setVisible(true);
 }
 
-
+void NodeController::updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox)
+{
+    auto chainPos = band.getChainPosition();
+    auto channel = band.getChannel();
+    
+    auto [freq, gainOrSlope, Q, bypassed] = getParameterTuple(chainPos, channel, apvts);
+    
+    if(bypassed)
+    {
+        band.setVisible(false);
+        return;
+    }
+    
+    auto centerX = juce::mapFromLog10(freq, 20.f, 20000.f) * bBox.getWidth() + bBox.getX();
+    
+    auto bounds = bBox;
+    
+    
+    auto BW = bandWidthFromQ(Q);
+    
+    double widthOctaves = std::log2(20000.0 / 20.0);
+    bounds.setWidth(bBox.getWidth() * BW / widthOctaves);
+    
+    bounds.setCentre(centerX, bBox.getCentreY());
+    
+    band.setBounds(bounds.toNearestInt());
+    band.setVisible(true);
+}
 
 
 // Mouse Handling

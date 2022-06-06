@@ -45,7 +45,7 @@ void AnalyzerBand::paint(juce::Graphics& g)
     
     g.setColour(getColour(chainPosition, channel));
     g.setOpacity(isSelected  ?  BAND_OPACITY_SELECTED : BAND_OPACITY_NOT_SELECTED);
-    g.drawRect(getLocalBounds().toFloat());
+    g.fillRect(getLocalBounds());
 }
 
 
