@@ -112,22 +112,23 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
 NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvts{apvts}
 {
     
+    auto addWidget = [&](size_t i, auto& widgets, ChainPosition pos, Channel ch)
+    {
+        widgets[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
+        widgets[i]->setComponentID(juce::String("NODE:") + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
+        widgets[i]->addMouseListener(this, false);
+        addChildComponent(*widgets[i]);
+    };
+    
+    
     setComponentID("CONTROLLER");
     for(uint i=0; i< 8; ++i)
     {
         auto pos = static_cast<ChainPosition>(i);
        
-        nodes[i] = std::make_unique<AnalyzerNode>(pos, Channel::Left);
-        nodes[i]->setComponentID(juce::String("NODE:") + "L:" + std::to_string(i));
-        nodes[i]->addMouseListener(this, false);
-        addChildComponent(*nodes[i]);
-       
-        nodes[i + 8] = std::make_unique<AnalyzerNode>(pos, Channel::Right);
-        nodes[i + 8]->setComponentID(juce::String("NODE:") + "R:" + std::to_string(i));
-        nodes[i + 8]->addMouseListener(this, false);
-        addChildComponent(*nodes[i + 8]);
-        
-        
+        addWidget(i, nodes, pos, Channel::Left);
+        addWidget(i + 8, nodes, pos, Channel::Right);
+   
         freqAttachements[i] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, Channel::Left, pos), nullptr);
         qAttachements[i] = std::make_unique<ParameterAttachment>(*getQParam(apvts, Channel::Left, pos), nullptr);
         gainOrSlopeAttachements[i] = std::make_unique<ParameterAttachment>(*getGainOrSlopeParam(apvts, Channel::Left, pos), nullptr);
