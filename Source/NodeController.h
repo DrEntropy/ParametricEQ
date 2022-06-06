@@ -80,6 +80,19 @@ struct NodeController : AnalyzerBase
     void mouseUp(const juce::MouseEvent &event) override;
     void mouseDoubleClick(const juce::MouseEvent &event) override;
     
+    
+    struct Listener
+    {
+        virtual ~Listener() = default;
+        virtual void bandMousedOver(ChainPosition cp, Channel ch) = 0;
+        virtual void bandSelected(ChainPosition cp, Channel ch) = 0;
+        virtual void clearSelection() = 0;
+    };
+    
+    void addNodeListener (Listener*);
+    void removeNodeListener (Listener*);
+    
+    
 private:
     void refreshWidgets();
 
@@ -132,6 +145,8 @@ private:
     juce::ComponentDragger dragger;
     BoundsContrainer constrainer{};
     HorizontalConstrainer hConstrainer{};
+    
+    juce::ListenerList<Listener> nodeListeners;
     
     juce::AudioProcessorValueTreeState& apvts;
 };

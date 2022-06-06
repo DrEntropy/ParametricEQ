@@ -63,7 +63,6 @@ float bandWidthFromQ(float Q)
     {
         return 20000;
     }
-    
     // bandwidth in octaves, assume sufficiently high sample rate.
     // https://www.w3.org/TR/audio-eq-cookbook/
     
@@ -72,9 +71,7 @@ float bandWidthFromQ(float Q)
 
 float qFromBandWidth(float BW)
 {
-    
-    
-    // bandwidth in octaves, assume sufficiently high sample rate.
+    // q from bandwidth in octaves, assume sufficiently high sample rate.
     // https://www.w3.org/TR/audio-eq-cookbook/
     
     double invQ = 2 * std::sinh(std::log(2.0) / 2.0 * BW);
@@ -342,6 +339,8 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             band->displayAsSelected(true);
             band->toFront(false);
             lastBandEntered = band;
+            nodeListeners.call([&band](Listener& nl){nl.bandMousedOver(band->getChainPosition(),
+                                                                           band->getChannel());});
             break;
         }
             
@@ -404,6 +403,8 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
             currentNode = node;
             currentBand = lastBandEntered;
             activateQControls(node->getChainPosition(), node->getChannel());
+            nodeListeners.call([&node](Listener& nl){nl.bandSelected(node->getChainPosition(),
+                                                                           node->getChannel());});
             break;
         }
             
@@ -596,4 +597,21 @@ void NodeController::deactivateQControls()
     currentNode->displayAsSelected(false);
     if(currentBand)
         currentBand->displayAsSelected(false);
+    nodeListeners.call([](Listener& nl){nl.clearSelection();});
+}
+
+
+void NodeController::addNodeListener (Listener* lsnr)
+{
+    nodeListeners.add(lsnr);
+}
+ 
+
+
+ 
+void NodeController::removeNodeListener (Listener* lsnr)
+{
+    jassert(nodeListeners.contains(lsnr));
+    nodeListeners.remove(lsnr);
+    
 }

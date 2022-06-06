@@ -29,6 +29,8 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(*spectrumAnalyzer);
     addAndMakeVisible(responseCurve);
     addAndMakeVisible(nodeController);
+    
+    nodeController.addNodeListener(&eqParamContainer);
  
     setSize (1200, 800);
     
@@ -46,6 +48,7 @@ ParametricEQAudioProcessorEditor::~ParametricEQAudioProcessorEditor()
 {
     audioProcessor.removeSampleRateListener(this);
     audioProcessor.editorActive = false;
+    nodeController.removeNodeListener(&eqParamContainer);
 }
 
 //==============================================================================

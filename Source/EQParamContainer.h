@@ -12,11 +12,11 @@
 
 #include <JuceHeader.h>
 #include "EQParamWidget.h"
-
+#include "NodeController.h"
 //==============================================================================
 /*
 */
-class EQParamContainer  : public juce::Component
+class EQParamContainer  : public juce::Component, public NodeController::Listener
 {
 public:
     EQParamContainer(juce::AudioProcessorValueTreeState& apvts) : apvts(apvts)
@@ -49,6 +49,21 @@ public:
         highCut.setBounds(bounds);
     }
 
+    void bandMousedOver(ChainPosition cp, Channel ch) override
+    {
+        
+    }
+    
+    void bandSelected(ChainPosition cp, Channel ch) override
+    {
+        
+    }
+    
+    void clearSelection() override
+    {
+        
+    }
+    
 private:
     
     juce::AudioProcessorValueTreeState& apvts;
