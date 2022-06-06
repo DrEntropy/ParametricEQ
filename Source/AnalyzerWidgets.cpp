@@ -11,7 +11,7 @@
 #include "AnalyzerWidgets.h"
 
 #define BAND_OPACITY_SELECTED 0.5
-#define BAND_OPACITY_NOT_SELECTED 0.25
+#define BAND_OPACITY_NOT_SELECTED 0.0
 
 juce::Colour getColour(ChainPosition cp, Channel ch)
 {

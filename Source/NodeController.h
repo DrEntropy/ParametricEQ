@@ -91,12 +91,14 @@ private:
     float slopeFromY(float y);
     
     template <typename Widget>
-    void addWidget(size_t i, std::array<std::unique_ptr<Widget>, 16>& widgets, ChainPosition pos, Channel ch, int zOrder = -1)
+    void addWidget(size_t i, std::array<std::unique_ptr<Widget>, 16>& widgets, juce::String ID,
+                   ChainPosition pos, Channel ch, bool alwaysOnTop = false)
     {
         widgets[i] = std::make_unique<Widget>(pos, ch);
-        widgets[i]->setComponentID(juce::String("NODE:") + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
+        widgets[i]->setComponentID(ID + ":" + (ch == Channel::Left ? "L:" : "R:") + std::to_string(i));
         widgets[i]->addMouseListener(this, false);
-        addChildComponent(*widgets[i], zOrder);
+        widgets[i]->setAlwaysOnTop(alwaysOnTop);
+        addChildComponent(*widgets[i]);
     }
     
     bool adjustingNode{false};
@@ -104,7 +106,8 @@ private:
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::array<std::unique_ptr<AnalyzerBand> , 16> bands;
-    std::array<std::unique_ptr<AnalyzerQControl> , 16> qControls;
+    
+    AnalyzerQControl  qControlLeft{}, qControlRight{};
     
     std::array<std::unique_ptr<ParameterAttachment>, 16> freqAttachements;
     std::array<std::unique_ptr<ParameterAttachment>, 16> qAttachements;

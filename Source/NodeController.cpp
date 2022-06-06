@@ -55,30 +55,7 @@ WidgetVariant getEventsComponent(const juce::MouseEvent &event)
     return widgetVar;
 }
 
-struct ChannelVisitor
-{
-    Channel operator()(AnalyzerNode* node) const
-    {
-        return node->getChannel();
-    }
-    Channel operator()(AnalyzerBand* band) const
-    {
-        return band->getChannel();
-    }
-    Channel operator()(AnalyzerQControl* qc) const
-    {
-        return qc->getChannel();
-    }
-    Channel operator()(NodeController*) const
-    {
-        return Channel::Left;
-    }
-    Channel operator()(std::monostate) const
-    {
-        jassertfalse;
-        return Channel::Left;
-    }
-};
+ 
 
 float bandWidthFromQ(float Q)
 {
@@ -122,14 +99,36 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
 {
     auto componentID =  event.originalComponent -> getComponentID();
     auto widgetVar = getEventsComponent(event);
-    juce::String channelLabel{"None"};
-    
-    if(widgetVar.component.index() != WidgetVariant::Invalid  && widgetVar.component.index() != WidgetVariant::Invalid)
+    auto channelLabel = [&]()
     {
-        auto channel = std::visit(ChannelVisitor{}, widgetVar.component);
-        channelLabel = (channel == Channel::Left ? "Left" : "Right");
-    }
+        Channel ch;
+        switch (widgetVar.component.index())
+        {
+            case WidgetVariant::Node:
+            {
+                auto node = std::get<AnalyzerNode*>(widgetVar.component);
+                ch = node->getChannel();
+                break;
+            }
+                
+            case WidgetVariant::Band:
+            {
+                auto band = std::get<AnalyzerBand*>(widgetVar.component);
+                ch = band->getChannel();
+                break;
+            }
+            case WidgetVariant::QControl:
+            {
+                auto qcontrol = std::get<AnalyzerQControl *>(widgetVar.component);
+                ch = qcontrol->getChannel();
+            }
+            default:
+                ch = Channel::Left;
+        }
+        return ch == Channel::Left ? "L" : "R";
+    }();
     
+ 
     int x = 0;
     int y = 0;
     if(widgetVar.component.index() != WidgetVariant::Controller)
@@ -151,8 +150,6 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
 NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvts{apvts}
 {
     
-
-    
     auto addAttachments = [&](size_t i, ChainPosition pos, Channel ch)
     {
         freqAttachements[i] = std::make_unique<ParameterAttachment>(*getFrequencyParam(apvts, ch, pos), nullptr);
@@ -165,15 +162,23 @@ NodeController::NodeController(juce::AudioProcessorValueTreeState& apvts) : apvt
     {
         auto pos = static_cast<ChainPosition>(i);
         
-        addWidget(i, bands, pos, Channel::Left, 0);
-        addWidget(i + 8, bands, pos, Channel::Right, 0);
+        addWidget(i, bands, "BAND", pos, Channel::Left);
+        addWidget(i + 8, bands, "BAND", pos, Channel::Right);
        
-        addWidget(i, nodes, pos, Channel::Left);
-        addWidget(i + 8, nodes, pos, Channel::Right);
+        addWidget(i, nodes, "NODE", pos, Channel::Left, true);
+        addWidget(i + 8, nodes, "NODE", pos, Channel::Right, true);
         
         addAttachments(i, pos, Channel::Left);
         addAttachments(i + 8, pos, Channel::Right);
     }
+    
+ 
+    qControlLeft.setComponentID(juce::String("Left QControl"));
+    qControlRight.setComponentID(juce::String("Right QControl"));
+    qControlLeft.addMouseListener(this, false);
+    qControlRight.addMouseListener(this, false);
+    addChildComponent(qControlLeft);
+    addChildComponent(qControlRight);
     
     allParamsListener.reset( new AllParamsListener(apvts,std::bind(&NodeController::refreshWidgets,  this)));
 }
@@ -280,25 +285,68 @@ void NodeController::mouseMove(const juce::MouseEvent &event)
 }
 
 
-
-// TODO: these could be handled in the components themselves
+ 
 void NodeController::mouseEnter(const juce::MouseEvent &event)
 {
-    if(auto widget = dynamic_cast<AnalyzerWidgetBase*>(event.originalComponent))
+  
+    auto widgetVar = getEventsComponent(event);
+     
+    switch (widgetVar.component.index())
     {
-        widget->displayAsSelected(true);
-     }
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            node->displayAsSelected(true);
+            
+            auto index = static_cast<size_t>(node->getChainPosition()) + (node->getChannel() == Channel::Left ? 0 : 8);
+            bands[index]->displayAsSelected(true);
+            
+            break;
+        }
+            
+        case WidgetVariant::Band:
+        {
+            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+            band->displayAsSelected(true);
+            band->toFront(false);
+            break;
+        }
+            
+        default:
+            ;
+            
+    }
     debugMouse("Enter", event);
 }
 
 
 void NodeController::mouseExit(const juce::MouseEvent &event)
 {
-    if(auto widget = dynamic_cast<AnalyzerWidgetBase*>(event.originalComponent))
+    auto widgetVar = getEventsComponent(event);
+    // use a visitor here?
+    switch (widgetVar.component.index())
     {
-        widget->displayAsSelected(false);
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            node->displayAsSelected(false);
+            
+            auto index = static_cast<size_t>(node->getChainPosition()) + (node->getChannel() == Channel::Left ? 0 : 8);
+            bands[index]->displayAsSelected(false);
+            
+            break;
+        }
+            
+        case WidgetVariant::Band:
+        {
+            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+            band->displayAsSelected(false);
+            break;
+        }
+            
+        default:
+            ;
     }
-   
     debugMouse("Exit", event);
 }
 
