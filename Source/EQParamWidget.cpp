@@ -90,7 +90,7 @@ void EQParamWidget::refreshSliders(Channel ch)
     
     auto bypass = apvts.getParameter(createBypassParamString(activeChannel, chainPos));
     auto bypassed  = bypass->getValue() > 0.5;
-    auto colour = bypassed ? juce::Colours::grey : (selected ? juce::Colours::green : juce::Colours::white);
+    auto colour = bypassed ? juce::Colours::grey : (selected ? juce::Colours::lightgreen : juce::Colours::white);
 
     gainOrSlopeSlider->setColour(juce::Slider::textBoxOutlineColourId, colour);
     qSlider.setColour(juce::Slider::textBoxOutlineColourId, colour);

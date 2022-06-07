@@ -344,6 +344,14 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             break;
         }
             
+        case WidgetVariant::QControl:
+        {
+            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+            qControl->displayAsSelected(true);
+            qControl->toFront(false);
+            break;
+        }
+            
         default:
             ;
             
@@ -364,7 +372,6 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
             if(!qControlsVisible() || currentNode != node)
                 node->displayAsSelected(false);
             
-            
             break;
         }
             
@@ -372,7 +379,17 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         {
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
             if(!qControlsVisible() || currentBand != band)
+            {
                 band->displayAsSelected(false);
+                nodeListeners.call([](Listener& nl){nl.clearSelection();});
+            }
+            break;
+        }
+            
+        case WidgetVariant::QControl:
+        {
+            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+            qControl->displayAsSelected(false);
             break;
         }
             
@@ -596,8 +613,10 @@ void NodeController::deactivateQControls()
     qControlRight.setVisible(false);
     currentNode->displayAsSelected(false);
     if(currentBand)
+    {
         currentBand->displayAsSelected(false);
-    nodeListeners.call([](Listener& nl){nl.clearSelection();});
+        nodeListeners.call([](Listener& nl){nl.clearSelection();});
+    }
 }
 
 
@@ -606,12 +625,9 @@ void NodeController::addNodeListener (Listener* lsnr)
     nodeListeners.add(lsnr);
 }
  
-
-
  
 void NodeController::removeNodeListener (Listener* lsnr)
 {
     jassert(nodeListeners.contains(lsnr));
     nodeListeners.remove(lsnr);
-    
 }

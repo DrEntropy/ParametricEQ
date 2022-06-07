@@ -21,14 +21,9 @@ class EQParamContainer  : public juce::Component, public NodeController::Listene
 public:
     EQParamContainer(juce::AudioProcessorValueTreeState& apvts) : apvts(apvts)
     {
-        addAndMakeVisible(lowCut);
-        addAndMakeVisible(param1);
-        addAndMakeVisible(param2);
-        addAndMakeVisible(param3);
-        addAndMakeVisible(param4);
-        addAndMakeVisible(param5);
-        addAndMakeVisible(param6);
-        addAndMakeVisible(highCut);
+        
+        for(auto& widget : widgets)
+           addAndMakeVisible(widget);
 
     }
 
@@ -39,43 +34,44 @@ public:
         auto bounds = getLocalBounds();
         auto width = bounds.getWidth();
         
-        lowCut.setBounds(bounds.removeFromLeft(width / 8));
-        param1.setBounds(bounds.removeFromLeft(width / 8));
-        param2.setBounds(bounds.removeFromLeft(width / 8));
-        param3.setBounds(bounds.removeFromLeft(width / 8));
-        param4.setBounds(bounds.removeFromLeft(width / 8));
-        param5.setBounds(bounds.removeFromLeft(width / 8));
-        param6.setBounds(bounds.removeFromLeft(width / 8));
-        highCut.setBounds(bounds);
+        for(auto& widget : widgets)
+            widget.setBounds(bounds.removeFromLeft(width / 8));
     }
 
+    // currently no difference in selected vs moused over here currently.
     void bandMousedOver(ChainPosition cp, Channel ch) override
     {
-        
+        clearSelection();
+        widgets.at(static_cast<int>(cp)).bandSelected(ch);
     }
     
     void bandSelected(ChainPosition cp, Channel ch) override
     {
-        
+        clearSelection();
+        widgets.at(static_cast<int>(cp)).bandSelected(ch);
     }
     
     void clearSelection() override
     {
-        
+        for(auto& widget:widgets)
+            widget.bandCleared();
     }
     
 private:
     
     juce::AudioProcessorValueTreeState& apvts;
     
-    EQParamWidget lowCut {apvts, ChainPosition::LowCut, true};
-    EQParamWidget param1 {apvts, ChainPosition::LowShelf, false};
-    EQParamWidget param2 {apvts, ChainPosition::PeakFilter1, false};
-    EQParamWidget param3 {apvts, ChainPosition::PeakFilter2, false};
-    EQParamWidget param4 {apvts, ChainPosition::PeakFilter3, false};
-    EQParamWidget param5 {apvts, ChainPosition::PeakFilter4, false};
-    EQParamWidget param6 {apvts, ChainPosition::HighShelf, false};
-    EQParamWidget highCut {apvts, ChainPosition::HighCut, true};
+    std::array<EQParamWidget, 8> widgets
+    {{
+        {apvts, ChainPosition::LowCut, true},
+        {apvts, ChainPosition::LowShelf, false},
+        {apvts, ChainPosition::PeakFilter1, false},
+        {apvts, ChainPosition::PeakFilter2, false},
+        {apvts, ChainPosition::PeakFilter3, false},
+        {apvts, ChainPosition::PeakFilter4, false},
+        {apvts, ChainPosition::HighShelf, false},
+        {apvts, ChainPosition::HighCut, true}
+    }};
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQParamContainer)
