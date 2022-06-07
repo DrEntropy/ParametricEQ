@@ -92,6 +92,8 @@ struct NodeController : AnalyzerBase
     void addNodeListener (Listener*);
     void removeNodeListener (Listener*);
     
+    // to be used for double click on controller and for the big button.
+    void resetAllParameters();
     
 private:
     void refreshWidgets();
@@ -122,7 +124,6 @@ private:
     
     AnalyzerNode* currentNode{nullptr};
     AnalyzerBand* currentBand{nullptr};
-    AnalyzerBand* lastBandEntered{nullptr};
     
     std::array<std::unique_ptr<AnalyzerNode> , 16> nodes; //first 8 are left/mid, second  8 are right side.
     std::array<std::unique_ptr<AnalyzerBand> , 16> bands;

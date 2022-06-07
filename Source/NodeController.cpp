@@ -571,6 +571,42 @@ void NodeController::mouseUp(const juce::MouseEvent &event)
 
 void NodeController::mouseDoubleClick(const juce::MouseEvent &event)
 {
+    auto widgetVar = getEventsComponent(event);
+ 
+    switch (widgetVar.component.index())
+    {
+        case WidgetVariant::Node:
+        {
+            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+            // TODO reset freq and q
+            
+            break;
+        }
+            
+        case WidgetVariant::Band:
+        {
+            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+            // TODO reset frequency only
+            break;
+        }
+            
+        case WidgetVariant::QControl:
+        {
+            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+            // TODO reset Q only
+            break;
+        }
+            
+        case WidgetVariant::Controller:
+        {
+            resetAllParameters();
+            break;
+        }
+          
+            
+        default:
+            ;
+    }
     debugMouse("DoubleClick", event);
 }
 
@@ -635,6 +671,30 @@ void NodeController::deactivateQControls()
     }
 }
 
+void NodeController::resetAllParameters()
+{
+    
+    auto setDefaults = [&](size_t i, ChainPosition cp)
+    {
+        using namespace ChainHelpers;
+        qAttachements[i]->setValueAsCompleteGesture(defaultQ.at(cp));
+        freqAttachements[i]->setValueAsCompleteGesture(defaultFrequencies.at(cp));
+        if(cp == ChainPosition::LowCut || cp == ChainPosition::HighCut)
+             gainOrSlopeAttachements[i]->setValueAsCompleteGesture(defaultSlopeIndex);
+        else
+            gainOrSlopeAttachements[i]->setValueAsCompleteGesture(defaultGain);
+    };
+    
+    for(size_t j=0;j < 8; ++j)
+    {
+        ChainPosition cp = static_cast<ChainPosition>(j);
+        setDefaults(j, cp);
+        setDefaults(j+8, cp);
+        
+    }
+      
+}
+
 
 void NodeController::addNodeListener (Listener* lsnr)
 {
@@ -647,3 +707,5 @@ void NodeController::removeNodeListener (Listener* lsnr)
     jassert(nodeListeners.contains(lsnr));
     nodeListeners.remove(lsnr);
 }
+
+
