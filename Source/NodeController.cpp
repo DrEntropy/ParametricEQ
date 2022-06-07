@@ -26,6 +26,12 @@ struct WidgetVariant
     };
 };
  
+size_t getWidgetIndex(ChainPosition cp, Channel ch)
+{
+    auto index = static_cast<size_t>(cp) + (ch == Channel::Left ? 0 : 8);
+    jassert(index >= 0 && index <= 16);
+    return index;
+}
 
 WidgetVariant getEventsComponent(const juce::MouseEvent &event)
 {
@@ -326,7 +332,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             node->displayAsSelected(true);
             
-            auto index = static_cast<size_t>(node->getChainPosition()) + (node->getChannel() == Channel::Left ? 0 : 8);
+            auto index = getWidgetIndex(node->getChainPosition(), node->getChannel());
             bands[index]->displayAsSelected(true);
             bands[index]->toFront(false);
             
@@ -338,7 +344,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
             band->displayAsSelected(true);
             band->toFront(false);
-            lastBandEntered = band;
+    
             nodeListeners.call([&band](Listener& nl){nl.bandMousedOver(band->getChainPosition(),
                                                                            band->getChannel());});
             break;
@@ -393,6 +399,16 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
             break;
         }
             
+        case WidgetVariant::Controller:
+        {
+         
+            if(currentNode && !fftBoundingBox.toFloat().contains(event.position))
+                deactivateQControls();
+             
+            break;
+        }
+          
+            
         default:
             ;
     }
@@ -418,7 +434,7 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
                 deactivateQControls();
             
             currentNode = node;
-            currentBand = lastBandEntered;
+            currentBand = bands[getWidgetIndex(node->getChainPosition(), node->getChannel())].get();
             activateQControls(node->getChainPosition(), node->getChannel());
             nodeListeners.call([&node](Listener& nl){nl.bandSelected(node->getChainPosition(),
                                                                            node->getChannel());});
