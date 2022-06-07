@@ -334,7 +334,8 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
             
             auto index = getWidgetIndex(node->getChainPosition(), node->getChannel());
             bands[index]->displayAsSelected(true);
-            bands[index]->toFront(false);
+            if(!qControlsVisible())
+                bands[index]->toFront(false);
             
             break;
         }
@@ -343,7 +344,8 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
         {
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
             band->displayAsSelected(true);
-            band->toFront(false);
+            if(!qControlsVisible())
+                band->toFront(false);
     
             nodeListeners.call([&band](Listener& nl){nl.bandMousedOver(band->getChainPosition(),
                                                                            band->getChannel());});
@@ -375,8 +377,8 @@ void NodeController::mouseExit(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            if(!qControlsVisible() || currentNode != node)
-                node->displayAsSelected(false);
+            //if(!qControlsVisible() || currentNode != node)
+            node->displayAsSelected(false);
             
             break;
         }
