@@ -331,6 +331,8 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
             node->displayAsSelected(true);
+            nodeListeners.call([&node](Listener& nl){nl.bandMousedOver(node->getChainPosition(),
+                                                                           node->getChannel());});
             
             auto index = getWidgetIndex(node->getChainPosition(), node->getChannel());
             bands[index]->displayAsSelected(true);
