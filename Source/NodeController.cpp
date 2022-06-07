@@ -151,7 +151,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
     
      
     
-    DBG(type + "from: " + componentID + " ch:" + channelLabel + " freq:" +
+    DBG(type + " : " + componentID + " ch:" + channelLabel + " freq:" +
         std::to_string(frequencyFromX(x + event.x))  + " gain:" + std::to_string(gainFromY(y + event.y)) );
     
     if(widgetVar.component.index() == WidgetVariant::Node)
