@@ -364,31 +364,32 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
  
 void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, Channel channel, ChainPosition chainPos, bool isCut)
 {
+    using namespace ChainHelpers;
+    
     auto label = createBypassParamString(channel, chainPos);
     layout.add(std::make_unique<juce::AudioParameterBool>(label, label, true) );
     
     label = createFreqParamString(channel, chainPos);
     layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
                                        juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.25f),
-                                                                     (chainPos == ChainPosition::HighCut ||
-                                                                      chainPos == ChainPosition::HighShelf ? 20000.0f : 20.0f)));
+                                                                      defaultFrequencies.at(chainPos)));
     
     
     if(!isCut)
     {
         label = createQParamString(channel, chainPos);
         layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
-                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), 1.0f));
+                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.0f), defaultQ.at(chainPos)));
         
         label = createGainParamString(channel, chainPos);
         layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
-                                           juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), 0.0f));
+                                           juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.0f), defaultGain));
     }
     else
     {
         label = createQParamString(channel, chainPos);
         layout.add(std::make_unique<juce::AudioParameterFloat>(label, label,
-                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.01f, 1.0f), 0.71f));
+                                           juce::NormalisableRange<float>(0.1f, 10.f, 0.01f, 1.0f), defaultQ.at(chainPos)));
         juce::StringArray slopes;
         
         for (const auto& [order, stringRep] : FilterInfo::mapSlopeToString)
@@ -397,7 +398,7 @@ void ParametricEQAudioProcessor::addFilterParamToLayout (ParamLayout& layout, Ch
         }
         
         label = createSlopeParamString(channel, chainPos);
-        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, slopes, 0));
+        layout.add(std::make_unique<juce::AudioParameterChoice>(label, label, slopes, defaultSlopeIndex));
     }
 }
 

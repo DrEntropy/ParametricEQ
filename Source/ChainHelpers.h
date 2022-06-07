@@ -130,4 +130,49 @@ inline void initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel chan
     initializeChainLink<ChainPosition::HighCut, HighCutLowCutParameters>(chain, channel, apvts, rampTime, onRealTimeThread, sampleRate);
 }
 
+
+const std::map<ChainPosition, float>  defaultFrequencies
+{
+    {ChainPosition::LowCut, 20.0f},
+    {ChainPosition::LowShelf, 100.0f},
+    {ChainPosition::PeakFilter1, 300.0f},
+    {ChainPosition::PeakFilter2, 500.0f},
+    {ChainPosition::PeakFilter3, 1000.0f},
+    {ChainPosition::PeakFilter4, 5000.0f},
+    {ChainPosition::HighShelf, 6000.0f},
+    {ChainPosition::HighCut, 20000.0f}
+};
+
+const std::map<ChainPosition, float>  defaultQ
+{
+    {ChainPosition::LowCut, 0.71f},
+    {ChainPosition::LowShelf, 1.0f},
+    {ChainPosition::PeakFilter1, 1.0f},
+    {ChainPosition::PeakFilter2, 1.0f},
+    {ChainPosition::PeakFilter3, 1.0f},
+    {ChainPosition::PeakFilter4, 1.0f},
+    {ChainPosition::HighShelf, 1.0f},
+    {ChainPosition::HighCut, 0.71f}
+};
+
+const float defaultGain {0.0f};
+
+const int defaultSlopeIndex {0};
+
+const std::map<ChainPosition, float>  defaultGainOrSlope
+{
+    {ChainPosition::LowCut, 20.0f},
+    {ChainPosition::LowShelf, 100.0f},
+    {ChainPosition::PeakFilter1, 300.0f},
+    {ChainPosition::PeakFilter2, 500.0f},
+    {ChainPosition::PeakFilter3, 1000.0f},
+    {ChainPosition::PeakFilter4, 5000.0f},
+    {ChainPosition::HighShelf, 6000.0f},
+    {ChainPosition::HighCut, 20000.0f}
+};
+
+
+
+ 
+
 }
