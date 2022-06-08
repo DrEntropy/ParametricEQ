@@ -98,12 +98,18 @@ struct NodeController : AnalyzerBase
 private:
     void refreshWidgets();
 
+
     void updateNode(AnalyzerNode& node, juce::Rectangle<float> bBox);
     void updateBand(AnalyzerBand& band, juce::Rectangle<float> bBox);
     void activateQControls(ChainPosition pos, Channel ch);
     void deactivateQControls();
     
     void refreshQControls();
+    
+    void resetQ(ChainPosition cp, Channel ch);
+    void resetFreq(ChainPosition cp, Channel ch);
+    void resetGainOrSlope(ChainPosition cp, Channel ch);
+    
     
     void debugMouse(juce::String type, const juce::MouseEvent &event);
     

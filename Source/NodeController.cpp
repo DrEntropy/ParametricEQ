@@ -582,22 +582,28 @@ void NodeController::mouseDoubleClick(const juce::MouseEvent &event)
         case WidgetVariant::Node:
         {
             auto node = std::get<AnalyzerNode*>(widgetVar.component);
-            // TODO reset freq and q
-            
+            auto cp = node->getChainPosition();
+            auto ch = node->getChannel();
+            resetFreq(cp, ch);
+            resetGainOrSlope(cp, ch);
             break;
         }
             
         case WidgetVariant::Band:
         {
             auto band = std::get<AnalyzerBand*>(widgetVar.component);
-            // TODO reset frequency only
+            auto cp = band->getChainPosition();
+            auto ch = band->getChannel();
+            resetFreq(cp, ch);
             break;
         }
             
         case WidgetVariant::QControl:
         {
             auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
-            // TODO reset Q only
+            auto cp = qControl->getChainPosition();
+            auto ch = qControl->getChannel();
+            resetQ(cp, ch);
             break;
         }
             
@@ -674,29 +680,43 @@ void NodeController::deactivateQControls()
         nodeListeners.call([](Listener& nl){nl.clearSelection();});
     }
 }
+void NodeController::resetQ(ChainPosition cp, Channel ch)
+{
+    using namespace ChainHelpers;
+    auto index =  getWidgetIndex(cp, ch);
+    qAttachements[index]->setValueAsCompleteGesture(defaultQ.at(cp));
+}
+
+void NodeController::resetFreq(ChainPosition cp, Channel ch)
+{
+    using namespace ChainHelpers;
+    auto index =  getWidgetIndex(cp, ch);
+    freqAttachements[index]->setValueAsCompleteGesture(defaultFrequencies.at(cp));
+}
+
+void NodeController::resetGainOrSlope(ChainPosition cp, Channel ch)
+{
+    using namespace ChainHelpers;
+    auto index =  getWidgetIndex(cp, ch);
+    if(cp == ChainPosition::LowCut || cp == ChainPosition::HighCut)
+        gainOrSlopeAttachements[index]->setValueAsCompleteGesture(defaultSlopeIndex);
+    else
+        gainOrSlopeAttachements[index]->setValueAsCompleteGesture(defaultGain);
+}
 
 void NodeController::resetAllParameters()
 {
-    
-    auto setDefaults = [&](size_t i, ChainPosition cp)
-    {
-        using namespace ChainHelpers;
-        qAttachements[i]->setValueAsCompleteGesture(defaultQ.at(cp));
-        freqAttachements[i]->setValueAsCompleteGesture(defaultFrequencies.at(cp));
-        if(cp == ChainPosition::LowCut || cp == ChainPosition::HighCut)
-             gainOrSlopeAttachements[i]->setValueAsCompleteGesture(defaultSlopeIndex);
-        else
-            gainOrSlopeAttachements[i]->setValueAsCompleteGesture(defaultGain);
-    };
-    
     for(size_t j=0;j < 8; ++j)
     {
         ChainPosition cp = static_cast<ChainPosition>(j);
-        setDefaults(j, cp);
-        setDefaults(j+8, cp);
+        resetGainOrSlope(cp, Channel::Left);
+        resetFreq(cp, Channel::Left);
+        resetGainOrSlope(cp, Channel::Left);
         
+        resetGainOrSlope(cp, Channel::Right);
+        resetFreq(cp, Channel::Right);
+        resetGainOrSlope(cp, Channel::Right);
     }
-      
 }
 
 
