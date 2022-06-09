@@ -12,6 +12,9 @@
 #include "ChainHelpers.h"
 #include <variant>
 
+// helper type for the visitor
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 struct WidgetVariant
 {
@@ -321,48 +324,79 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
 {
   
     auto widgetVar = getEventsComponent(event);
-     
-    switch (widgetVar.component.index())
-    {
-        case WidgetVariant::Node:
+    
+    std::visit(overloaded {
+        [&](AnalyzerNode* node)
         {
-            auto node = std::get<AnalyzerNode*>(widgetVar.component);
             node->displayAsSelected(true);
             nodeListeners.call([&node](Listener& nl){nl.bandMousedOver(node->getChainPosition(),
-                                                                           node->getChannel());});
+                                                                       node->getChannel());});
             
             auto index = getWidgetIndex(node->getChainPosition(), node->getChannel());
             bands[index]->displayAsSelected(true);
             if(!qControlsVisible())
                 bands[index]->toFront(false);
             
-            break;
-        }
-            
-        case WidgetVariant::Band:
+        },
+        [&](AnalyzerBand* band)
         {
-            auto band = std::get<AnalyzerBand*>(widgetVar.component);
             band->displayAsSelected(true);
             if(!qControlsVisible())
                 band->toFront(false);
     
             nodeListeners.call([&band](Listener& nl){nl.bandMousedOver(band->getChainPosition(),
-                                                                           band->getChannel());});
-            break;
-        }
-            
-        case WidgetVariant::QControl:
+                                                                       band->getChannel());});
+        },
+        [&](AnalyzerQControl* qControl)
         {
-            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
             qControl->displayAsSelected(true);
             qControl->toFront(false);
-            break;
-        }
-            
-        default:
-            ;
-            
-    }
+        },
+        [](NodeController* /* controller */) {},
+        [](std::monostate) { jassertfalse; }
+            }, widgetVar.component);
+     
+//    switch (widgetVar.component.index())
+//    {
+//        case WidgetVariant::Node:
+//        {
+//            auto node = std::get<AnalyzerNode*>(widgetVar.component);
+//            node->displayAsSelected(true);
+//            nodeListeners.call([&node](Listener& nl){nl.bandMousedOver(node->getChainPosition(),
+//                                                                           node->getChannel());});
+//
+//            auto index = getWidgetIndex(node->getChainPosition(), node->getChannel());
+//            bands[index]->displayAsSelected(true);
+//            if(!qControlsVisible())
+//                bands[index]->toFront(false);
+//
+//            break;
+//        }
+//
+//        case WidgetVariant::Band:
+//        {
+//            auto band = std::get<AnalyzerBand*>(widgetVar.component);
+//            band->displayAsSelected(true);
+//            if(!qControlsVisible())
+//                band->toFront(false);
+//
+//            nodeListeners.call([&band](Listener& nl){nl.bandMousedOver(band->getChainPosition(),
+//                                                                           band->getChannel());});
+//            break;
+//        }
+//
+//        case WidgetVariant::QControl:
+//        {
+//            auto qControl = std::get<AnalyzerQControl*>(widgetVar.component);
+//            qControl->displayAsSelected(true);
+//            qControl->toFront(false);
+//            break;
+//        }
+//
+//        default:
+//            ;
+//
+//    }
     debugMouse("Enter", event);
 }
 
