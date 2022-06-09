@@ -117,6 +117,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
 {
     auto componentID =  event.originalComponent -> getComponentID();
     auto widgetVar = getEventsComponent(event);
+    
     auto channelLabel = [&]()
     {
         Channel ch;
@@ -146,22 +147,18 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
         return ch == Channel::Left ? "L" : "R";
     }();
     
- 
-    int x = 0;
-    int y = 0;
-    if(widgetVar.component.index() != WidgetVariant::Controller)
+    
+    auto [x, y] = [&]() -> std::pair<int, int>
     {
-        x = event.originalComponent->getX();
-        y = event.originalComponent->getY();
-    }
-    
+        if(widgetVar.component.index() != WidgetVariant::Controller)
+        {
+            return {event.originalComponent->getX(), event.originalComponent->getY()};
+        }
+        return {0, 0};
+    }();
      
-    
     DBG(type + " : " + componentID + " ch:" + channelLabel + " freq:" +
         std::to_string(frequencyFromX(x + event.x))  + " gain:" + std::to_string(gainFromY(y + event.y)) );
-    
-    if(widgetVar.component.index() == WidgetVariant::Node)
-        DBG("Node frequency:" + std::to_string(std::get<AnalyzerNode *>(widgetVar.component)->getFrequency()));
 }
 
 
