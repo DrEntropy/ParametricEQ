@@ -11,12 +11,19 @@
 #include "AnalyzerWidgets.h"
 
 #define BAND_OPACITY_SELECTED 0.5
-#define BAND_OPACITY_NOT_SELECTED 0.0
+#define BAND_OPACITY_NOT_SELECTED 0.1
 
 juce::Colour getColour(ChainPosition cp, Channel ch)
 {
-    //TODO paint different shade for each cp and different colour for each channel
-    return juce::Colours::lime;
+    float colorMod =   static_cast<float> (cp) / 30.f;
+    switch(ch)
+    {
+        case Channel::Left:
+            return juce::Colour::fromHSV(0.2f + colorMod , 0.8f, 1.0f, 1.0f);
+        case Channel::Right:
+            return juce::Colour::fromHSV(0.5f + colorMod, 0.8f, 1.0f, 1.0f);
+    }
+  
 }
 
 AnalyzerWidgetBase::AnalyzerWidgetBase(ChainPosition cp, Channel ch) : chainPosition(cp), channel(ch){}
