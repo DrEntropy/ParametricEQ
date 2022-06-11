@@ -396,9 +396,12 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         {
             dragger.startDraggingComponent(band, event);
             getAttachmentForWidget(freqAttachements, band).beginGesture();
-            if(currentNode && (currentNode->getChannel() != band->getChannel() || currentNode->getChainPosition() != band->getChainPosition()))
+            if(qControlsVisible() && currentNode && (currentNode->getChannel() != band->getChannel()
+                                                || currentNode->getChainPosition() != band->getChainPosition()))
             {
                 deactivateQControls();
+                nodeListeners.call([&band](Listener& nl){nl.bandSelected(band->getChainPosition(),
+                                                                               band->getChannel());});
             }
         },
         [&](AnalyzerQControl* qControl)
@@ -596,7 +599,7 @@ void NodeController::deactivateQControls()
 {
     qControlLeft.setVisible(false);
     qControlRight.setVisible(false);
-    currentNode->displayAsSelected(false);
+    //currentNode->displayAsSelected(false);
     if(currentBand)
     {
         currentBand->displayAsSelected(false);
