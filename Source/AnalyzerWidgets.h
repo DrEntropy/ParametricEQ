@@ -41,7 +41,6 @@ struct AnalyzerBand : AnalyzerWidgetBase
 struct AnalyzerQControl : AnalyzerWidgetBase
 {
     AnalyzerQControl() : AnalyzerWidgetBase(ChainPosition::PeakFilter1, Channel::Left) { setMouseCursor(juce::MouseCursor::LeftRightResizeCursor); }
-    
     void setChainPosition(ChainPosition cp) { chainPosition = cp; }
     void setChannel(Channel ch) { channel = ch; }
 };

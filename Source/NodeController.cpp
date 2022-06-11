@@ -12,10 +12,11 @@
 #include "ChainHelpers.h"
 #include <variant>
 
-// helper type for the visitor
+// helper type for the variant visitor
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+// monostate is the default variant and indicates an invalid state in this model.
 using WidgetVariant = std::variant<std::monostate, NodeController*, AnalyzerNode*, AnalyzerQControl*, AnalyzerBand*>;
  
  
