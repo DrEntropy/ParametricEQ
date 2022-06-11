@@ -29,8 +29,7 @@ juce::Colour getColour(ChainPosition cp, Channel ch)
             return juce::Colour::fromHSV(juce::jmap(band0To1, BASE_HUE_LEFT, MAX_HUE_LEFT) , BAND_SATURATION, 1.0f, 1.0f);
         case Channel::Right:
             return juce::Colour::fromHSV(juce::jmap(band0To1, BASE_HUE_RIGHT, MAX_HUE_RIGHT), BAND_SATURATION, 1.0f, 1.0f);
-    }
-  
+    }  
 }
 
 AnalyzerWidgetBase::AnalyzerWidgetBase(ChainPosition cp, Channel ch) : chainPosition(cp), channel(ch){}

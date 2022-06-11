@@ -52,7 +52,6 @@ WidgetVariant getEventsComponent(const juce::MouseEvent &event)
        jassertfalse;  // Should not happen
        return std::monostate();
     }
-   
 }
 
  
@@ -136,13 +135,9 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
         [](std::monostate) { jassertfalse; }
     }, widgetVar);
     
-     
-    
-    
     auto x = event.originalComponent->getX();
     auto y = event.originalComponent->getY();
   
-     
     DBG(type + " : " + componentID + " ch:" + channelLabel + " freq:" +
         std::to_string(frequencyFromX(x + event.x))  + " gain:" + std::to_string(gainFromY(y + event.y)) );
 }
@@ -218,6 +213,11 @@ void NodeController::refreshWidgets()
             updateNode(*nodes[i + 8], bBox);
             updateBand(*bands[i + 8], bBox);
         }
+        else
+        {
+            nodes[i+8]->setVisible(false);
+            bands[i+8]->setVisible(false);
+        }
     }
     if(qControlsVisible())
         refreshQControls();
@@ -235,7 +235,6 @@ void NodeController::refreshQControls()
         rightBounds.setCentre(bandBounds.getRight(), bandBounds.getCentreY());
         qControlLeft.setBounds(leftBounds);
         qControlRight.setBounds(rightBounds);
-        
     }
 }
 
@@ -428,59 +427,44 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
 {
     
     auto widgetVar = getEventsComponent(event);
+    
+    auto dragNode = [&](AnalyzerNode* node)
+    {
+        dragger.dragComponent(node, event, &constrainer);
+        
+        node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
+        
+        float gainOrSlopeUnnorm;
+        auto& gainOrSlopeAttach = getAttachmentForWidget(gainOrSlopeAttachements, node);
+        
+        if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
+        {
+            auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
+            node->updateGainOrSlope(slope);
+            gainOrSlopeUnnorm = (slope-6.f)/6.f;
+        }
+        else
+        {
+            gainOrSlopeUnnorm = gainFromY(node->getY() + node->getHeight() / 2.0);
+            node->updateGainOrSlope(gainOrSlopeUnnorm);
+        }
+        
+        gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
+        getAttachmentForWidget(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
+        
+        updateNode(*node, fftBoundingBox.toFloat());
+    };
 
     std::visit(overloaded
     {
         [&](AnalyzerNode* node)
         {
-            dragger.dragComponent(node, event, &constrainer);
-            
-            node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
-            
-            float gainOrSlopeUnnorm;
-            auto& gainOrSlopeAttach = getAttachmentForWidget(gainOrSlopeAttachements, node);
-            
-            if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
-            {
-                auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
-                node->updateGainOrSlope(slope);
-                gainOrSlopeUnnorm = (slope-6.f)/6.f;
-            }
-            else
-            {
-                gainOrSlopeUnnorm = gainFromY(node->getY() + node->getHeight() / 2.0);
-                node->updateGainOrSlope(gainOrSlopeUnnorm);
-            }
-            
-            gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
-            getAttachmentForWidget(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
+            dragNode(node);
         },
         [&](AnalyzerBand* band)
         {
             auto node = nodes[getWidgetIndex(band->getChainPosition(), band->getChannel())].get();
-            //TODO factor this exactly common code out!
-            dragger.dragComponent(node, event, &constrainer);
-            
-            node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
-            
-            float gainOrSlopeUnnorm;
-            auto& gainOrSlopeAttach = getAttachmentForWidget(gainOrSlopeAttachements, node);
-            
-            if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
-            {
-                auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
-                node->updateGainOrSlope(slope);
-                gainOrSlopeUnnorm = (slope-6.f)/6.f;
-            }
-            else
-            {
-                gainOrSlopeUnnorm = gainFromY(node->getY() + node->getHeight() / 2.0);
-                node->updateGainOrSlope(gainOrSlopeUnnorm);
-            }
-            
-            gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
-            getAttachmentForWidget(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
-       
+            dragNode(node);
         },
         [&](AnalyzerQControl* qControl)
         {
@@ -664,11 +648,11 @@ void NodeController::resetAllParameters()
         ChainPosition cp = static_cast<ChainPosition>(j);
         resetGainOrSlope(cp, Channel::Left);
         resetFreq(cp, Channel::Left);
-        resetGainOrSlope(cp, Channel::Left);
+        resetQ(cp, Channel::Left);
         
         resetGainOrSlope(cp, Channel::Right);
         resetFreq(cp, Channel::Right);
-        resetGainOrSlope(cp, Channel::Right);
+        resetQ(cp, Channel::Right);
     }
 }
 

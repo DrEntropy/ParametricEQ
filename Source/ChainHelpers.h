@@ -136,12 +136,12 @@ inline void initializeFilters(ChainHelpers::MonoFilterChain& chain, Channel chan
 const std::map<ChainPosition, float>  defaultFrequencies
 {
     {ChainPosition::LowCut, 20.0f},
-    {ChainPosition::LowShelf, 100.0f},
-    {ChainPosition::PeakFilter1, 300.0f},
+    {ChainPosition::LowShelf, 50.0f},
+    {ChainPosition::PeakFilter1, 100.0f},
     {ChainPosition::PeakFilter2, 500.0f},
-    {ChainPosition::PeakFilter3, 1000.0f},
+    {ChainPosition::PeakFilter3, 2000.0f},
     {ChainPosition::PeakFilter4, 5000.0f},
-    {ChainPosition::HighShelf, 6000.0f},
+    {ChainPosition::HighShelf, 10000.0f},
     {ChainPosition::HighCut, 20000.0f}
 };
 
@@ -161,20 +161,5 @@ const float defaultGain {0.0f};
 
 const int defaultSlopeIndex {0};
 
-const std::map<ChainPosition, float>  defaultGainOrSlope
-{
-    {ChainPosition::LowCut, 20.0f},
-    {ChainPosition::LowShelf, 100.0f},
-    {ChainPosition::PeakFilter1, 300.0f},
-    {ChainPosition::PeakFilter2, 500.0f},
-    {ChainPosition::PeakFilter3, 1000.0f},
-    {ChainPosition::PeakFilter4, 5000.0f},
-    {ChainPosition::HighShelf, 6000.0f},
-    {ChainPosition::HighCut, 20000.0f}
-};
-
-
-
- 
 
 }

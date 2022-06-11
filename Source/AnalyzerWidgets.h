@@ -51,6 +51,7 @@ struct AnalyzerNode : AnalyzerWidgetBase
     {
         setSize(nodeSize, nodeSize);
     }
+    
     static constexpr int nodeSize{8};
     juce::Rectangle<int> mouseOverBounds, qualityBounds;
     float getFrequency() const { return frequency; }

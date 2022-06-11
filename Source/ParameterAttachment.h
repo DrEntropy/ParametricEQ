@@ -26,11 +26,6 @@ struct ParameterAttachment : juce::AudioProcessorParameter::Listener,
     void setValueAsPartOfGesture (float newDenormalisedValue);
     void endGesture();
     
-    // TODO when needed.
-    //void resetToDefaultValue();
-    //juce::String getName() const;
-    //float getDenormalizedValue() const;
-    //juce::RangedAudioParameter& getParameter();
 private:
     float normalise (float f) const;
 
