@@ -96,6 +96,7 @@ struct NodeController : AnalyzerBase
     void resetAllParameters();
     
 private:
+ 
     void refreshWidgets();
 
 

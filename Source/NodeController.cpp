@@ -395,8 +395,11 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
         },
         [&](AnalyzerBand* band)
         {
-            dragger.startDraggingComponent(band, event);
-            getAttachmentForWidget(freqAttachements, band).beginGesture();
+            auto node = nodes[getWidgetIndex(band->getChainPosition(), band->getChannel())].get();
+            dragger.startDraggingComponent(node, event);
+            getAttachmentForWidget(freqAttachements, node).beginGesture();
+            getAttachmentForWidget(gainOrSlopeAttachements, node).beginGesture();
+            
             if(qControlsVisible() && currentNode && (currentNode->getChannel() != band->getChannel()
                                                 || currentNode->getChainPosition() != band->getChainPosition()))
             {
@@ -454,9 +457,30 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
         },
         [&](AnalyzerBand* band)
         {
-            dragger.dragComponent(band, event, &hConstrainer);
-            float freq = frequencyFromX(band->getBounds().getCentreX());
-            getAttachmentForWidget(freqAttachements, band).setValueAsPartOfGesture(freq);
+            auto node = nodes[getWidgetIndex(band->getChainPosition(), band->getChannel())].get();
+            //TODO factor this exactly common code out!
+            dragger.dragComponent(node, event, &constrainer);
+            
+            node->updateFrequency(frequencyFromX(node->getX() + node->getWidth() / 2.0));
+            
+            float gainOrSlopeUnnorm;
+            auto& gainOrSlopeAttach = getAttachmentForWidget(gainOrSlopeAttachements, node);
+            
+            if(node->getChainPosition() == ChainPosition::LowCut || node->getChainPosition() == ChainPosition::HighCut)
+            {
+                auto slope = slopeFromY(node->getY() + node->getHeight() / 2.0);
+                node->updateGainOrSlope(slope);
+                gainOrSlopeUnnorm = (slope-6.f)/6.f;
+            }
+            else
+            {
+                gainOrSlopeUnnorm = gainFromY(node->getY() + node->getHeight() / 2.0);
+                node->updateGainOrSlope(gainOrSlopeUnnorm);
+            }
+            
+            gainOrSlopeAttach.setValueAsPartOfGesture(gainOrSlopeUnnorm);
+            getAttachmentForWidget(freqAttachements, node).setValueAsPartOfGesture(node->getFrequency());
+       
         },
         [&](AnalyzerQControl* qControl)
         {
@@ -495,7 +519,9 @@ void NodeController::mouseUp(const juce::MouseEvent &event)
         },
         [&](AnalyzerBand* band)
         {
-            getAttachmentForWidget(freqAttachements, band).endGesture();;
+            auto node = nodes[getWidgetIndex(band->getChainPosition(), band->getChannel())].get();
+            getAttachmentForWidget(freqAttachements, node).endGesture();
+            getAttachmentForWidget(gainOrSlopeAttachements, node).endGesture();
         },
         [&](AnalyzerQControl* qControl)
         {
