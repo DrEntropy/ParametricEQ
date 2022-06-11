@@ -9,19 +9,26 @@
 */
 
 #include "AnalyzerWidgets.h"
+#include "ChainHelpers.h"
 
-#define BAND_OPACITY_SELECTED 0.5
-#define BAND_OPACITY_NOT_SELECTED 0.1
+
+#define BAND_OPACITY_SELECTED 0.5f
+#define BAND_OPACITY_NOT_SELECTED 0.1f
+#define BASE_HUE_RIGHT 0.5f
+#define MAX_HUE_RIGHT 0.7f
+#define BASE_HUE_LEFT 0.1f
+#define MAX_HUE_LEFT 0.4f
+#define BAND_SATURATION 0.8f
 
 juce::Colour getColour(ChainPosition cp, Channel ch)
 {
-    float colorMod =   static_cast<float> (cp) / 30.f;
+    float band0To1 =   static_cast<float> (cp) / (ChainHelpers::numberOfBands - 1);
     switch(ch)
     {
         case Channel::Left:
-            return juce::Colour::fromHSV(0.2f + colorMod , 0.8f, 1.0f, 1.0f);
+            return juce::Colour::fromHSV(juce::jmap(band0To1, BASE_HUE_LEFT, MAX_HUE_LEFT) , BAND_SATURATION, 1.0f, 1.0f);
         case Channel::Right:
-            return juce::Colour::fromHSV(0.5f + colorMod, 0.8f, 1.0f, 1.0f);
+            return juce::Colour::fromHSV(juce::jmap(band0To1, BASE_HUE_RIGHT, MAX_HUE_RIGHT), BAND_SATURATION, 1.0f, 1.0f);
     }
   
 }

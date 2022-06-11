@@ -23,6 +23,8 @@ using CutChain = juce::dsp::ProcessorChain<Filter,Filter,Filter,Filter>;
 using CutFilter = FilterLink<CutChain, CutCoeffArray, HighCutLowCutParameters, CoefficientsMaker>;
 using ParametricFilter = FilterLink<Filter, FilterCoeffPtr, FilterParameters, CoefficientsMaker>;
 
+constexpr size_t numberOfBands{8};
+
 using MonoFilterChain = juce::dsp::ProcessorChain<CutFilter,
                                             ParametricFilter,
                                             ParametricFilter,
