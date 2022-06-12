@@ -10,6 +10,11 @@
 
 #include "ParameterHelpers.h"
 
+juce::String createFilterNumberString(ChainPosition chainpos)
+{
+    return juce::String(static_cast<int>(chainpos));
+}
+
 juce::String createChannelString(Channel channel)
 {
    if (channel == Channel::Left)
@@ -17,39 +22,58 @@ juce::String createChannelString(Channel channel)
     return "right_";
 }
 
-juce::String createParamString(Channel channel, juce::String label, int filterNum)
+juce::String createParamString(Channel channel, juce::String label, ChainPosition chainpos)
 {
-    return "Filter_" + createChannelString(channel) + juce::String(filterNum)+"_"+ label;
+    return "Filter_" + createChannelString(channel) + createFilterNumberString(chainpos)+"_"+ label;
 }
 
 
-juce::String createGainParamString(Channel channel, int filterNum)
+juce::String createGainParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "gain",filterNum);
+    return createParamString(channel, "gain", chainpos);
 }
 
-juce::String createQParamString(Channel channel, int filterNum)
+juce::String createQParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "Q",filterNum);
+    return createParamString(channel, "Q", chainpos);
 }
 
-juce::String createFreqParamString(Channel channel, int filterNum)
+juce::String createFreqParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "freq",filterNum);
+    return createParamString(channel, "freq", chainpos);
 }
 
-juce::String createBypassParamString(Channel channel, int filterNum)
+juce::String createBypassParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "bypass",filterNum);
+    return createParamString(channel, "bypass", chainpos);
 }
 
-juce::String createTypeParamString(Channel channel, int filterNum)
+juce::String createTypeParamString(Channel channel, ChainPosition chainpos)
 {
-    return createParamString(channel, "type",filterNum);
+    return createParamString(channel, "type", chainpos);
 }
 
 
-juce::String createSlopeParamString(Channel channel, int filterNum)
+juce::String createSlopeParamString(Channel channel, ChainPosition filterNum)
 {
     return createParamString(channel, "slope",filterNum);
+}
+
+
+juce::RangedAudioParameter* getFrequencyParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+  return  apvts.getParameter(createFreqParamString(channel, chainpos));
+}
+
+juce::RangedAudioParameter* getQParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+    return  apvts.getParameter(createQParamString(channel, chainpos));
+}
+
+juce::RangedAudioParameter* getGainOrSlopeParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos)
+{
+    if(chainpos == ChainPosition::LowCut || chainpos == ChainPosition::HighCut)
+        return apvts.getParameter(createSlopeParamString(channel, chainpos));
+    
+    return  apvts.getParameter(createGainParamString(channel, chainpos));
 }

@@ -88,8 +88,10 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
         if(TextOnlyHorizontalSlider* textOnlyHSliderp = dynamic_cast<TextOnlyHorizontalSlider*> (&slider))
         {
             auto bounds = slider.getLocalBounds().toFloat();
-
-            g.setColour(juce::Colours::white);
+            // Note i am using this outline colour for everything .
+            auto mainColour = slider.findColour(juce::Slider::textBoxOutlineColourId);
+            g.setColour(mainColour);
+           
             g.drawRect(bounds, HALF_SLIDER_BORDER);
             bounds.reduce(HALF_SLIDER_BORDER, HALF_SLIDER_BORDER);
             
@@ -100,7 +102,7 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
             auto barBounds = bounds.withWidth(sliderPos);
             g.fillRect(barBounds);
             
-            g.setColour(juce::Colours::white);
+            g.setColour(mainColour);
             juce::String message = textOnlyHSliderp->getDisplayString();
             g.drawFittedText(message, bounds.toNearestInt(), juce::Justification::centred, 1);
         }
@@ -130,19 +132,26 @@ struct EQParamLookAndFeel : juce::LookAndFeel_V4
 class EQParamWidget  : public juce::Component
 {
 public:
-    EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut);
+    EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition chainPos, bool isCut);
     ~EQParamWidget() override;
     void refreshButtons(ChannelMode mode);
+    void refreshSliders(Channel ch);
     void setUpButton(juce::Button& button);
     void attachSliders(Channel channel);
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
  
-
+    void bandSelected(Channel ch);
+    void bandCleared();
+    
 private:
     
-    int filterNumber;
+    ChainPosition chainPos;
     bool isCut;
+    
+    bool selected{false};
+    
+    Channel activeChannel;
     
     juce::AudioProcessorValueTreeState& apvts;
     HertzSlider frequencySlider;

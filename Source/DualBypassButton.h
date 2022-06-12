@@ -24,7 +24,7 @@
 class DualBypassButton  : public juce::Component
 {
 public:
-    DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts);
+    DualBypassButton(ChainPosition chainPos, juce::AudioProcessorValueTreeState& apvts);
     ~DualBypassButton() override = default;
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
@@ -50,7 +50,7 @@ private:
     const juce::Colour onColor = juce::Colours::darkblue;
     const juce::Colour offColor = juce::Colours::lightblue;
     
-    int filterNum;
+    ChainPosition chainPos;
     BypassButton leftMidBypass;
     BypassButton rightSideBypass;
     

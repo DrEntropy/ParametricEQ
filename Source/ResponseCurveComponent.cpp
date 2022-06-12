@@ -72,23 +72,8 @@ void ResponseCurveComponent::buildNewResponseCurves()
 
 void ResponseCurveComponent::updateChainParameters()
 {
-    auto singleChainUpdate = [this](MonoFilterChain& chain, Channel channel)
-    {
-        initializeChain<1>(chain, getParametericFilterParams<1>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        initializeChain<2>(chain, getParametericFilterParams<2>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        initializeChain<3>(chain, getParametericFilterParams<3>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        initializeChain<4>(chain, getParametericFilterParams<4>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        initializeChain<5>(chain, getParametericFilterParams<5>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        initializeChain<6>(chain, getParametericFilterParams<6>(channel, sampleRate, apvts), 0.0, false, sampleRate);
-        
-        HighCutLowCutParameters lowCutParams = getCutFilterParams<0>(channel, sampleRate, true, apvts);
-        initializeChain<0>(chain, lowCutParams, 0.0, false,sampleRate);
-        HighCutLowCutParameters highCutParams = getCutFilterParams<7>(channel, sampleRate, false, apvts);
-        initializeChain<7>(chain, highCutParams, 0.0, false,sampleRate);
-    };
-    
-    singleChainUpdate(leftChain, Channel::Left);
-    singleChainUpdate(rightChain, Channel::Right);
+    ChainHelpers::initializeFilters(leftChain, Channel::Left, apvts, 0.0, false, sampleRate);
+    ChainHelpers::initializeFilters(rightChain, Channel::Right, apvts, 0.0, false, sampleRate);
 }
 
  

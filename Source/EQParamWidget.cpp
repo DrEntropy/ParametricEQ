@@ -11,7 +11,7 @@
 #include "EQParamWidget.h"
 
 
-EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filterNumber, bool isCut) : apvts (apvts), filterNumber (filterNumber), isCut (isCut)
+EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition cp, bool isCut) : apvts (apvts), chainPos(cp), isCut (isCut)
 {
     setLookAndFeel(&eQParamLookAndFeel);
     
@@ -22,7 +22,7 @@ EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filt
         gainOrSlopeSlider.reset(new SlopeSlider());
     else
         gainOrSlopeSlider.reset(new GainSlider());
-    
+   
     addAndMakeVisible(*gainOrSlopeSlider);
     
     attachSliders(Channel::Left);
@@ -53,12 +53,48 @@ EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, int filt
                                           if(auto* comp = safePtr.getComponent() )
                                               comp->refreshButtons(static_cast<ChannelMode>(v));
                                          }));
+    
+    auto leftBypass = apvts.getParameter(createBypassParamString(Channel::Left, cp));
+    auto rightBypass = apvts.getParameter(createBypassParamString(Channel::Right, cp));
+    
+    leftMidBypassListener.reset(new ParamListener(leftBypass,
+                                                  [safePtr](float v)
+                                                   {
+                                                    if(auto* comp = safePtr.getComponent() )
+                                                        comp->refreshSliders(Channel::Left);
+                                                   }));
+    
+    rightSideBypassListener.reset(new ParamListener(rightBypass,
+                                                     [safePtr](float v)
+                                                      {
+                                                       if(auto* comp = safePtr.getComponent() )
+                                                           comp->refreshSliders(Channel::Right);
+                                                      }));
+    
+    activeChannel = Channel::Left;
+    refreshSliders(activeChannel);
+   
 }
 
 
 EQParamWidget::~EQParamWidget() 
 {
     setLookAndFeel(nullptr);
+}
+
+void EQParamWidget::refreshSliders(Channel ch)
+{
+   
+    if(ch != activeChannel)
+        return;
+    
+    auto bypass = apvts.getParameter(createBypassParamString(activeChannel, chainPos));
+    auto bypassed  = bypass->getValue() > 0.5;
+    auto colour = bypassed ? juce::Colours::grey : (selected ? juce::Colours::lightgreen : juce::Colours::white);
+
+    gainOrSlopeSlider->setColour(juce::Slider::textBoxOutlineColourId, colour);
+    qSlider.setColour(juce::Slider::textBoxOutlineColourId, colour);
+    frequencySlider.setColour(juce::Slider::textBoxOutlineColourId, colour);
 }
 
 void EQParamWidget::refreshButtons(ChannelMode mode)
@@ -75,7 +111,35 @@ void EQParamWidget::refreshButtons(ChannelMode mode)
         leftMidButton.setVisible(false);
         rightSideButton.setVisible(false);
         leftMidButton.setToggleState(true,juce::NotificationType::sendNotification);
+        activeChannel = Channel::Left;
     }
+}
+
+
+//TODO test this crap out!
+void EQParamWidget::bandSelected(Channel ch)
+{
+    selected = true;
+    if(activeChannel == ch)
+    {
+        refreshSliders(ch);
+    }
+    else  // push the other button
+    {
+        activeChannel = ch;
+        if(ch == Channel::Left)
+            leftMidButton.setToggleState(true, juce::NotificationType::sendNotification);
+        else
+            rightSideButton.setToggleState(true, juce::NotificationType::sendNotification);
+        
+    }
+        
+}
+
+void EQParamWidget::bandCleared()
+{
+    selected = false;
+    refreshSliders(activeChannel);
 }
 
 void EQParamWidget::setUpButton(juce::Button& button)
@@ -87,21 +151,25 @@ void EQParamWidget::setUpButton(juce::Button& button)
 
 void EQParamWidget::attachSliders(Channel channel)
 {
+    
     frequencyAttachment.reset(); //must first delete old attachment before creating new one!
-    frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, filterNumber), frequencySlider));
+    frequencyAttachment.reset(new SliderAttachment(apvts, createFreqParamString(channel, chainPos), frequencySlider));
 
     qAttachment.reset();
-    qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, filterNumber), qSlider));
+    qAttachment.reset(new SliderAttachment(apvts, createQParamString(channel, chainPos), qSlider));
 
     juce::String gainOrSlopeParamString;
 
     if(isCut)
-        gainOrSlopeParamString = createSlopeParamString(channel, filterNumber);
+        gainOrSlopeParamString = createSlopeParamString(channel, chainPos);
     else
-        gainOrSlopeParamString = createGainParamString(channel, filterNumber);
+        gainOrSlopeParamString = createGainParamString(channel, chainPos);
 
     gainOrSlopeAttachment.reset();
     gainOrSlopeAttachment.reset(new SliderAttachment(apvts, gainOrSlopeParamString, *gainOrSlopeSlider));
+    
+    activeChannel = channel;
+    refreshSliders(activeChannel);
 }
 
  

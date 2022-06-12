@@ -25,6 +25,18 @@
               file="Source/HelperFunctions.h"/>
       </GROUP>
       <GROUP id="{2E90EA13-AF78-352E-2563-3511802F5243}" name="ResponseCurve">
+        <FILE id="rwjo49" name="ParameterAttachment.cpp" compile="1" resource="0"
+              file="Source/ParameterAttachment.cpp"/>
+        <FILE id="R2N5ea" name="ParameterAttachment.h" compile="0" resource="0"
+              file="Source/ParameterAttachment.h"/>
+        <FILE id="uTToKi" name="AnalyzerWidgets.cpp" compile="1" resource="0"
+              file="Source/AnalyzerWidgets.cpp"/>
+        <FILE id="YVjDUQ" name="AnalyzerWidgets.h" compile="0" resource="0"
+              file="Source/AnalyzerWidgets.h"/>
+        <FILE id="r6ZLkq" name="NodeController.cpp" compile="1" resource="0"
+              file="Source/NodeController.cpp"/>
+        <FILE id="eAL25T" name="NodeController.h" compile="0" resource="0"
+              file="Source/NodeController.h"/>
         <FILE id="aNLSVq" name="AllParamsListener.cpp" compile="1" resource="0"
               file="Source/AllParamsListener.cpp"/>
         <FILE id="n2kulb" name="AllParamsListener.h" compile="0" resource="0"
@@ -126,8 +138,10 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="ParametricEQ" recommendedWarnings="LLVM"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="ParametricEQ"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="ParametricEQ" recommendedWarnings="LLVM"
+                       macOSDeploymentTarget="10.14" osxCompatibility="10.14 SDK"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="ParametricEQ" macOSDeploymentTarget="10.14"
+                       osxCompatibility="10.14 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>

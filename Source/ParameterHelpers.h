@@ -25,17 +25,36 @@ const std::map<ChannelMode,juce::String>  mapModeToString
     {ChannelMode::MidSide, "Mid-Side"},
 };
 
-juce::String createGainParamString(Channel channel, int filterNum);
+enum class ChainPosition
+{
+    LowCut,
+    LowShelf,
+    PeakFilter1,
+    PeakFilter2,
+    PeakFilter3,
+    PeakFilter4,
+    HighShelf,
+    HighCut
+};
 
-juce::String createQParamString(Channel channel, int filterNum);
+juce::String createFilterNumberString(ChainPosition chainpos);
 
-juce::String createFreqParamString(Channel channel, int filterNum);
+juce::String createGainParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createBypassParamString(Channel channel, int filterNum);
+juce::String createQParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createTypeParamString(Channel channel, int filterNum);
+juce::String createFreqParamString(Channel channel, ChainPosition chainpos);
 
-juce::String createSlopeParamString(Channel channel, int filterNum);
+juce::String createBypassParamString(Channel channel, ChainPosition chainpos);
+
+juce::String createTypeParamString(Channel channel, ChainPosition chainpos);
+
+juce::String createSlopeParamString(Channel channel, ChainPosition chainpos);
 
 juce::String createChannelString(Channel channel);
  
+juce::RangedAudioParameter* getFrequencyParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);
+
+juce::RangedAudioParameter* getQParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);
+
+juce::RangedAudioParameter* getGainOrSlopeParam(juce::AudioProcessorValueTreeState& apvts, Channel channel, ChainPosition chainpos);

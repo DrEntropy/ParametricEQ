@@ -13,7 +13,7 @@
 #include "ParameterHelpers.h"
 
 //==============================================================================
-DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeState& apvts):filterNum(filterNum), apvts(apvts)
+DualBypassButton::DualBypassButton(ChainPosition cp, juce::AudioProcessorValueTreeState& apvts):chainPos(cp), apvts(apvts)
 {
     addAndMakeVisible(leftMidBypass);
     addAndMakeVisible(rightSideBypass);
@@ -22,8 +22,8 @@ DualBypassButton::DualBypassButton(int filterNum, juce::AudioProcessorValueTreeS
     leftMidBypass.onLeft = true;
     rightSideBypass.isPaired = true;  //never on its own.
  
-    leftMidAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Left, filterNum), leftMidBypass));
-    rightSideAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Right, filterNum), rightSideBypass));
+    leftMidAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Left, chainPos), leftMidBypass));
+    rightSideAttachment.reset(new ButtonAttachment(apvts, createBypassParamString(Channel::Right, chainPos), rightSideBypass));
     
     leftMidBypass.onClick = [this]() { this->repaint(); };
     rightSideBypass.onClick = [this]() { this->repaint(); };
@@ -62,21 +62,21 @@ void DualBypassButton::paintOverChildren(juce::Graphics& g)
     auto rightColor = (isShowingAsOn(Channel::Left) && ! isPaired) || (isShowingAsOn(Channel::Right) && isPaired) ? onColor : offColor;
 
     
-    switch(filterNum)
+    switch(chainPos)
     {
-        case 0:
+        case ChainPosition::LowCut:
             drawCut(pp, g, unflipped, leftColor, rightColor);
             break;
             
-        case 1:
+        case ChainPosition::LowShelf:
             drawShelf(pp, g, unflipped, leftColor, rightColor);
             break;
             
-        case 6:
+        case ChainPosition::HighShelf:
             drawShelf(pp, g, flipped,  rightColor, leftColor);
             break;
             
-        case 7:
+        case ChainPosition::HighCut:
             drawCut(pp, g, flipped, rightColor, leftColor);
             break;
             
