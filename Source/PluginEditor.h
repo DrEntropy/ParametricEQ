@@ -22,6 +22,7 @@
 #include "AnalyzerControls.h"
 #include "ResponseCurveComponent.h"
 #include "NodeController.h"
+#include "GlobalControls.h"
 
 
 //layout defines
@@ -69,7 +70,9 @@ private:
     
     std::unique_ptr<SpectrumAnalyzer<juce::AudioBuffer<float>>> spectrumAnalyzer;
      
-    AnalyzerControls analyzerControls;
+    
+    
+    GlobalControls globalControls;
     
     ResponseCurveComponent responseCurve;
     
