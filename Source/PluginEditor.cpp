@@ -12,7 +12,7 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), globalControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts), nodeController(p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), globalControls(p.apvts, nodeController), responseCurve(p.getSampleRate(), p.apvts), nodeController(p.apvts)
 
 {
     spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));

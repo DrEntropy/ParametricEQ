@@ -5,6 +5,8 @@
               cppLanguageStandard="17">
   <MAINGROUP id="HEULSx" name="ParametricEQ">
     <GROUP id="{F1950BD2-3FC3-3885-9EB9-5F2E6BFD7A21}" name="Source">
+      <FILE id="X5eWME" name="GlobalParameters.h" compile="0" resource="0"
+            file="Source/GlobalParameters.h"/>
       <FILE id="tqMRHE" name="GlobalControls.cpp" compile="1" resource="0"
             file="Source/GlobalControls.cpp"/>
       <FILE id="YUNa9d" name="GlobalControls.h" compile="0" resource="0"

@@ -46,7 +46,7 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
     {
         auto bounds = button.getLocalBounds();
         
-        g.setColour(button.getToggleState() ? juce::Colours::green : juce::Colours::black);
+        g.setColour((button.getToggleState() || shouldDrawButtonAsDown) ? juce::Colours::green : juce::Colours::black);
         
         g.fillRect(bounds);
         g.setColour(juce::Colours::white);

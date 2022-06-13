@@ -14,10 +14,7 @@
 #include "BottomLookAndFeel.h"
 #include "BottomControl.h"
  
-struct RotarySlider : juce::Slider
-{
-    RotarySlider() : juce::Slider(juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow) {}
-};
+
 //==============================================================================
 /*
 */

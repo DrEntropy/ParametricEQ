@@ -10,6 +10,7 @@
 
 #include "NodeController.h"
 #include "ChainHelpers.h"
+#include "GlobalParameters.h"
 #include <variant>
 
 // helper type for the variant visitor
@@ -201,7 +202,7 @@ void NodeController::resized()
 void NodeController::refreshWidgets()
 {
     auto bBox = fftBoundingBox.toFloat();
-    bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo;
+    bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load()) != ChannelMode::Stereo;
     
     for(uint i=0; i< 8; ++i)
     {

@@ -14,6 +14,7 @@
 #include "FilterParameters.h"
 #include "HighCutLowCutParameters.h"
 #include "TestFunctions.h"
+#include "GlobalParameters.h"
  
 #include <string>
 
@@ -205,7 +206,7 @@ void ParametricEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     
     updateTrims();
     
-    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load());
     
     performPreLoopUpdate(mode, getSampleRate());
     
@@ -428,11 +429,11 @@ ParamLayout ParametricEQAudioProcessor::createParameterLayout()
         modes.add(stringRep);
     }
     
-    layout.add(std::make_unique<juce::AudioParameterChoice>("Processing Mode", "Processing Mode", modes, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>(GlobalParameters::processingModeName, GlobalParameters::processingModeName, modes, 0));
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>("input_trim", "input_trim",
+    layout.add(std::make_unique<juce::AudioParameterFloat>(GlobalParameters::inTrimName, GlobalParameters::inTrimName,
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("output_trim", "output_trim",
+    layout.add(std::make_unique<juce::AudioParameterFloat>(GlobalParameters::outTrimName, GlobalParameters::outTrimName,
                                                            juce::NormalisableRange<float>(-18.f, 18.f, 0.25f, 1.0f), 0.0f));
     createFilterLayouts(layout, Channel::Left);
     createFilterLayouts(layout, Channel::Right);
@@ -480,8 +481,8 @@ void ParametricEQAudioProcessor::performInnerLoopUpdate(int numSamplesToSkip)
 void ParametricEQAudioProcessor::updateTrims()
 {
     
-    float inputGain= apvts.getRawParameterValue("input_trim")->load();
-    float outputGain = apvts.getRawParameterValue("output_trim")->load();
+    float inputGain= apvts.getRawParameterValue(GlobalParameters::inTrimName)->load();
+    float outputGain = apvts.getRawParameterValue(GlobalParameters::outTrimName)->load();
     inputTrim.setGainDecibels(inputGain);
     outputTrim.setGainDecibels(outputGain);
  
@@ -491,7 +492,7 @@ void ParametricEQAudioProcessor::updateTrims()
 
 bool ParametricEQAudioProcessor::isAnyActiveOn()
 {
-    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load());
     
     bool isAnyOn = false;
     

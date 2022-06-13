@@ -12,19 +12,31 @@
 #include "GlobalControls.h"
 
 //==============================================================================
-GlobalControls::GlobalControls(juce::AudioProcessorValueTreeState& apv):apvts(apv),analyzerControls(apv)
+GlobalControls::GlobalControls(juce::AudioProcessorValueTreeState& apv, NodeController& nodeController):apvts(apv), nodeControl(nodeController),
+                               inGain(apv, GlobalParameters::inTrimName),
+                               outGain(apv, GlobalParameters::outTrimName),
+                               processingMode(apv, GlobalParameters::processingModeName), analyzerControls(apv)
 {
+    setLookAndFeel(&lookAndFeel);
+    
     addAndMakeVisible(analyzerControls);
+    addAndMakeVisible(outGain);
+    addAndMakeVisible(inGain);
+    addAndMakeVisible(processingMode);
+    addAndMakeVisible(resetAllBands);
+    
+    resetAllBands.onClick = [&]()
+    {
+       nodeControl.resetAllParameters();
+    };
 }
 
 GlobalControls::~GlobalControls()
 {
+    setLookAndFeel(nullptr);
 }
 
-void GlobalControls::paint (juce::Graphics& g)
-{
  
-}
 
 void GlobalControls::resized()
 {
@@ -40,9 +52,13 @@ void GlobalControls::resized()
     
     // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
     auto analyzerControlBounds =  bounds.removeFromLeft(bounds.getHeight() * 9  / 2);
-    
+    inGain.setBounds(inTrimBounds);
+    outGain.setBounds(outTrimBounds);
+    processingMode.setBounds(procModeBounds);
     analyzerControls.setBounds(analyzerControlBounds);
-   
     
-    auto resetAllBounds = bounds; //Placeholder
+    auto resetBounds  = bounds.expanded(-20, -20);
+    resetAllBands.setBounds(resetBounds);
+    
+  
 }

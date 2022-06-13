@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "DualBypassButton.h"
 #include "ParameterHelpers.h"
+#include "GlobalParameters.h"
 
 //==============================================================================
 DualBypassButton::DualBypassButton(ChainPosition cp, juce::AudioProcessorValueTreeState& apvts):chainPos(cp), apvts(apvts)
@@ -29,7 +30,7 @@ DualBypassButton::DualBypassButton(ChainPosition cp, juce::AudioProcessorValueTr
     rightSideBypass.onClick = [this]() { this->repaint(); };
     
     auto safePtr = juce::Component::SafePointer<DualBypassButton>(this);
-    modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
+    modeListener.reset(new ParamListener(apvts.getParameter(GlobalParameters::processingModeName),
                                         [safePtr](float v)
                                          {
                                           if(auto* comp = safePtr.getComponent() )
@@ -179,7 +180,7 @@ void DualBypassButton::drawPeak(PathPoints pp, juce::Graphics& g, juce::Colour l
 
 void DualBypassButton::resized()
 {
-    refreshButtons(static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()));
+    refreshButtons(static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load()));
 }
 
 

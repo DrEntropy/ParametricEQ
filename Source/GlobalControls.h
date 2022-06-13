@@ -12,26 +12,39 @@
 
 #include <JuceHeader.h>
 #include "AnalyzerControls.h"
+#include "BottomControl.h"
+#include "GlobalParameters.h"
+#include "NodeController.h"
 
 //==============================================================================
 /*
 */
+
+
+
 class GlobalControls  : public juce::Component
 {
 public:
-    GlobalControls(juce::AudioProcessorValueTreeState& apv);
+    GlobalControls(juce::AudioProcessorValueTreeState& apv, NodeController& nodeController);
     ~GlobalControls() override;
-
-    void paint (juce::Graphics&) override;
+ 
     void resized() override;
 
 private:
+     
     
     juce::AudioProcessorValueTreeState& apvts;
+    NodeController& nodeControl;
+    
+    BottomControl<RotarySlider> inGain;
+    BottomControl<RotarySlider> outGain;
+    BottomControl<SwitchSlider> processingMode;
     
     AnalyzerControls analyzerControls;
     
- 
+    juce::TextButton resetAllBands{"Reset All Bands"};
+    
+    BottomLookAndFeel lookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlobalControls)
 };

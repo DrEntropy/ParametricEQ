@@ -9,6 +9,7 @@
 */
 
 #include "EQParamWidget.h"
+#include "GlobalParameters.h"
 
 
 EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition cp, bool isCut) : apvts (apvts), chainPos(cp), isCut (isCut)
@@ -44,10 +45,10 @@ EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPos
     };
     
 
-    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load());
     refreshButtons(mode);
     
-    modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
+    modeListener.reset(new ParamListener(apvts.getParameter(GlobalParameters::processingModeName),
                                         [safePtr](float v)
                                          {
                                           if(auto* comp = safePtr.getComponent() )
