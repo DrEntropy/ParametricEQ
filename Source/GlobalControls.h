@@ -16,12 +16,7 @@
 #include "GlobalParameters.h"
 #include "NodeController.h"
 
-//==============================================================================
-/*
-*/
-
-
-
+ 
 class GlobalControls  : public juce::Component
 {
 public:
@@ -32,6 +27,8 @@ public:
 
 private:
      
+    static constexpr int resetButtonHMargin{20};
+    static constexpr int resetButtonVMargin{30};
     
     juce::AudioProcessorValueTreeState& apvts;
     NodeController& nodeControl;

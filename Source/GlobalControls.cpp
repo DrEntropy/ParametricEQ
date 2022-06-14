@@ -73,7 +73,7 @@ void GlobalControls::resized()
     
     resetBox.setBounds(bounds);
     
-    auto resetBounds  = bounds.expanded(-20, -30);
+    auto resetBounds  = bounds.expanded(-resetButtonHMargin, -resetButtonVMargin);
     resetAllBands.setBounds(resetBounds);
     
   
