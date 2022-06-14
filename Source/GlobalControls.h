@@ -40,6 +40,8 @@ private:
     BottomControl<RotarySlider> outGain;
     BottomControl<SwitchSlider> processingMode;
     
+    BoundaryBox inGainBox,  outGainBox, modeBox, resetBox;
+    
     AnalyzerControls analyzerControls;
     
     juce::TextButton resetAllBands{"Reset All Bands"};

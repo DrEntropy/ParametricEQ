@@ -63,9 +63,11 @@ void ParametricEQAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
     
-    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
+    
  
     bounds.reduce(OVERALL_MARGIN, OVERALL_MARGIN);
+    
+    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
     
     inputMeter.setBounds(bounds.removeFromLeft(SCALE_AND_METER_WIDTH));
     outputMeter.setBounds(bounds.removeFromRight(SCALE_AND_METER_WIDTH));

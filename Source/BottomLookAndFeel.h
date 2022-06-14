@@ -54,6 +54,22 @@ struct BottomLookAndFeel : juce::LookAndFeel_V4
         
     }
     
+    void drawButtonText (juce::Graphics &g, juce::TextButton & button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+    {
+         
+        using namespace juce;
+        
+        // Font font (getTextButtonFont (button, button.getHeight()));
+        g.setFont (Font(button.getHeight()));
+        g.setColour (button.findColour (button.getToggleState() ? TextButton::textColourOnId
+                                                                : TextButton::textColourOffId)
+                           .withMultipliedAlpha (button.isEnabled() ? 1.0f : 0.5f));
+
+        
+        g.drawFittedText(button.getButtonText(), button.getLocalBounds(), Justification::centred, 1);
+ 
+        }
+    
     
     void drawRotarySlider(juce::Graphics & g, int x,int y, int width, int height, float sliderPosProportional,
                                        float rotaryStartAngle, float rotaryEndAngle, juce::Slider &slider) override

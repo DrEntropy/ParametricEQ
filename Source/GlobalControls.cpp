@@ -19,11 +19,17 @@ GlobalControls::GlobalControls(juce::AudioProcessorValueTreeState& apv, NodeCont
 {
     setLookAndFeel(&lookAndFeel);
     
+    addAndMakeVisible(inGainBox);
+    addAndMakeVisible(outGainBox);
+    addAndMakeVisible(modeBox);
+    addAndMakeVisible(resetBox);
+    
     addAndMakeVisible(analyzerControls);
     addAndMakeVisible(outGain);
     addAndMakeVisible(inGain);
     addAndMakeVisible(processingMode);
     addAndMakeVisible(resetAllBands);
+    
     
     resetAllBands.onClick = [&]()
     {
@@ -41,23 +47,33 @@ GlobalControls::~GlobalControls()
 void GlobalControls::resized()
 {
     auto bounds = getLocalBounds();
-    //   make room for square bounded controls
+     
     auto controlWidth = bounds.getHeight();
     
-    //controls are square:
+    // trim controls are square:
     auto inTrimBounds = bounds.removeFromLeft(controlWidth);
     auto outTrimBounds = bounds.removeFromRight(controlWidth);
-    bounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
+    
+    modeBox.setBounds(bounds.withWidth(3 * controlWidth / 2));
     auto procModeBounds = bounds.removeFromLeft(controlWidth);
+    bounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
     
     // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
     auto analyzerControlBounds =  bounds.removeFromLeft(bounds.getHeight() * 9  / 2);
     inGain.setBounds(inTrimBounds);
+    inGainBox.setBounds(inTrimBounds);
+    
     outGain.setBounds(outTrimBounds);
+    outGainBox.setBounds(outTrimBounds);
+    
     processingMode.setBounds(procModeBounds);
+     
+    
     analyzerControls.setBounds(analyzerControlBounds);
     
-    auto resetBounds  = bounds.expanded(-20, -20);
+    resetBox.setBounds(bounds);
+    
+    auto resetBounds  = bounds.expanded(-20, -30);
     resetAllBands.setBounds(resetBounds);
     
   

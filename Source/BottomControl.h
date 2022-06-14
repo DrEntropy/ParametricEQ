@@ -73,3 +73,15 @@ struct RotarySlider : juce::Slider
 {
     RotarySlider() : juce::Slider(juce::Slider::SliderStyle::Rotary, juce::Slider::TextBoxBelow) {}
 };
+
+
+struct BoundaryBox : juce::Component
+{
+    void paint(juce::Graphics& g) override
+    {
+        auto bounds = getLocalBounds();
+        g.setColour(juce::Colours::lightgrey);
+        g.drawRect(bounds.toFloat());
+    }
+    
+};
