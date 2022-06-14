@@ -24,7 +24,6 @@ public:
     AnalyzerControls(juce::AudioProcessorValueTreeState&);
     ~AnalyzerControls() override;
     
-    void paint(juce::Graphics& g) override;
  
     void resized() override;
 
@@ -42,6 +41,8 @@ private:
     BottomControl<SwitchSlider> prePostSlider;
     BottomControl<SwitchSlider> pointsSlider;
     BottomControl<RotarySlider> decaySlider;
+    
+    BoundaryBox boundaryBox;
  
     std::unique_ptr<ButtonAttachment> analyzerEnableAttachment;
     

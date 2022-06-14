@@ -37,6 +37,8 @@ AnalyzerControls::AnalyzerControls(juce::AudioProcessorValueTreeState& apvts) :
             comp->toggleEnablement();
     };
     
+    addAndMakeVisible(boundaryBox);
+    
     buttonLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(buttonLabel);
     addAndMakeVisible(analyzerEnable);
@@ -50,16 +52,12 @@ AnalyzerControls::~AnalyzerControls()
     setLookAndFeel(nullptr);
 }
 
-void AnalyzerControls::paint(juce::Graphics& g)
-{
-    auto bounds = getLocalBounds();
-    g.setColour(juce::Colours::lightgrey);
-    g.drawRect(bounds.toFloat());
-}
 
 void AnalyzerControls::resized()
 {
     auto bounds = getLocalBounds();
+    boundaryBox.setBounds(bounds);
+    
     auto width = bounds.getHeight(); // use square sections
     
     auto enableSection = bounds.removeFromLeft(width);
