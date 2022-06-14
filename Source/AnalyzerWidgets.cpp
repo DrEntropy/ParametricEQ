@@ -37,6 +37,7 @@ AnalyzerWidgetBase::AnalyzerWidgetBase(ChainPosition cp, Channel ch) : chainPosi
 void AnalyzerWidgetBase::displayAsSelected(bool selected)
 {
     isSelected = selected;
+    repaint(); 
 }
 
 void AnalyzerWidgetBase::paint(juce::Graphics& g)
