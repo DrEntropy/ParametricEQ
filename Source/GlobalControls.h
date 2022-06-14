@@ -26,17 +26,17 @@ public:
     void resized() override;
 
 private:
-     
     static constexpr int resetButtonHMargin{20};
     static constexpr int resetButtonVMargin{30};
+    static constexpr float processingModeAspectRatio{1.5f};
+    static constexpr float analyzerControlAspectRatio{9.0f / 2.0f};
     
     juce::AudioProcessorValueTreeState& apvts;
     NodeController& nodeControl;
     
-    BottomControl<RotarySlider> inGain;
-    BottomControl<RotarySlider> outGain;
+    BottomControl<RotarySlider> inGain, outGain;
     BottomControl<SwitchSlider> processingMode;
-    
+
     BoundaryBox inGainBox,  outGainBox, modeBox, resetBox;
     
     AnalyzerControls analyzerControls;

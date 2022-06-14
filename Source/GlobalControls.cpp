@@ -47,19 +47,18 @@ GlobalControls::~GlobalControls()
 void GlobalControls::resized()
 {
     auto bounds = getLocalBounds();
-     
+    // square controls
     auto controlWidth = bounds.getHeight();
     
-    // trim controls are square:
     auto inTrimBounds = bounds.removeFromLeft(controlWidth);
     auto outTrimBounds = bounds.removeFromRight(controlWidth);
     
-    modeBox.setBounds(bounds.withWidth(3 * controlWidth / 2));
+    //processing mode control is square, but leave some room
+    modeBox.setBounds(bounds.withWidth(static_cast<int>(processingModeAspectRatio * controlWidth)));
     auto procModeBounds = bounds.removeFromLeft(controlWidth);
-    bounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
+    bounds.removeFromLeft(static_cast<int>((processingModeAspectRatio - 1.0f) * controlWidth)); // remove rest of rectangle
     
-    // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
-    auto analyzerControlBounds =  bounds.removeFromLeft(bounds.getHeight() * 9  / 2);
+    auto analyzerControlBounds =  bounds.removeFromLeft(static_cast<int>(bounds.getHeight() * analyzerControlAspectRatio));
     inGain.setBounds(inTrimBounds);
     inGainBox.setBounds(inTrimBounds);
     
@@ -67,14 +66,10 @@ void GlobalControls::resized()
     outGainBox.setBounds(outTrimBounds);
     
     processingMode.setBounds(procModeBounds);
-     
     
     analyzerControls.setBounds(analyzerControlBounds);
     
     resetBox.setBounds(bounds);
-    
-    auto resetBounds  = bounds.expanded(-resetButtonHMargin, -resetButtonVMargin);
-    resetAllBands.setBounds(resetBounds);
-    
-  
+    auto resetButtonBounds  = bounds.expanded(-resetButtonHMargin, -resetButtonVMargin);
+    resetAllBands.setBounds(resetButtonBounds);
 }
