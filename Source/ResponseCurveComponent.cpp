@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "ResponseCurveComponent.h"
 #include "EQConstants.h"
+#include "GlobalParameters.h"
 
 using namespace ChainHelpers;
 
@@ -38,7 +39,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.setColour(juce::Colours::yellow);
     g.strokePath(leftResponseCurve, pst);
     
-    if(static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo)
+    if(static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load()) != ChannelMode::Stereo)
     {
         g.setColour(juce::Colours::hotpink);
         g.strokePath(rightResponseCurve, pst);
@@ -64,7 +65,7 @@ void ResponseCurveComponent::buildNewResponseCurves()
  
     createResponseCurve(leftResponseCurve, buildNewResponseCurve(leftChain));
     
-    if(static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo)
+    if(static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load()) != ChannelMode::Stereo)
     {
         createResponseCurve(rightResponseCurve, buildNewResponseCurve(rightChain));
     }

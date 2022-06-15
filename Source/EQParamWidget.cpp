@@ -9,6 +9,7 @@
 */
 
 #include "EQParamWidget.h"
+#include "GlobalParameters.h"
 
 
 EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPosition cp, bool isCut) : apvts (apvts), chainPos(cp), isCut (isCut)
@@ -44,10 +45,10 @@ EQParamWidget::EQParamWidget(juce::AudioProcessorValueTreeState& apvts, ChainPos
     };
     
 
-    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load());
+    ChannelMode mode = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load());
     refreshButtons(mode);
     
-    modeListener.reset(new ParamListener(apvts.getParameter("Processing Mode"),
+    modeListener.reset(new ParamListener(apvts.getParameter(GlobalParameters::processingModeName),
                                         [safePtr](float v)
                                          {
                                           if(auto* comp = safePtr.getComponent() )
@@ -90,7 +91,7 @@ void EQParamWidget::refreshSliders(Channel ch)
     
     auto bypass = apvts.getParameter(createBypassParamString(activeChannel, chainPos));
     auto bypassed  = bypass->getValue() > 0.5;
-    auto colour = bypassed ? juce::Colours::grey : (selected ? juce::Colours::lightgreen : juce::Colours::white);
+    auto colour = bypassed ? juce::Colours::grey : (selected ? juce::Colours::limegreen : juce::Colours::white);
 
     gainOrSlopeSlider->setColour(juce::Slider::textBoxOutlineColourId, colour);
     qSlider.setColour(juce::Slider::textBoxOutlineColourId, colour);

@@ -12,7 +12,7 @@
 
 //==============================================================================
 ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), analyzerControls(p.apvts), responseCurve(p.getSampleRate(), p.apvts), nodeController(p.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), globalControls(p.apvts, nodeController), responseCurve(p.getSampleRate(), p.apvts), nodeController(p.apvts)
 
 {
     spectrumAnalyzer.reset(new SpectrumAnalyzer<juce::AudioBuffer<float>> (audioProcessor.getSampleRate(), audioProcessor.leftSCSFifo, audioProcessor.rightSCSFifo, audioProcessor.apvts));
@@ -21,7 +21,7 @@ ParametricEQAudioProcessorEditor::ParametricEQAudioProcessorEditor (ParametricEQ
     addAndMakeVisible(outputMeter);
     addAndMakeVisible(eqParamContainer);
     
-    addAndMakeVisible(analyzerControls);
+    addAndMakeVisible(globalControls);
     
     addAndMakeVisible(bypassButtonContainer);
     
@@ -63,9 +63,11 @@ void ParametricEQAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
     
-    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
+    
  
     bounds.reduce(OVERALL_MARGIN, OVERALL_MARGIN);
+    
+    auto bottomBounds = bounds.removeFromBottom(BOTTOM_CONTROLS_HEIGHT); // placeholder for bottom controls
     
     inputMeter.setBounds(bounds.removeFromLeft(SCALE_AND_METER_WIDTH));
     outputMeter.setBounds(bounds.removeFromRight(SCALE_AND_METER_WIDTH));
@@ -86,22 +88,8 @@ void ParametricEQAudioProcessorEditor::resized()
     responseCurve.setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     nodeController.setBounds(centerBounds.reduced(PARAM_CONTROLS_MARGIN));
     
-    // for future use, make room for square bounded controls
-    auto controlWidth = bottomBounds.getHeight();
+    globalControls.setBounds(bottomBounds);
     
-    //controls are square:
-    auto inTrimBounds = bottomBounds.removeFromLeft(controlWidth);
-    auto outTrimBounds = bottomBounds.removeFromRight(controlWidth);
-    bottomBounds.removeFromLeft(controlWidth / 2); //space between in trim and proc mode
-    auto procModeBounds = bottomBounds.removeFromLeft(controlWidth);
-    
-    // analyzer control has 4 buttons, but make it 4.5 = 9/2 for abit extra room.
-    auto analyzerControlBounds = bottomBounds.removeFromLeft(bottomBounds.getHeight() * 9  / 2);
-    
-    analyzerControls.setBounds(analyzerControlBounds);
-   
-    
-    auto resetAllBounds = bottomBounds; //Placeholder
 }
 
 

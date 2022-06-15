@@ -10,11 +10,12 @@
 
 #include "NodeController.h"
 #include "ChainHelpers.h"
+#include "GlobalParameters.h"
 #include <variant>
 
 // helper type for the variant visitor
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+template<class... Ts> struct Overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
 // monostate is the default variant and indicates an invalid state in this model.
 using WidgetVariant = std::variant<std::monostate, NodeController*, AnalyzerNode*, AnalyzerQControl*, AnalyzerBand*>;
@@ -114,7 +115,7 @@ void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event
     auto channelToString = [](Channel ch) { return ch == Channel::Left ? "L" : "R";};
     
     juce::String channelLabel;
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -201,7 +202,7 @@ void NodeController::resized()
 void NodeController::refreshWidgets()
 {
     auto bBox = fftBoundingBox.toFloat();
-    bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue("Processing Mode")->load()) != ChannelMode::Stereo;
+    bool drawRightMid = static_cast<ChannelMode>(apvts.getRawParameterValue(GlobalParameters::processingModeName)->load()) != ChannelMode::Stereo;
     
     for(uint i=0; i< 8; ++i)
     {
@@ -302,7 +303,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
   
     auto widgetVar = getEventsComponent(event);
     
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -341,7 +342,7 @@ void NodeController::mouseEnter(const juce::MouseEvent &event)
 void NodeController::mouseExit(const juce::MouseEvent &event)
 {
     auto widgetVar = getEventsComponent(event);
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -374,7 +375,7 @@ void NodeController::mouseDown(const juce::MouseEvent &event)
 {
     
     auto widgetVar = getEventsComponent(event);
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -455,7 +456,7 @@ void NodeController::mouseDrag(const juce::MouseEvent &event)
         updateNode(*node, fftBoundingBox.toFloat());
     };
 
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -494,7 +495,7 @@ void NodeController::mouseUp(const juce::MouseEvent &event)
 {
     auto widgetVar = getEventsComponent(event);
     
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
@@ -525,7 +526,7 @@ void NodeController::mouseDoubleClick(const juce::MouseEvent &event)
 {
     auto widgetVar = getEventsComponent(event);
     
-    std::visit(overloaded
+    std::visit(Overloaded
     {
         [&](AnalyzerNode* node)
         {
