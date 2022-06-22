@@ -41,6 +41,7 @@ struct FilterCoefficientGenerator : juce::Thread
             wait (waitTime);
             if (paramChanged.compareAndSetBool (false, true))
             {
+              //  DBG("Coef Gen fifo depth:" + std::to_string(paramFifo.getNumAvailableForReading()));
                 while (paramFifo.getNumAvailableForReading() >0)
                 {
                     ParamType params;

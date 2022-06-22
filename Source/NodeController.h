@@ -14,6 +14,7 @@
 #include "AllParamsListener.h"
 #include "ParameterAttachment.h"
 
+#define MOUSE_DEBUG false
 
 static const double widthOctaves {std::log2(20000.0 / 20.0)};
 

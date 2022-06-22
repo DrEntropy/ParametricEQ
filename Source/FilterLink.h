@@ -131,6 +131,10 @@ struct FilterLink
         if(fromFifo)
         {
             FifoDataType newCoefficients;
+            
+//            if(coeffFifo.getNumAvailableForReading() > 0)
+//                DBG("Filter Link fifo depth:" + std::to_string(coeffFifo.getNumAvailableForReading()));
+            
             while(coeffFifo.pull(newCoefficients))
             {
                 updateCoefficients(newCoefficients);

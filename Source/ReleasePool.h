@@ -47,6 +47,10 @@ struct ReleasePool : juce::Timer {
        if (newAddition.compareAndSetBool (false, true))
        {
            Ptr object;
+           
+//           if(holdFifo.getNumAvailableForReading() > 0)
+//                DBG("release fifo depth:" + std::to_string(holdFifo.getNumAvailableForReading()));
+           
            while (holdFifo.getNumAvailableForReading() >0)
            {
                bool exchangeSucceeded = holdFifo.exchange(object);

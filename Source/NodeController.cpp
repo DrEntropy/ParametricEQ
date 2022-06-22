@@ -109,6 +109,9 @@ std::tuple<float, float, float, bool> getParameterTuple(ChainPosition chainPos, 
 
 void NodeController::debugMouse(juce::String type, const juce::MouseEvent &event)
 {
+    if(!MOUSE_DEBUG)
+        return;
+    
     auto componentID =  event.originalComponent -> getComponentID();
     auto widgetVar = getEventsComponent(event);
     
